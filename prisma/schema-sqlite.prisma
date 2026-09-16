@@ -1,0 +1,371 @@
+// Схема базы данных для FamilyPay (SQLite версия для быстрого старта)
+// Для production используйте PostgreSQL (см. schema.prisma)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ПОЛЬЗОВАТЕЛИ И АУТЕНТИФИКАЦИЯ
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  phone         String?
+  image         String?
+  password      String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  accounts         Account[]
+  sessions         Session[]
+  familyMembers    FamilyMember[]
+  transactions     Transaction[]
+  budgets          Budget[]
+  goals            Goal[]
+  notifications    Notification[]
+  activityLogs     ActivityLog[]
+  createdFamilies  Family[]       @relation("FamilyCreator")
+  
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// СЕМЬЯ
+// ============================================
+
+model Family {
+  id          String   @id @default(cuid())
+  name        String
+  currency    String   @default("RUB")
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  createdBy       User               @relation("FamilyCreator", fields: [createdById], references: [id])
+  members         FamilyMember[]
+  accounts        FinancialAccount[]
+  transactions    Transaction[]
+  categories      Category[]
+  budgets         Budget[]
+  goals           Goal[]
+  recurringItems  RecurringTransaction[]
+  invitations     FamilyInvitation[]
+  
+  @@map("families")
+}
+
+model FamilyMember {
+  id       String     @id @default(cuid())
+  familyId String
+  userId   String
+  role     String     @default("VIEWER") // ADMIN, PARENT, TEEN, VIEWER
+  
+  joinedAt DateTime @default(now())
+  
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([familyId, userId])
+  @@map("family_members")
+}
+
+model FamilyInvitation {
+  id       String   @id @default(cuid())
+  familyId String
+  email    String
+  role     String   @default("VIEWER")
+  token    String   @unique
+  expires  DateTime
+  
+  createdAt DateTime @default(now())
+  
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  
+  @@map("family_invitations")
+}
+
+// ============================================
+// ФИНАНСОВЫЕ СЧЕТА
+// ============================================
+
+model FinancialAccount {
+  id          String      @id @default(cuid())
+  familyId    String
+  name        String
+  type        String      // CASH, BANK_ACCOUNT, CARD, SAVINGS, INVESTMENT, DEBT
+  balance     Float       @default(0)
+  currency    String      @default("RUB")
+  description String?
+  color       String?
+  icon        String?
+  isActive    Int         @default(1) // SQLite не имеет boolean
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  family            Family        @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  transactions      Transaction[]
+  goalAllocations   GoalAllocation[]
+  
+  @@map("financial_accounts")
+}
+
+// ============================================
+// КАТЕГОРИИ
+// ============================================
+
+model Category {
+  id          String       @id @default(cuid())
+  familyId    String?
+  name        String
+  type        String       // INCOME, EXPENSE
+  color       String?
+  icon        String?
+  parentId    String?
+  isSystem    Int          @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  family       Family?       @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  parent       Category?     @relation("CategorySubcategories", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subcategories Category[]   @relation("CategorySubcategories")
+  transactions Transaction[]
+  budgets      Budget[]
+  
+  @@map("categories")
+}
+
+// ============================================
+// ТРАНЗАКЦИИ
+// ============================================
+
+model Transaction {
+  id          String          @id @default(cuid())
+  familyId    String
+  accountId   String
+  categoryId  String?
+  userId      String
+  
+  type        String          // INCOME, EXPENSE, TRANSFER
+  amount      Float
+  currency    String          @default("RUB")
+  description String?
+  date        DateTime        @default(now())
+  
+  toAccountId String?
+  
+  location    String?
+  receipt     String?
+  tags        String?         // JSON array as string
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  family      Family           @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  account     FinancialAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category    Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  user        User             @relation(fields: [userId], references: [id])
+  
+  @@map("transactions")
+}
+
+// ============================================
+// ПОВТОРЯЮЩИЕСЯ ТРАНЗАКЦИИ
+// ============================================
+
+model RecurringTransaction {
+  id          String               @id @default(cuid())
+  familyId    String
+  accountId   String
+  categoryId  String?
+  
+  type        String               // INCOME, EXPENSE
+  amount      Float
+  currency    String               @default("RUB")
+  description String?
+  
+  frequency   String               // DAILY, WEEKLY, BIWEEKLY, MONTHLY, QUARTERLY, YEARLY
+  startDate   DateTime
+  endDate     DateTime?
+  nextDate    DateTime
+  
+  isActive    Int                  @default(1)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  
+  @@map("recurring_transactions")
+}
+
+// ============================================
+// БЮДЖЕТЫ
+// ============================================
+
+model Budget {
+  id          String       @id @default(cuid())
+  familyId    String
+  categoryId  String
+  userId      String
+  
+  name        String
+  amount      Float
+  currency    String       @default("RUB")
+  period      String       // WEEKLY, MONTHLY, QUARTERLY, YEARLY
+  startDate   DateTime
+  endDate     DateTime
+  
+  spent       Float        @default(0)
+  
+  isActive    Int          @default(1)
+  
+  alertAt50   Int          @default(1)
+  alertAt80   Int          @default(1)
+  alertAt100  Int          @default(1)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  family   Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+  
+  @@map("budgets")
+}
+
+// ============================================
+// ФИНАНСОВЫЕ ЦЕЛИ
+// ============================================
+
+model Goal {
+  id          String     @id @default(cuid())
+  familyId    String
+  userId      String
+  
+  name        String
+  description String?
+  targetAmount Float
+  currentAmount Float     @default(0)
+  currency    String     @default("RUB")
+  
+  targetDate  DateTime?
+  status      String     @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED, PAUSED
+  
+  color       String?
+  icon        String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  family      Family           @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id])
+  allocations GoalAllocation[]
+  
+  @@map("goals")
+}
+
+model GoalAllocation {
+  id        String   @id @default(cuid())
+  goalId    String
+  accountId String
+  amount    Float
+  date      DateTime @default(now())
+  note      String?
+  
+  goal    Goal             @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  account FinancialAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  @@map("goal_allocations")
+}
+
+// ============================================
+// УВЕДОМЛЕНИЯ
+// ============================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      String           // BUDGET_ALERT, GOAL_MILESTONE, RECURRING_DUE, LOW_BALANCE, LARGE_EXPENSE, FAMILY_INVITE, SYSTEM
+  title     String
+  message   String
+  data      String?          // JSON as string
+  isRead    Int              @default(0)
+  
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notifications")
+}
+
+// ============================================
+// ЖУРНАЛ АКТИВНОСТИ
+// ============================================
+
+model ActivityLog {
+  id          String         @id @default(cuid())
+  userId      String
+  action      String         // CREATE, UPDATE, DELETE, INVITE, JOIN, LEAVE
+  entityType  String
+  entityId    String
+  description String
+  metadata    String?        // JSON as string
+  
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("activity_logs")
+}
