@@ -1,0 +1,199 @@
+{
+  "header": {
+    "brand": "FamilyPay",
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "contact": "Contact"
+    },
+    "auth": {
+      "login": "Log In",
+      "register": "Sign Up"
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "language": {
+      "ru": "🇷🇺 RU",
+      "kg": "🇰🇬 KR",
+      "en": "🇬🇧 EN"
+    }
+  },
+  "hero": {
+    "badge": "A new level of family finances",
+    "title": {
+      "part1": "Family budget",
+      "part2": "under control"
+    },
+    "description": "Manage your whole family's finances in one app. Plan your budget, achieve goals, and track expenses together.",
+    "cta": {
+      "primary": "Start for Free",
+      "secondary": "Watch Demo"
+    },
+    "social_proof": {
+      "count": "10,000+",
+      "text": "families already use FamilyPay"
+    },
+    "video": {
+      "brand": "FamilyPay",
+      "title": {
+        "part1": "Achieve financial goals",
+        "part2": "together as a family"
+      },
+      "description": "Plan, save, and control — together it's easier"
+    }
+  },
+  "features": {
+    "badge": "Features",
+    "title": "Everything for managing family finances",
+    "description": "Powerful tools for budget control and achieving financial goals",
+    "items": [
+      {
+        "emoji": "👨‍👩‍👧‍👦",
+        "title": "Shared Access",
+        "description": "Add family members with different access levels. Everyone sees the complete financial picture."
+      },
+      {
+        "emoji": "📊",
+        "title": "Expense Analytics",
+        "description": "Detailed statistics by category. Understand where your money goes and optimize spending."
+      },
+      {
+        "emoji": "🎯",
+        "title": "Budgets & Limits",
+        "description": "Plan expenses by category. Get notifications when limits are exceeded."
+      },
+      {
+        "emoji": "💳",
+        "title": "Multiple Accounts",
+        "description": "Cash, cards, savings, investments — manage all accounts in one place."
+      },
+      {
+        "emoji": "🚀",
+        "title": "Financial Goals",
+        "description": "Save for vacation, a car, or education. Track your progress towards goals."
+      },
+      {
+        "emoji": "🔄",
+        "title": "Automation",
+        "description": "Set up recurring transactions. Salary, payments, and subscriptions are added automatically."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "value": "10K+",
+        "label": "Active Users"
+      },
+      {
+        "value": "500K+",
+        "label": "Transactions per Month"
+      },
+      {
+        "value": "98%",
+        "label": "Satisfied Clients"
+      },
+      {
+        "value": "24/7",
+        "label": "Support"
+      }
+    ]
+  },
+  "pricing": {
+    "badge": "Pricing",
+    "title": "Simple and transparent pricing",
+    "description": "Choose the plan that suits your family",
+    "plans": [
+      {
+        "name": "Basic",
+        "price": "Free",
+        "period": "",
+        "features": [
+          "Up to 3 family members",
+          "5 financial accounts",
+          "Basic analytics",
+          "3 active budgets"
+        ],
+        "cta": "Get Started",
+        "popular": false
+      },
+      {
+        "name": "Family",
+        "price": "$6.99",
+        "period": "/month",
+        "features": [
+          "Up to 10 family members",
+          "Unlimited accounts",
+          "Advanced analytics",
+          "Unlimited budgets and goals",
+          "Recurring transactions",
+          "Priority support"
+        ],
+        "cta": "Try Free",
+        "popular": true,
+        "badge": "⭐ Popular"
+      },
+      {
+        "name": "Premium",
+        "price": "$13.99",
+        "period": "/month",
+        "features": [
+          "Unlimited members",
+          "All Family features",
+          "AI expense analytics",
+          "Personal manager",
+          "API access"
+        ],
+        "cta": "Contact Us",
+        "popular": false
+      }
+    ]
+  },
+  "cta": {
+    "title": "Start managing your finances today",
+    "description": "Join thousands of families who already control their budget with FamilyPay",
+    "button": "Create Family Budget"
+  },
+  "footer": {
+    "brand": {
+      "name": "FamilyPay",
+      "description": "Modern solution for managing family budget"
+    },
+    "social": {
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "youtube": "YouTube"
+    },
+    "sections": {
+      "product": {
+        "title": "Product",
+        "links": [
+          { "label": "Features", "href": "#features" },
+          { "label": "Pricing", "href": "#pricing" },
+          { "label": "Demo", "href": "#demo" }
+        ]
+      },
+      "company": {
+        "title": "Company",
+        "links": [
+          { "label": "About Us", "href": "/about" },
+          { "label": "Blog", "href": "/blog" },
+          { "label": "Careers", "href": "/careers" }
+        ]
+      },
+      "contacts": {
+        "title": "Contact",
+        "email": "support@familypay.kg",
+        "phone": "+996 (312) 12-34-56",
+        "address": "Bishkek, Kyrgyzstan"
+      }
+    },
+    "bottom": {
+      "copyright": "© 2026 FamilyPay. All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    }
+  }
+}

@@ -1,9 +1,13 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/Header";
 import { StatsSection, CtaSection } from "./components/StatsSection";
+import { useLocale } from "./i18n/LocaleContext";
 
 export default function Home() {
+  const { t } = useLocale();
   return (
     <div className="min-h-screen bg-white dark:bg-[#0f1923] transition-colors duration-300">
       <Header />
@@ -18,14 +22,14 @@ export default function Home() {
             <div className="space-y-6 sm:space-y-8 order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#4FD1C5]/10 border border-[#4FD1C5]/30 rounded-full text-xs sm:text-sm font-medium text-[#0D6D6E] dark:text-[#4FD1C5]">
                 <span className="w-2 h-2 rounded-full bg-[#4FD1C5] animate-pulse flex-shrink-0" />
-                Новый уровень семейных финансов
+                {t.hero.badge}
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-                Семейный бюджет{" "}
+                {t.hero.title.part1}{" "}
                 <span className="relative inline-block">
                   <span className="bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
-                    под контролем
+                    {t.hero.title.part2}
                   </span>
                   <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none">
                     <path d="M2 8 Q75 2 150 8 Q225 14 298 8" stroke="url(#ul)" strokeWidth="3" strokeLinecap="round" fill="none" />
@@ -40,8 +44,7 @@ export default function Home() {
               </h1>
 
               <p className="text-base sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-lg">
-                Управляйте финансами всей семьи в одном приложении. Планируйте
-                бюджет, достигайте целей и следите за расходами вместе.
+                {t.hero.description}
               </p>
 
               <div className="flex flex-wrap gap-3 sm:gap-4">
@@ -49,7 +52,7 @@ export default function Home() {
                   href="/register"
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-2xl font-semibold text-sm sm:text-base shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 hover:-translate-y-1 transition-all duration-300"
                 >
-                  Начать бесплатно
+                  {t.hero.cta.primary}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -61,7 +64,7 @@ export default function Home() {
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                  Смотреть демо
+                  {t.hero.cta.secondary}
                 </Link>
               </div>
 
@@ -74,7 +77,7 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">10 000+</span> семей уже используют FamilyPay
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">{t.hero.social_proof.count}</span> {t.hero.social_proof.text}
                 </p>
               </div>
             </div>
@@ -88,15 +91,15 @@ export default function Home() {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
-                  <p className="text-white/70 text-xs font-semibold tracking-widest uppercase mb-1.5">FamilyPay</p>
+                  <p className="text-white/70 text-xs font-semibold tracking-widest uppercase mb-1.5">{t.hero.video.brand}</p>
                   <h2 className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-snug drop-shadow-lg">
-                    Достигайте финансовых целей{" "}
+                    {t.hero.video.title.part1}{" "}
                     <span className="bg-gradient-to-r from-[#4FD1C5] to-[#a7f3d0] bg-clip-text text-transparent">
-                      всей семьёй
+                      {t.hero.video.title.part2}
                     </span>
                   </h2>
                   <p className="text-white/60 text-xs sm:text-sm mt-2 leading-relaxed">
-                    Планируйте, копите и контролируйте — вместе это проще
+                    {t.hero.video.description}
                   </p>
                 </div>
               </div>
@@ -111,18 +114,18 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16 space-y-4">
             <span className="inline-block px-4 py-1.5 bg-[#4FD1C5]/10 text-[#0D6D6E] dark:text-[#4FD1C5] text-sm font-semibold rounded-full border border-[#4FD1C5]/20">
-              Возможности
+              {t.features.badge}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white px-4">
-              Всё для управления семейными финансами
+              {t.features.title}
             </h2>
             <p className="text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto px-4">
-              Мощные инструменты для контроля бюджета и достижения финансовых целей
+              {t.features.description}
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {features.map((f, i) => (
+            {t.features.items.map((f, i) => (
               <div
                 key={i}
                 className="group relative p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
@@ -136,7 +139,7 @@ export default function Home() {
                     <span className="text-xl sm:text-2xl">{f.emoji}</span>
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">{f.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{f.description}</p>
                 </div>
               </div>
             ))}
@@ -152,43 +155,30 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16 space-y-4">
             <span className="inline-block px-4 py-1.5 bg-[#4FD1C5]/10 text-[#0D6D6E] dark:text-[#4FD1C5] text-sm font-semibold rounded-full border border-[#4FD1C5]/20">
-              Тарифы
+              {t.pricing.badge}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-              Простые и прозрачные тарифы
+              {t.pricing.title}
             </h2>
             <p className="text-base sm:text-lg text-gray-500 dark:text-gray-400">
-              Выберите план, который подходит вашей семье
+              {t.pricing.description}
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
-            <PricingCard
-              name="Базовый"
-              price="Бесплатно"
-              features={["До 3 членов семьи", "5 финансовых счетов", "Базовая аналитика", "3 активных бюджета"]}
-              cta="Начать"
-              href="/register"
-              popular={false}
-            />
-            <PricingCard
-              name="Семейный"
-              price="499 сом"
-              period="/месяц"
-              features={["До 10 членов семьи", "Неограниченно счетов", "Расширенная аналитика", "Неограниченно бюджетов и целей", "Повторяющиеся транзакции", "Приоритетная поддержка"]}
-              cta="Попробовать бесплатно"
-              href="/register"
-              popular={true}
-            />
-            <PricingCard
-              name="Премиум"
-              price="999 сом"
-              period="/месяц"
-              features={["Неограниченно членов", "Все возможности Семейного", "AI-аналитика расходов", "Персональный менеджер", "API доступ"]}
-              cta="Связаться с нами"
-              href="/contact"
-              popular={false}
-            />
+            {t.pricing.plans.map((plan, idx) => (
+              <PricingCard
+                key={idx}
+                name={plan.name}
+                price={plan.price}
+                period={plan.period}
+                features={plan.features}
+                cta={plan.cta}
+                href={plan.name === t.pricing.plans[2].name ? "/contact" : "/register"}
+                popular={plan.popular}
+                badge={plan.popular ? plan.badge : undefined}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -213,13 +203,17 @@ export default function Home() {
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="flex items-center gap-2.5 mb-4">
                 <Image src="/logo.png" alt="FamilyPay Logo" width={32} height={32} className="w-8 h-8" />
-                <span className="text-xl font-bold text-white">FamilyPay</span>
+                <span className="text-xl font-bold text-white">{t.footer.brand.name}</span>
               </Link>
               <p className="text-sm leading-relaxed mb-5">
-                Современное решение для управления семейным бюджетом
+                {t.footer.brand.description}
               </p>
               <div className="flex gap-2.5">
-                {[{ icon: "𝕏", label: "Twitter" }, { icon: "in", label: "LinkedIn" }, { icon: "▶", label: "YouTube" }].map((s) => (
+                {[
+                  { icon: "𝕏", label: t.footer.social.twitter },
+                  { icon: "in", label: t.footer.social.linkedin },
+                  { icon: "▶", label: t.footer.social.youtube }
+                ].map((s) => (
                   <button
                     key={s.label}
                     aria-label={s.label}
@@ -233,40 +227,40 @@ export default function Home() {
 
             {/* product */}
             <div>
-              <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">Продукт</h4>
+              <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">{t.footer.sections.product.title}</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><Link href="#features" className="hover:text-[#4FD1C5] transition-colors">Возможности</Link></li>
-                <li><Link href="#pricing" className="hover:text-[#4FD1C5] transition-colors">Тарифы</Link></li>
-                <li><Link href="#demo" className="hover:text-[#4FD1C5] transition-colors">Демо</Link></li>
+                {t.footer.sections.product.links.map((link, i) => (
+                  <li key={i}><Link href={link.href} className="hover:text-[#4FD1C5] transition-colors">{link.label}</Link></li>
+                ))}
               </ul>
             </div>
 
             {/* company */}
             <div>
-              <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">Компания</h4>
+              <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">{t.footer.sections.company.title}</h4>
               <ul className="space-y-2.5 text-sm">
-                <li><Link href="/about" className="hover:text-[#4FD1C5] transition-colors">О нас</Link></li>
-                <li><Link href="/blog" className="hover:text-[#4FD1C5] transition-colors">Блог</Link></li>
-                <li><Link href="/careers" className="hover:text-[#4FD1C5] transition-colors">Карьера</Link></li>
+                {t.footer.sections.company.links.map((link, i) => (
+                  <li key={i}><Link href={link.href} className="hover:text-[#4FD1C5] transition-colors">{link.label}</Link></li>
+                ))}
               </ul>
             </div>
 
             {/* contacts */}
             <div>
-              <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">Контакты</h4>
+              <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">{t.footer.sections.contacts.title}</h4>
               <ul className="space-y-2.5 text-sm">
-                <li className="flex items-start gap-2"><span>✉️</span><span>support@familypay.kg</span></li>
-                <li className="flex items-start gap-2"><span>📞</span><span>+996 (312) 12-34-56</span></li>
-                <li className="flex items-start gap-2"><span>📍</span><span>Бишкек, Кыргызстан</span></li>
+                <li className="flex items-start gap-2"><span>✉️</span><span>{t.footer.sections.contacts.email}</span></li>
+                <li className="flex items-start gap-2"><span>📞</span><span>{t.footer.sections.contacts.phone}</span></li>
+                <li className="flex items-start gap-2"><span>📍</span><span>{t.footer.sections.contacts.address}</span></li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
-            <p>© 2026 FamilyPay. Все права защищены.</p>
+            <p>{t.footer.bottom.copyright}</p>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-              <Link href="/privacy" className="hover:text-[#4FD1C5] transition-colors">Политика конфиденциальности</Link>
-              <Link href="/terms" className="hover:text-[#4FD1C5] transition-colors">Условия использования</Link>
+              <Link href="/privacy" className="hover:text-[#4FD1C5] transition-colors">{t.footer.bottom.privacy}</Link>
+              <Link href="/terms" className="hover:text-[#4FD1C5] transition-colors">{t.footer.bottom.terms}</Link>
             </div>
           </div>
         </div>
@@ -275,20 +269,10 @@ export default function Home() {
   );
 }
 
-// ─── Feature data ──────────────────────────────────────────────
-const features = [
-  { emoji: "👨‍👩‍👧‍👦", title: "Совместный доступ", desc: "Добавляйте членов семьи с разными уровнями доступа. Каждый видит общую картину финансов." },
-  { emoji: "📊", title: "Аналитика расходов", desc: "Детальная статистика по категориям. Понимайте, на что уходят деньги и оптимизируйте траты." },
-  { emoji: "🎯", title: "Бюджеты и лимиты", desc: "Планируйте расходы по категориям. Получайте уведомления при превышении лимитов." },
-  { emoji: "💳", title: "Множество счетов", desc: "Наличные, карты, сбережения, инвестиции — управляйте всеми счетами в одном месте." },
-  { emoji: "🚀", title: "Финансовые цели", desc: "Копите на отпуск, автомобиль или образование. Отслеживайте прогресс достижения целей." },
-  { emoji: "🔄", title: "Автоматизация", desc: "Настройте повторяющиеся транзакции. Зарплата, платежи и подписки добавляются автоматически." },
-];
-
 // ─── Pricing card ──────────────────────────────────────────────
-function PricingCard({ name, price, period, features, cta, href, popular }: {
+function PricingCard({ name, price, period, features, cta, href, popular, badge }: {
   name: string; price: string; period?: string;
-  features: string[]; cta: string; href: string; popular: boolean;
+  features: string[]; cta: string; href: string; popular: boolean; badge?: string;
 }) {
   return (
     <div className={`relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col transition-all duration-300 hover:-translate-y-1 ${
@@ -296,9 +280,9 @@ function PricingCard({ name, price, period, features, cta, href, popular }: {
         ? "bg-gradient-to-b from-[#0D6D6E] to-[#0a5758] text-white shadow-2xl shadow-teal-700/40 sm:scale-105"
         : "bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:shadow-xl hover:shadow-teal-500/10"
     }`}>
-      {popular && (
+      {popular && badge && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-[#4FD1C5] to-[#38bdf8] text-white text-xs font-bold rounded-full shadow-lg whitespace-nowrap">
-          ⭐ Популярный
+          {badge}
         </div>
       )}
       <div className="mb-5 sm:mb-6">

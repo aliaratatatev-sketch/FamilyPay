@@ -2,15 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-const stats = [
-  { value: '10K+', label: 'Активных пользователей' },
-  { value: '500K+', label: 'Транзакций в месяц' },
-  { value: '98%', label: 'Довольных клиентов' },
-  { value: '24/7', label: 'Поддержка' },
-];
+import { useLocale } from '../i18n/LocaleContext';
 
 export function StatsSection() {
+  const { t } = useLocale();
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
@@ -30,7 +25,7 @@ export function StatsSection() {
     <section className="py-40 transition-all duration-500" style={{ background: dark ? bgDark : bgLight }}>
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 text-center text-white">
-          {stats.map((s, i) => (
+          {t.stats.items.map((s, i) => (
             <div key={i} className="space-y-2">
               <div className="text-4xl sm:text-5xl font-black drop-shadow-lg">{s.value}</div>
               <div className="text-teal-100 text-xs sm:text-sm font-medium">{s.label}</div>
@@ -43,6 +38,7 @@ export function StatsSection() {
 }
 
 export function CtaSection() {
+  const { t } = useLocale();
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
@@ -66,16 +62,16 @@ export function CtaSection() {
       </div>
       <div className="relative z-10 container mx-auto px-6 text-center">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-          Начните управлять финансами сегодня
+          {t.cta.title}
         </h2>
         <p className="text-lg sm:text-xl text-teal-100 mb-10 max-w-2xl mx-auto">
-          Присоединяйтесь к тысячам семей, которые уже контролируют свой бюджет с FamilyPay
+          {t.cta.description}
         </p>
         <Link
           href="/register"
           className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 bg-white text-[#0D6D6E] rounded-2xl font-bold text-base sm:text-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
         >
-          Создать семейный бюджет
+          {t.cta.button}
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
