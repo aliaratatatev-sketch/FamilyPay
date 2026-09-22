@@ -1,0 +1,228 @@
+{
+  "nav": {
+    "dashboard": "Дашборд",
+    "users": "Пользователи",
+    "families": "Семьи",
+    "categories": "Категории",
+    "accounts": "Счета",
+    "transactions": "Транзакции",
+    "budgets": "Бюджеты",
+    "goals": "Цели"
+  },
+  "header": {
+    "adminPanel": "Админ-панель",
+    "admin": "Администратор",
+    "logout": "Выйти"
+  },
+  "dashboard": {
+    "title": "Дашборд",
+    "subtitle": "Обзор системы FamilyPay",
+    "stats": {
+      "users": "Пользователи",
+      "families": "Семьи",
+      "transactions": "Транзакции",
+      "accounts": "Счета",
+      "categories": "Категории",
+      "budgets": "Бюджеты",
+      "goals": "Цели"
+    },
+    "recentTransactions": {
+      "title": "Транзакции за 30 дней",
+      "income": "Доходы (30 дней)",
+      "expense": "Расходы (30 дней)",
+      "transfer": "Переводы (30 дней)",
+      "amount": "На сумму"
+    },
+    "recentActivity": {
+      "title": "Последняя активность"
+    },
+    "topFamilies": {
+      "title": "Топ семей"
+    },
+    "loading": "Загрузка статистики...",
+    "error": "Ошибка загрузки данных"
+  },
+  "users": {
+    "title": "Пользователи",
+    "subtitle": "Управление пользователями системы",
+    "add": "Добавить пользователя",
+    "search": "Поиск по email или имени...",
+    "table": {
+      "user": "Пользователь",
+      "families": "Семьи",
+      "activity": "Активность",
+      "registered": "Дата регистрации",
+      "actions": "Действия"
+    },
+    "modal": {
+      "create": "Создать пользователя",
+      "edit": "Редактировать пользователя",
+      "email": "Email",
+      "name": "Имя",
+      "phone": "Телефон",
+      "password": "Пароль",
+      "passwordHint": "(оставьте пустым, чтобы не менять)",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "create_btn": "Создать"
+    },
+    "delete": "Удалить пользователя?"
+  },
+  "families": {
+    "title": "Семьи",
+    "subtitle": "Управление семьями и их членами",
+    "add": "Создать семью",
+    "search": "Поиск семей...",
+    "created": "Создана",
+    "members": "Члены",
+    "accounts": "Счета",
+    "operations": "Операции",
+    "budgets": "Бюджеты",
+    "goals": "Цели",
+    "membersLabel": "Члены семьи:",
+    "modal": {
+      "create": "Создать семью",
+      "edit": "Редактировать семью",
+      "name": "Название",
+      "currency": "Валюта",
+      "creatorId": "ID создателя",
+      "creatorIdPlaceholder": "ID пользователя-администратора",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "create_btn": "Создать"
+    },
+    "delete": "Удалить семью? Это удалит все связанные данные!"
+  },
+  "categories": {
+    "title": "Категории",
+    "subtitle": "Управление категориями доходов и расходов",
+    "add": "Создать категорию",
+    "all": "Все",
+    "income": "Доходы",
+    "expense": "Расходы",
+    "operations": "Операций",
+    "budgets": "Бюджетов",
+    "subcategories": "Подкат.",
+    "subcategoriesLabel": "Подкатегории:",
+    "family": "Семья",
+    "system": "Системная",
+    "modal": {
+      "create": "Создать категорию",
+      "edit": "Редактировать категорию",
+      "name": "Название",
+      "type": "Тип",
+      "typeIncome": "Доход",
+      "typeExpense": "Расход",
+      "icon": "Иконка",
+      "color": "Цвет",
+      "isSystem": "Системная категория (нельзя удалить)",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "create_btn": "Создать"
+    },
+    "delete": "Удалить категорию?"
+  },
+  "accounts": {
+    "title": "Финансовые счета",
+    "subtitle": "Управление счетами и балансами",
+    "add": "Создать счёт",
+    "balance": "Баланс",
+    "operations": "Операций",
+    "onGoals": "На цели",
+    "family": "Семья",
+    "inactive": "Неактивен",
+    "types": {
+      "CASH": "Наличные",
+      "BANK_ACCOUNT": "Банковский счёт",
+      "CARD": "Карта",
+      "SAVINGS": "Накопления",
+      "INVESTMENT": "Инвестиции",
+      "DEBT": "Долг"
+    },
+    "modal": {
+      "create": "Создать счёт",
+      "edit": "Редактировать счёт",
+      "familyId": "ID семьи",
+      "name": "Название",
+      "type": "Тип",
+      "balance": "Баланс",
+      "currency": "Валюта",
+      "description": "Описание",
+      "icon": "Иконка",
+      "color": "Цвет",
+      "isActive": "Счёт активен",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "create_btn": "Создать"
+    },
+    "delete": "Удалить счёт?"
+  },
+  "transactions": {
+    "title": "Транзакции",
+    "subtitle": "История всех финансовых операций",
+    "all": "Все",
+    "income": "Доходы",
+    "expense": "Расходы",
+    "transfer": "Переводы",
+    "table": {
+      "date": "Дата",
+      "type": "Тип",
+      "description": "Описание",
+      "category": "Категория",
+      "account": "Счёт",
+      "amount": "Сумма",
+      "actions": "Действия"
+    },
+    "types": {
+      "INCOME": "Доход",
+      "EXPENSE": "Расход",
+      "TRANSFER": "Перевод"
+    },
+    "noDescription": "Без описания",
+    "delete": "Удалить транзакцию?"
+  },
+  "budgets": {
+    "title": "Бюджеты",
+    "subtitle": "Управление бюджетами семей",
+    "progress": "Прогресс",
+    "spent": "Потрачено",
+    "limit": "Лимит",
+    "remaining": "Осталось",
+    "family": "Семья",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "delete": "Удалить бюджет?"
+  },
+  "goals": {
+    "title": "Финансовые цели",
+    "subtitle": "Управление целями накоплений",
+    "all": "Все",
+    "active": "Активные",
+    "completed": "Достигнутые",
+    "progress": "Прогресс",
+    "saved": "Накоплено",
+    "target": "Цель",
+    "remaining": "Осталось",
+    "allocations": "Последние пополнения",
+    "family": "Семья",
+    "targetBy": "Цель до",
+    "noDescription": "Без описания",
+    "status": {
+      "ACTIVE": "Активна",
+      "COMPLETED": "Достигнута",
+      "CANCELLED": "Отменена",
+      "PAUSED": "Приостановлена"
+    },
+    "delete": "Удалить цель?"
+  },
+  "pagination": {
+    "back": "Назад",
+    "next": "Далее",
+    "page": "Страница",
+    "of": "из"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "more": "ещё"
+  }
+}

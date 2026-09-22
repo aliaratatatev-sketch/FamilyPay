@@ -1,0 +1,228 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "families": "Families",
+    "categories": "Categories",
+    "accounts": "Accounts",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "goals": "Goals"
+  },
+  "header": {
+    "adminPanel": "Admin Panel",
+    "admin": "Administrator",
+    "logout": "Log Out"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "FamilyPay System Overview",
+    "stats": {
+      "users": "Users",
+      "families": "Families",
+      "transactions": "Transactions",
+      "accounts": "Accounts",
+      "categories": "Categories",
+      "budgets": "Budgets",
+      "goals": "Goals"
+    },
+    "recentTransactions": {
+      "title": "30 Days Transactions",
+      "income": "Income (30 days)",
+      "expense": "Expenses (30 days)",
+      "transfer": "Transfers (30 days)",
+      "amount": "Amount"
+    },
+    "recentActivity": {
+      "title": "Recent Activity"
+    },
+    "topFamilies": {
+      "title": "Top Families"
+    },
+    "loading": "Loading statistics...",
+    "error": "Error loading data"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "System users management",
+    "add": "Add User",
+    "search": "Search by email or name...",
+    "table": {
+      "user": "User",
+      "families": "Families",
+      "activity": "Activity",
+      "registered": "Registration Date",
+      "actions": "Actions"
+    },
+    "modal": {
+      "create": "Create User",
+      "edit": "Edit User",
+      "email": "Email",
+      "name": "Name",
+      "phone": "Phone",
+      "password": "Password",
+      "passwordHint": "(leave blank to keep unchanged)",
+      "cancel": "Cancel",
+      "save": "Save",
+      "create_btn": "Create"
+    },
+    "delete": "Delete user?"
+  },
+  "families": {
+    "title": "Families",
+    "subtitle": "Manage families and their members",
+    "add": "Create Family",
+    "search": "Search families...",
+    "created": "Created",
+    "members": "Members",
+    "accounts": "Accounts",
+    "operations": "Operations",
+    "budgets": "Budgets",
+    "goals": "Goals",
+    "membersLabel": "Family members:",
+    "modal": {
+      "create": "Create Family",
+      "edit": "Edit Family",
+      "name": "Name",
+      "currency": "Currency",
+      "creatorId": "Creator ID",
+      "creatorIdPlaceholder": "Admin user ID",
+      "cancel": "Cancel",
+      "save": "Save",
+      "create_btn": "Create"
+    },
+    "delete": "Delete family? This will delete all related data!"
+  },
+  "categories": {
+    "title": "Categories",
+    "subtitle": "Manage income and expense categories",
+    "add": "Create Category",
+    "all": "All",
+    "income": "Income",
+    "expense": "Expenses",
+    "operations": "Operations",
+    "budgets": "Budgets",
+    "subcategories": "Subcat.",
+    "subcategoriesLabel": "Subcategories:",
+    "family": "Family",
+    "system": "System",
+    "modal": {
+      "create": "Create Category",
+      "edit": "Edit Category",
+      "name": "Name",
+      "type": "Type",
+      "typeIncome": "Income",
+      "typeExpense": "Expense",
+      "icon": "Icon",
+      "color": "Color",
+      "isSystem": "System category (cannot be deleted)",
+      "cancel": "Cancel",
+      "save": "Save",
+      "create_btn": "Create"
+    },
+    "delete": "Delete category?"
+  },
+  "accounts": {
+    "title": "Financial Accounts",
+    "subtitle": "Manage accounts and balances",
+    "add": "Create Account",
+    "balance": "Balance",
+    "operations": "Operations",
+    "onGoals": "On Goals",
+    "family": "Family",
+    "inactive": "Inactive",
+    "types": {
+      "CASH": "Cash",
+      "BANK_ACCOUNT": "Bank Account",
+      "CARD": "Card",
+      "SAVINGS": "Savings",
+      "INVESTMENT": "Investment",
+      "DEBT": "Debt"
+    },
+    "modal": {
+      "create": "Create Account",
+      "edit": "Edit Account",
+      "familyId": "Family ID",
+      "name": "Name",
+      "type": "Type",
+      "balance": "Balance",
+      "currency": "Currency",
+      "description": "Description",
+      "icon": "Icon",
+      "color": "Color",
+      "isActive": "Account is active",
+      "cancel": "Cancel",
+      "save": "Save",
+      "create_btn": "Create"
+    },
+    "delete": "Delete account?"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "History of all financial operations",
+    "all": "All",
+    "income": "Income",
+    "expense": "Expenses",
+    "transfer": "Transfers",
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "category": "Category",
+      "account": "Account",
+      "amount": "Amount",
+      "actions": "Actions"
+    },
+    "types": {
+      "INCOME": "Income",
+      "EXPENSE": "Expense",
+      "TRANSFER": "Transfer"
+    },
+    "noDescription": "No description",
+    "delete": "Delete transaction?"
+  },
+  "budgets": {
+    "title": "Budgets",
+    "subtitle": "Manage family budgets",
+    "progress": "Progress",
+    "spent": "Spent",
+    "limit": "Limit",
+    "remaining": "Remaining",
+    "family": "Family",
+    "active": "Active",
+    "inactive": "Inactive",
+    "delete": "Delete budget?"
+  },
+  "goals": {
+    "title": "Financial Goals",
+    "subtitle": "Manage savings goals",
+    "all": "All",
+    "active": "Active",
+    "completed": "Completed",
+    "progress": "Progress",
+    "saved": "Saved",
+    "target": "Target",
+    "remaining": "Remaining",
+    "allocations": "Recent allocations",
+    "family": "Family",
+    "targetBy": "Target by",
+    "noDescription": "No description",
+    "status": {
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "PAUSED": "Paused"
+    },
+    "delete": "Delete goal?"
+  },
+  "pagination": {
+    "back": "Back",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  },
+  "common": {
+    "loading": "Loading...",
+    "more": "more"
+  }
+}
