@@ -161,7 +161,7 @@ export default function Header() {
               {t.header.auth.login}
             </Link>
             <Link
-              href="/register"
+              href="/login"
               className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl hover:shadow-lg hover:shadow-[#4FD1C5]/30 hover:-translate-y-0.5 transition-all duration-200"
             >
               {t.header.auth.register}

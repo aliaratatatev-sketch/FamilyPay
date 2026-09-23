@@ -20,6 +20,31 @@
       "en": "🇬🇧 EN"
     }
   },
+  "auth": {
+    "login": {
+      "title": "Кош келиңиз!",
+      "subtitle": "Каржыны башкаруу үчүн кириңиз",
+      "email": "Email",
+      "password": "Сыр сөз",
+      "submit": "Кирүү",
+      "googleButton": "Google аркылуу кирүү",
+      "or": "же"
+    },
+    "register": {
+      "title": "Аккаунт түзүү",
+      "subtitle": "Каттоодон өтүп, азыр эле баштаңыз",
+      "name": "Ат",
+      "email": "Email",
+      "password": "Сыр сөз",
+      "submit": "Каттоо",
+      "googleButton": "Google аркылуу кирүү"
+    },
+    "tabs": {
+      "login": "Кирүү",
+      "register": "Катталуу"
+    },
+    "backHome": "← Башкы бетке кайтуу"
+  },
   "hero": {
     "badge": "Үй-бүлөлүк каржынын жаңы деңгээли",
     "title": {

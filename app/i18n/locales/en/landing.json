@@ -20,6 +20,31 @@
       "en": "🇬🇧 EN"
     }
   },
+  "auth": {
+    "login": {
+      "title": "Welcome back!",
+      "subtitle": "Sign in to manage your finances",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log In",
+      "googleButton": "Sign in with Google",
+      "or": "or"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Sign up and get started now",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign Up",
+      "googleButton": "Sign in with Google"
+    },
+    "tabs": {
+      "login": "Log In",
+      "register": "Sign Up"
+    },
+    "backHome": "← Back to home"
+  },
   "hero": {
     "badge": "A new level of family finances",
     "title": {

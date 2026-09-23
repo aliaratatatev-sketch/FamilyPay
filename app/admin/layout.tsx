@@ -90,7 +90,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             <div className="p-4 rounded-xl bg-gradient-to-br from-[#0D6D6E]/10 to-[#4FD1C5]/10 border border-[#4FD1C5]/20">
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{t.header.admin}</p>
               <p className="text-sm font-semibold text-gray-900 dark:text-white">Admin User</p>
-              <button className="mt-3 text-xs text-[#0D6D6E] dark:text-[#4FD1C5] font-medium hover:underline">
+              <button 
+                onClick={async () => {
+                  await fetch('/api/auth/logout', { method: 'POST' });
+                  window.location.href = '/login';
+                }}
+                className="mt-3 text-xs text-[#0D6D6E] dark:text-[#4FD1C5] font-medium hover:underline"
+              >
                 {t.header.logout}
               </button>
             </div>

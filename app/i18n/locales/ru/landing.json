@@ -20,6 +20,31 @@
       "en": "🇬🇧 EN"
     }
   },
+  "auth": {
+    "login": {
+      "title": "Добро пожаловать!",
+      "subtitle": "Войдите для управления финансами",
+      "email": "Email",
+      "password": "Пароль",
+      "submit": "Войти",
+      "googleButton": "Войти через Google",
+      "or": "или"
+    },
+    "register": {
+      "title": "Создать аккаунт",
+      "subtitle": "Зарегистрируйтесь и начните прямо сейчас",
+      "name": "Имя",
+      "email": "Email",
+      "password": "Пароль",
+      "submit": "Зарегистрироваться",
+      "googleButton": "Войти через Google"
+    },
+    "tabs": {
+      "login": "Войти",
+      "register": "Регистрация"
+    },
+    "backHome": "← Вернуться на главную"
+  },
   "hero": {
     "badge": "Новый уровень семейных финансов",
     "title": {
