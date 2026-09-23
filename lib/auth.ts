@@ -51,7 +51,32 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      console.log('✅ SignIn callback triggered');
+      console.log('User:', user?.email);
+      console.log('Account provider:', account?.provider);
+      // Разрешаем вход
+      return true;
+    },
+    async redirect({ url, baseUrl }) {
+      console.log('🔄 Redirect callback triggered');
+      console.log('URL:', url);
+      console.log('BaseURL:', baseUrl);
+      
+      // После успешного входа перенаправляем на dashboard
+      if (url.startsWith('/')) {
+        console.log('Redirecting to:', `${baseUrl}${url}`);
+        return `${baseUrl}${url}`;
+      }
+      else if (new URL(url).origin === baseUrl) {
+        console.log('Redirecting to:', url);
+        return url;
+      }
+      console.log('Redirecting to dashboard:', `${baseUrl}/dashboard`);
+      return `${baseUrl}/dashboard`;
+    },
     async session({ session, token, user }) {
+      console.log('📝 Session callback triggered');
       if (session.user) {
         session.user.id = token.sub || user?.id || '';
         
@@ -64,14 +89,17 @@ export const authOptions: NextAuthOptions = {
           
           if (dbUser) {
             session.user.role = dbUser.role;
+            console.log('User role:', dbUser.role);
           }
         }
       }
       return session;
     },
     async jwt({ token, user, account }) {
+      console.log('🔑 JWT callback triggered');
       if (user) {
         token.sub = user.id;
+        console.log('User ID:', user.id);
       }
       
       // Добавляем роль в токен при входе
@@ -82,6 +110,7 @@ export const authOptions: NextAuthOptions = {
         });
         if (dbUser) {
           token.role = dbUser.role;
+          console.log('Token role set:', dbUser.role);
         }
       }
       

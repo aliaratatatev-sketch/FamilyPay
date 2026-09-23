@@ -19,19 +19,12 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const result = await signIn('google', {
+      // Используем redirect: true для автоматического перенаправления
+      await signIn('google', {
         callbackUrl: '/dashboard',
-        redirect: false,
       });
-
-      if (result?.error) {
-        setError('Ошибка входа через Google');
-      } else if (result?.url) {
-        router.push(result.url);
-      }
     } catch (err) {
       setError('Ошибка соединения с сервером');
-    } finally {
       setLoading(false);
     }
   };

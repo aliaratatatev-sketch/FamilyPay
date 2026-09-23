@@ -10,10 +10,16 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // Если точно не авторизован, редирект
     if (status === 'unauthenticated') {
-      router.push('/login');
+      console.log('🔴 User unauthenticated, redirecting to /login');
+      router.replace('/login');
     }
-  }, [status, router]);
+    
+    if (status === 'authenticated') {
+      console.log('✅ User authenticated:', session?.user?.email);
+    }
+  }, [status, router, session]);
 
   if (status === 'loading') {
     return (
@@ -23,8 +29,8 @@ export default function DashboardPage() {
     );
   }
 
-  if (!session) {
-    return null;
+  if (status === 'unauthenticated') {
+    return null; // Показываем пустоту пока идет редирект
   }
 
   return (
