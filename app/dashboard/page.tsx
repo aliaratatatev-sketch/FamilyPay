@@ -247,25 +247,19 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Debug Info */}
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-200 font-semibold mb-2">
-            🔍 Отладочная информация:
-          </p>
-          <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1 font-mono">
-            <p>Email: {session?.user?.email || 'Нет email'}</p>
-            <p>Имя: {session?.user?.name || 'Нет имени'}</p>
-            <p>Роль в БД: {session?.user?.role || 'Нет роли'}</p>
-            <p>isAdmin (состояние): {isAdmin ? '✅ Да' : '❌ Нет'}</p>
-            <p>hasAdminAccess (состояние): {hasAdminAccess ? '✅ Да' : '❌ Нет'}</p>
-          </div>
-        </div>
-
-        {session.user?.role === 'ADMIN' && (
-          <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              🔑 Вы администратор по роли БД. <Link href="/admin" className="underline font-semibold">Перейти в админ-панель</Link>
+        {/* Debug Info - только для администраторов */}
+        {isAdmin && (
+          <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-200 font-semibold mb-2">
+              🔍 Отладочная информация (только для администраторов):
             </p>
+            <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1 font-mono">
+              <p>Email: {session?.user?.email || 'Нет email'}</p>
+              <p>Имя: {session?.user?.name || 'Нет имени'}</p>
+              <p>Роль в БД: {session?.user?.role || 'Нет роли'}</p>
+              <p>isAdmin (состояние): {isAdmin ? '✅ Да' : '❌ Нет'}</p>
+              <p>hasAdminAccess (состояние): {hasAdminAccess ? '✅ Да' : '❌ Нет'}</p>
+            </div>
           </div>
         )}
       </main>
