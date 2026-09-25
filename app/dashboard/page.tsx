@@ -2,12 +2,16 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import AdminAccessModal from '../components/AdminAccessModal';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [hasAdminAccess, setHasAdminAccess] = useState(false);
 
   useEffect(() => {
     // Если точно не авторизован, редирект
@@ -18,8 +22,39 @@ export default function DashboardPage() {
     
     if (status === 'authenticated') {
       console.log('✅ User authenticated:', session?.user?.email);
+      checkAdminAccess();
     }
   }, [status, router, session]);
+
+  const checkAdminAccess = async () => {
+    try {
+      console.log('🔍 Checking admin access...');
+      const response = await fetch('/api/admin/check-access');
+      const data = await response.json();
+      
+      console.log('📋 Admin access response:', data);
+      console.log('📧 Current user email:', session?.user?.email);
+      
+      setIsAdmin(data.isAdmin || false);
+      setHasAdminAccess(data.hasAccess || false);
+      
+      if (data.isAdmin) {
+        console.log('✅ User is admin, button will be visible');
+      } else {
+        console.log('❌ User is NOT admin, button will be hidden');
+      }
+    } catch (error) {
+      console.error('❌ Error checking admin access:', error);
+    }
+  };
+
+  const handleAdminPanelClick = () => {
+    if (hasAdminAccess) {
+      router.push('/admin');
+    } else {
+      setShowAdminModal(true);
+    }
+  };
 
   if (status === 'loading') {
     return (
@@ -56,6 +91,17 @@ export default function DashboardPage() {
                 {session.user?.name || session.user?.email}
               </p>
             </div>
+            
+            {isAdmin && (
+              <button
+                onClick={handleAdminPanelClick}
+                className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-lg hover:shadow-lg transition flex items-center gap-2"
+              >
+                <span>🔐</span>
+                <span>Админ-панель</span>
+              </button>
+            )}
+            
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
@@ -202,14 +248,33 @@ export default function DashboardPage() {
         </div>
 
         {/* Debug Info */}
+        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-sm text-blue-800 dark:text-blue-200 font-semibold mb-2">
+            🔍 Отладочная информация:
+          </p>
+          <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1 font-mono">
+            <p>Email: {session?.user?.email || 'Нет email'}</p>
+            <p>Имя: {session?.user?.name || 'Нет имени'}</p>
+            <p>Роль в БД: {session?.user?.role || 'Нет роли'}</p>
+            <p>isAdmin (состояние): {isAdmin ? '✅ Да' : '❌ Нет'}</p>
+            <p>hasAdminAccess (состояние): {hasAdminAccess ? '✅ Да' : '❌ Нет'}</p>
+          </div>
+        </div>
+
         {session.user?.role === 'ADMIN' && (
-          <div className="mt-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              🔑 Вы администратор. <Link href="/admin" className="underline font-semibold">Перейти в админ-панель</Link>
+              🔑 Вы администратор по роли БД. <Link href="/admin" className="underline font-semibold">Перейти в админ-панель</Link>
             </p>
           </div>
         )}
       </main>
+      
+      {/* Admin Access Modal */}
+      <AdminAccessModal
+        isOpen={showAdminModal}
+        onClose={() => setShowAdminModal(false)}
+      />
     </div>
   );
 }
