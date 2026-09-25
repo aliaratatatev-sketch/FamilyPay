@@ -71,14 +71,14 @@ export default function Home() {
 
               <div className="flex items-center gap-4 sm:gap-6 pt-2">
                 <div className="flex -space-x-2">
-                  {["#0D6D6E","#4FD1C5","#10B981","#059669"].map((c,i)=>(
-                    <div key={i} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-white dark:border-[#0f1923] flex items-center justify-center text-white text-xs font-bold" style={{background:c}}>
-                      {["А","М","Д","С"][i]}
+                  {["#0D6D6E","#4FD1C5","#10B981"].map((c,i)=>(
+                    <div key={i} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-white dark:border-[#0f1923] flex items-center justify-center text-white text-[10px] font-bold" style={{background:c}} title={t.hero.social_proof.roles[i]}>
+                      {t.hero.social_proof.roles[i].charAt(0)}
                     </div>
                   ))}
                 </div>
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">{t.hero.social_proof.count}</span> {t.hero.social_proof.text}
+                  {t.hero.social_proof.text}
                 </p>
               </div>
             </div>
