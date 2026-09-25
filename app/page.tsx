@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/Header";
+import AuthAwareLink from "./components/AuthAwareLink";
 import { StatsSection, CtaSection } from "./components/StatsSection";
 import { useLocale } from "./i18n/LocaleContext";
 
@@ -48,17 +49,16 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-3 sm:gap-4">
-                <Link
-                  href="/register"
+                <AuthAwareLink
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-2xl font-semibold text-sm sm:text-base shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 hover:-translate-y-1 transition-all duration-300"
                 >
                   {t.hero.cta.primary}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
-                </Link>
+                </AuthAwareLink>
                 <Link
-                  href="#demo"
+                  href="#features"
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 border-2 border-[#0D6D6E]/30 dark:border-[#4FD1C5]/30 text-[#0D6D6E] dark:text-[#4FD1C5] rounded-2xl font-semibold text-sm sm:text-base hover:border-[#0D6D6E] dark:hover:border-[#4FD1C5] hover:bg-[#0D6D6E]/5 dark:hover:bg-[#4FD1C5]/5 transition-all duration-300"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

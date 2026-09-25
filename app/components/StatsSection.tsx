@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useLocale } from '../i18n/LocaleContext';
+import AuthAwareLink from './AuthAwareLink';
 
 export function StatsSection() {
   const { t } = useLocale();
@@ -67,15 +68,14 @@ export function CtaSection() {
         <p className="text-lg sm:text-xl text-teal-100 mb-10 max-w-2xl mx-auto">
           {t.cta.description}
         </p>
-        <Link
-          href="/register"
+        <AuthAwareLink
           className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 bg-white text-[#0D6D6E] rounded-2xl font-bold text-base sm:text-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
         >
           {t.cta.button}
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
-        </Link>
+        </AuthAwareLink>
       </div>
     </section>
   );
