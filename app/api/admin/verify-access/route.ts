@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { isAdminEmail } from '@/lib/admin-config';
+import { isAdminEmail, ACCESS_TOKEN_EXPIRY } from '@/lib/admin-config';
 import {
   getVerificationCode,
   deleteVerificationCode,
   saveAccessToken,
 } from '@/lib/admin-storage';
-
-const ACCESS_TOKEN_EXPIRY = 24 * 60 * 60 * 1000; // 24 часа
 
 export async function POST(req: NextRequest) {
   try {
