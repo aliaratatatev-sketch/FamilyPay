@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import AuthAwareLink from "./components/AuthAwareLink";
 import { StatsSection, CtaSection } from "./components/StatsSection";
 import { useLocale } from "./i18n/LocaleContext";
+import RequestApprovalCard from "./components/RequestApprovalCard";
 
 export default function Home() {
   const { t } = useLocale();
@@ -82,27 +83,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right — video */}
+            {/* Right — карточка модерации запроса */}
             <div className="relative flex items-center justify-center order-1 lg:order-2">
-              <div className="absolute -inset-4 bg-gradient-to-br from-[#0D6D6E]/20 to-[#4FD1C5]/20 rounded-3xl blur-2xl" />
-              <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-teal-500/20 border border-white/20 dark:border-white/5">
-                <video autoPlay loop muted playsInline className="w-full h-full object-cover" style={{ maxHeight: "520px" }}>
-                  <source src="/istockphoto-2063356537-640_adpp_is.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
-                  <p className="text-white/70 text-xs font-semibold tracking-widest uppercase mb-1.5">{t.hero.video.brand}</p>
-                  <h2 className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-snug drop-shadow-lg">
-                    {t.hero.video.title.part1}{" "}
-                    <span className="bg-gradient-to-r from-[#4FD1C5] to-[#a7f3d0] bg-clip-text text-transparent">
-                      {t.hero.video.title.part2}
-                    </span>
-                  </h2>
-                  <p className="text-white/60 text-xs sm:text-sm mt-2 leading-relaxed">
-                    {t.hero.video.description}
-                  </p>
-                </div>
-              </div>
+              <RequestApprovalCard />
             </div>
 
           </div>

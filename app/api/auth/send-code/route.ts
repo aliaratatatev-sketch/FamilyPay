@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { generateVerificationCode, sendTelegramCode } from '@/lib/telegram';
+import { generateVerificationCode, sendAdminVerificationCode } from '@/lib/telegram';
 
 // Простая проверка учетных данных (замените на свою логику)
 const ADMIN_CREDENTIALS = {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Отправляем код в Telegram
-    const sent = await sendTelegramCode(chatId, code);
+    const sent = await sendAdminVerificationCode(username, code);
 
     if (!sent) {
       return NextResponse.json(

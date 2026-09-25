@@ -88,7 +88,7 @@ export default function DashboardPage() {
                 Добро пожаловать,
               </p>
               <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                {session.user?.name || session.user?.email}
+                {session?.user?.name || session?.user?.email}
               </p>
             </div>
             
