@@ -56,3 +56,90 @@ html {
 .animate-pulse-slow {
   animation: pulse-slow 3s ease-in-out infinite;
 }
+
+/* ─── Theme Toggle Styles ─────────────────────────────────────── */
+.theme-toggle {
+  background-color: #f3f4f6;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: none;
+  line-height: 1;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.dark .theme-toggle {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle:hover {
+  background-color: #e5e7eb;
+  transform: none;
+}
+
+.dark .theme-toggle:hover {
+  background-color: rgba(79, 209, 197, 0.2);
+}
+
+.theme-toggle__input {
+  display: none;
+}
+
+.theme-toggle__icon {
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+  transition: transform 500ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle__icon--moon {
+  transition-delay: 200ms;
+}
+
+.theme-toggle__icon--sun {
+  transform: scale(0) rotate(-360deg);
+}
+
+.theme-toggle__input:checked + .theme-toggle__icon--moon {
+  transform: rotate(360deg) scale(0);
+}
+
+.theme-toggle__input:checked ~ .theme-toggle__icon--sun {
+  transition-delay: 200ms;
+  transform: scale(1) rotate(0deg);
+}
+
+/* ─── Video Modal Animations ──────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-out;
+}

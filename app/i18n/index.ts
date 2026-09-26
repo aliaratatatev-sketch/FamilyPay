@@ -26,7 +26,7 @@ export const defaultLocale: Locale = 'ru';
 export const locales: Locale[] = ['ru', 'kg', 'en'];
 
 export const localeNames: Record<Locale, string> = {
-  ru: '🇷🇺 RU',
-  kg: '🇰🇬 KR',
-  en: '🇬🇧 EN',
+  ru: 'RU · Русский',
+  kg: 'KG · Кыргызча',
+  en: 'EN · English',
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/Header";
@@ -7,9 +8,11 @@ import AuthAwareLink from "./components/AuthAwareLink";
 import { StatsSection, CtaSection } from "./components/StatsSection";
 import { useLocale } from "./i18n/LocaleContext";
 import RequestApprovalCard from "./components/RequestApprovalCard";
+import VideoModal from "./components/VideoModal";
 
 export default function Home() {
   const { t } = useLocale();
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
   return (
     <div className="min-h-screen bg-white dark:bg-[#0f1923] transition-colors duration-300">
       <Header />
@@ -58,15 +61,15 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </AuthAwareLink>
-                <Link
-                  href="#features"
+                <button
+                  onClick={() => setIsVideoOpen(true)}
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 border-2 border-[#0D6D6E]/30 dark:border-[#4FD1C5]/30 text-[#0D6D6E] dark:text-[#4FD1C5] rounded-2xl font-semibold text-sm sm:text-base hover:border-[#0D6D6E] dark:hover:border-[#4FD1C5] hover:bg-[#0D6D6E]/5 dark:hover:bg-[#4FD1C5]/5 transition-all duration-300"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                   {t.hero.cta.secondary}
-                </Link>
+                </button>
               </div>
 
               <div className="flex items-center gap-4 sm:gap-6 pt-2">
@@ -248,6 +251,13 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ─── VIDEO MODAL ──────────────────────────────────────────────── */}
+      <VideoModal 
+        isOpen={isVideoOpen}
+        onClose={() => setIsVideoOpen(false)}
+        videoUrl="/familypay-demo.mp4"
+      />
     </div>
   );
 }
