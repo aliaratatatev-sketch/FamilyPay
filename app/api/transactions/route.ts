@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getCurrentUserId } from '@/lib/session';
 import { Prisma } from '@prisma/client';
 
-// GET /api/transactions - Получить транзакции с фильтрами
+/**
+ * GET /api/transactions - Получить транзакции с фильтрами
+ * Query params: familyId, accountId, categoryId, type, startDate, endDate, page, pageSize
+ */
 export async function GET(request: NextRequest) {
   try {
+    const userId = await getCurrentUserId();
     const { searchParams } = request.nextUrl;
     
     const familyId = searchParams.get('familyId');
@@ -20,6 +25,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: 'Family ID is required' },
         { status: 400 }
+      );
+    }
+
+    // Проверяем членство в семье
+    const member = await prisma.familyMember.findUnique({
+      where: {
+        familyId_userId: {
+          familyId,
+          userId,
+        },
+      },
+    });
+
+    if (!member) {
+      return NextResponse.json(
+        { error: 'Access denied. You are not a member of this family' },
+        { status: 403 }
       );
     }
 
@@ -80,7 +102,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      data: transactions,
+      transactions,
       pagination: {
         total,
         page,
@@ -90,6 +112,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching transactions:', error);
+    
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Failed to fetch transactions' },
       { status: 500 }
@@ -97,15 +127,19 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/transactions - Создать новую транзакцию
+/**
+ * POST /api/transactions - Создать новую транзакцию
+ * Body: { familyId, accountId, type, amount, categoryId?, description?, date?, toAccountId?, location?, tags? }
+ */
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getCurrentUserId();
+    const userId = await getCurrentUserId();
     const body = await request.json();
     const {
       familyId,
       accountId,
       categoryId,
-      userId,
       type,
       amount,
       description,
@@ -116,11 +150,101 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Валидация обязательных полей
-    if (!familyId || !accountId || !userId || !type || !amount) {
+    if (!familyId || !accountId || !type || !amount) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'familyId, accountId, type, and amount are required' },
         { status: 400 }
       );
+    }
+
+    // Валидация типа транзакции
+    const validTypes = ['INCOME', 'EXPENSE', 'TRANSFER'];
+    if (!validTypes.includes(type)) {
+      return NextResponse.json(
+        { error: 'Invalid transaction type. Allowed: INCOME, EXPENSE, TRANSFER' },
+        { status: 400 }
+      );
+    }
+
+    // Для перевода требуется toAccountId
+    if (type === 'TRANSFER' && !toAccountId) {
+      return NextResponse.json(
+        { error: 'toAccountId is required for TRANSFER transactions' },
+        { status: 400 }
+      );
+    }
+
+    // Для расходов требуется категория
+    if (type === 'EXPENSE' && !categoryId) {
+      return NextResponse.json(
+        { error: 'categoryId is required for EXPENSE transactions' },
+        { status: 400 }
+      );
+    }
+
+    // Валидация суммы
+    const amountValue = parseFloat(amount);
+    if (isNaN(amountValue) || amountValue <= 0) {
+      return NextResponse.json(
+        { error: 'Amount must be a positive number' },
+        { status: 400 }
+      );
+    }
+
+    // Проверяем права пользователя в семье
+    const member = await prisma.familyMember.findUnique({
+      where: {
+        familyId_userId: {
+          familyId,
+          userId,
+        },
+      },
+    });
+
+    if (!member) {
+      return NextResponse.json(
+        { error: 'Access denied. You are not a member of this family' },
+        { status: 403 }
+      );
+    }
+
+    // Проверяем, что счёт принадлежит этой семье
+    const account = await prisma.financialAccount.findFirst({
+      where: {
+        id: accountId,
+        familyId,
+      },
+    });
+
+    if (!account) {
+      return NextResponse.json(
+        { error: 'Account not found or does not belong to this family' },
+        { status: 404 }
+      );
+    }
+
+    // Если это перевод, проверяем счёт-получатель
+    if (type === 'TRANSFER' && toAccountId) {
+      const toAccount = await prisma.financialAccount.findFirst({
+        where: {
+          id: toAccountId,
+          familyId,
+        },
+      });
+
+      if (!toAccount) {
+        return NextResponse.json(
+          { error: 'Destination account not found or does not belong to this family' },
+          { status: 404 }
+        );
+      }
+
+      if (accountId === toAccountId) {
+        return NextResponse.json(
+          { error: 'Cannot transfer to the same account' },
+          { status: 400 }
+        );
+      }
     }
 
     // Используем транзакцию БД для атомарности
@@ -216,9 +340,17 @@ export async function POST(request: NextRequest) {
       return transaction;
     });
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json({ transaction: result }, { status: 201 });
   } catch (error) {
     console.error('Error creating transaction:', error);
+    
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Failed to create transaction' },
       { status: 500 }

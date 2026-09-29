@@ -256,7 +256,7 @@ export default function Home() {
       <VideoModal 
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        videoUrl="/familypay-demo.mp4"
+        videoUrl="/istockphoto-2063356537-640_adpp_is.mp4"
       />
     </div>
   );

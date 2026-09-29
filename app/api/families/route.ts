@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getCurrentUserId } from '@/lib/session';
 
-// Пример API route для работы с семьями
-
-// GET /api/families - Получить список семей пользователя
-export async function GET(request: NextRequest) {
+/**
+ * GET /api/families - Получить список семей текущего пользователя
+ */
+export async function GET() {
   try {
-    // В реальном приложении userId нужно получать из сессии/токена
-    const userId = request.nextUrl.searchParams.get('userId');
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
-    }
+    const userId = await getCurrentUserId();
 
     const families = await prisma.family.findMany({
       where: {
@@ -36,10 +29,16 @@ export async function GET(request: NextRequest) {
               },
             },
           },
+          orderBy: {
+            joinedAt: 'asc',
+          },
         },
         accounts: {
           where: {
             isActive: true,
+          },
+          orderBy: {
+            createdAt: 'asc',
           },
         },
         _count: {
@@ -50,11 +49,22 @@ export async function GET(request: NextRequest) {
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
-    return NextResponse.json(families);
+    return NextResponse.json({ families });
   } catch (error) {
     console.error('Error fetching families:', error);
+    
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Failed to fetch families' },
       { status: 500 }
@@ -62,24 +72,41 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/families - Создать новую семью
+/**
+ * POST /api/families - Создать новую семью
+ * Body: { name: string, currency?: string }
+ */
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getCurrentUserId();
     const body = await request.json();
-    const { name, currency, userId } = body;
+    const { name, currency } = body;
 
-    if (!name || !userId) {
+    // Валидация
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json(
-        { error: 'Name and userId are required' },
+        { error: 'Name is required and must be a non-empty string' },
         { status: 400 }
       );
     }
 
+    if (name.length > 100) {
+      return NextResponse.json(
+        { error: 'Name must be less than 100 characters' },
+        { status: 400 }
+      );
+    }
+
+    const validCurrencies = ['RUB', 'USD', 'EUR', 'KGS'];
+    const selectedCurrency = currency && validCurrencies.includes(currency) 
+      ? currency 
+      : 'RUB';
+
     // Создаём семью и добавляем создателя как ADMIN
     const family = await prisma.family.create({
       data: {
-        name,
-        currency: currency || 'RUB',
+        name: name.trim(),
+        currency: selectedCurrency,
         createdById: userId,
         members: {
           create: {
@@ -93,9 +120,10 @@ export async function POST(request: NextRequest) {
             name: 'Наличные',
             type: 'CASH',
             balance: 0,
-            currency: currency || 'RUB',
+            currency: selectedCurrency,
             color: '#10B981',
             icon: '💵',
+            isActive: true,
           },
         },
       },
@@ -113,12 +141,27 @@ export async function POST(request: NextRequest) {
           },
         },
         accounts: true,
+        _count: {
+          select: {
+            transactions: true,
+            budgets: true,
+            goals: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json(family, { status: 201 });
+    return NextResponse.json({ family }, { status: 201 });
   } catch (error) {
     console.error('Error creating family:', error);
+    
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Failed to create family' },
       { status: 500 }

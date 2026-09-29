@@ -1,3 +1,5 @@
+'use client';
+
 export default function RequestApprovalCard() {
   return (
     <div className="relative w-full max-w-md mx-auto animate-fade-in">
