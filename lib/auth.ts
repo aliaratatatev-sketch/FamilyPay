@@ -55,7 +55,29 @@ export const authOptions: NextAuthOptions = {
       console.log('✅ SignIn callback triggered');
       console.log('User:', user?.email);
       console.log('Account provider:', account?.provider);
-      // Разрешаем вход
+      
+      // Если это вход через Google
+      if (account?.provider === 'google') {
+        if (!user.email) {
+          console.log('❌ Нет email от Google');
+          return false;
+        }
+        
+        // Проверяем, существует ли пользователь в базе данных
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+        
+        if (!existingUser) {
+          console.log('❌ Пользователь не найден в базе данных:', user.email);
+          return false; // Блокируем вход для несуществующих пользователей
+        }
+        
+        console.log('✅ Пользователь найден в базе:', existingUser.email);
+        return true;
+      }
+      
+      // Для других методов входа (credentials) разрешаем
       return true;
     },
     async redirect({ url, baseUrl }) {
@@ -119,6 +141,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/login',
+    error: '/login', // Перенаправляем ошибки на страницу входа
   },
   session: {
     strategy: 'jwt',

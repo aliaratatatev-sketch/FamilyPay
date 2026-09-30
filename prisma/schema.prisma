@@ -99,6 +99,21 @@ model AdminVerificationCode {
   @@map("admin_verification_codes")
 }
 
+model EmailVerificationCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  email     String
+  name      String?
+  password  String   // Хешированный пароль для будущего пользователя
+  expires   DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@index([code, expires])
+  @@index([email])
+  @@map("email_verification_codes")
+}
+
 // ============================================
 // СЕМЬЯ
 // ============================================

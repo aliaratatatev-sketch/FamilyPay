@@ -134,7 +134,6 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const userId = await getCurrentUserId();
-    const userId = await getCurrentUserId();
     const body = await request.json();
     const {
       familyId,
