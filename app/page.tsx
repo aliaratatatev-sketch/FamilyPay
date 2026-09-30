@@ -256,7 +256,7 @@ export default function Home() {
       <VideoModal 
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        videoUrl="/istockphoto-2063356537-640_adpp_is.mp4"
+        videoUrl="/gemini_generated_video_aa514352.mp4"
       />
     </div>
   );

@@ -69,16 +69,18 @@ export default function VideoModal({ isOpen, onClose, videoUrl }: VideoModalProp
 
         {/* Видео контейнер */}
         <div className="relative bg-[#0a1628] rounded-2xl overflow-hidden shadow-2xl">
-          <video
-            ref={videoRef}
-            className="w-full h-auto"
-            controls
-            playsInline
-            poster="/video-poster.jpg" // Опционально: добавьте превью
-          >
-            <source src={videoUrl} type="video/mp4" />
-            Ваш браузер не поддерживает воспроизведение видео.
-          </video>
+          <div className="relative" style={{ maxHeight: '80vh' }}>
+            <video
+              ref={videoRef}
+              className="w-full h-full object-contain"
+              controls
+              playsInline
+              style={{ maxHeight: '80vh' }}
+            >
+              <source src={videoUrl} type="video/mp4" />
+              Ваш браузер не поддерживает воспроизведение видео.
+            </video>
+          </div>
 
           {/* Брендинг (опционально, появляется при паузе) */}
           <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg">
