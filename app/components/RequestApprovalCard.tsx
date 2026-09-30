@@ -7,7 +7,7 @@ export default function RequestApprovalCard() {
       <div className="absolute -inset-4 bg-gradient-to-br from-[#0D6D6E]/20 to-[#4FD1C5]/20 rounded-3xl blur-2xl animate-pulse-slow" />
       
       {/* Карточка запроса */}
-      <div className="relative bg-white dark:bg-[#0f1923] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-teal-500/20 border border-gray-100 dark:border-white/10 transition-all duration-300 hover:shadow-teal-500/30 hover:scale-[1.02]">
+      <div className="relative bg-white dark:bg-[#0f1923] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-teal-500/20 border border-gray-100 dark:border-white/10 transition-all duration-300 hover:shadow-teal-500/30">
         
         {/* Основной контент карточки */}
         <div className="p-6 sm:p-8 space-y-6">

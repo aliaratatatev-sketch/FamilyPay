@@ -2,7 +2,9 @@
   "header": {
     "brand": "FamilyPay",
     "nav": {
+      "about": "About",
       "features": "Features",
+      "howItWorks": "How It Works",
       "pricing": "Pricing",
       "contact": "Contact"
     },
@@ -67,6 +69,66 @@
         "part2": "together as a family"
       },
       "description": "Plan, save, and control — together it's easier"
+    }
+  },
+  "about": {
+    "badge": "About",
+    "title": "FamilyPay — your reliable financial assistant",
+    "description": "We've created a platform that helps families manage finances easily and transparently",
+    "mission": {
+      "title": "Our Mission",
+      "text": "To make family financial management simple, clear, and accessible for every family in Kyrgyzstan and beyond."
+    },
+    "values": [
+      {
+        "emoji": "🤝",
+        "title": "Transparency",
+        "description": "All family members see the complete financial picture in real-time."
+      },
+      {
+        "emoji": "🔒",
+        "title": "Security",
+        "description": "Your data is protected by modern encryption technologies."
+      },
+      {
+        "emoji": "💡",
+        "title": "Simplicity",
+        "description": "Intuitive interface that's clear to every family member."
+      },
+      {
+        "emoji": "📈",
+        "title": "Efficiency",
+        "description": "Smart tools for achieving your financial goals."
+      }
+    ]
+  },
+  "howItWorks": {
+    "badge": "How It Works",
+    "title": "Get started in 3 simple steps",
+    "description": "From registration to full control in 5 minutes",
+    "steps": [
+      {
+        "number": "01",
+        "title": "Create Account",
+        "description": "Sign up and create a family space. Invite family members with one link.",
+        "icon": "👤"
+      },
+      {
+        "number": "02",
+        "title": "Set Up Accounts",
+        "description": "Add bank cards, cash, and other accounts. Create expense categories for your needs.",
+        "icon": "💳"
+      },
+      {
+        "number": "03",
+        "title": "Manage Together",
+        "description": "All family members add expenses, track the budget, and save for common goals in real-time.",
+        "icon": "🎯"
+      }
+    ],
+    "bonus": {
+      "title": "Bonus",
+      "text": "AI assistant helps optimize expenses and find savings opportunities"
     }
   },
   "features": {

@@ -23,7 +23,6 @@ export default function Header() {
     
     checkTheme();
     
-    // Наблюдаем за изменениями класса dark
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, {
       attributes: true,
@@ -55,7 +54,7 @@ export default function Header() {
         <nav className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-md group-hover:shadow-[#4FD1C5]/40 transition-shadow duration-300">
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-md group-hover:shadow-[#0D6D6E]/40 transition-shadow duration-300">
               <Image
                 src="/logo.png"
                 alt="FamilyPay"
@@ -71,15 +70,21 @@ export default function Header() {
 
           {/* Nav links */}
           <div className="hidden md:flex items-center gap-8">
-            {[t.header.nav.features, t.header.nav.pricing, t.header.nav.contact].map((item, i) => (
+            {[
+              { label: t.header.nav.about, href: '#about' },
+              { label: t.header.nav.features, href: '#features' },
+              { label: t.header.nav.howItWorks, href: '#how-it-works' },
+              { label: t.header.nav.pricing, href: '#pricing' },
+              { label: t.header.nav.contact, href: '#contact' }
+            ].map((item, i) => (
               <Link
                 key={i}
-                href={i === 0 ? '#features' : i === 1 ? '#pricing' : '#contact'}
-                className={`text-sm font-medium transition-colors duration-200 hover:text-[#4FD1C5] ${
+                href={item.href}
+                className={`text-sm font-medium transition-colors duration-200 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] ${
                   isDark ? 'text-gray-300' : 'text-gray-600'
                 }`}
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </div>
@@ -111,7 +116,7 @@ export default function Header() {
                       onClick={() => { setLocale(l); setLangOpen(false); }}
                       className={`w-full px-4 py-3 text-left transition-all duration-150 flex items-center gap-2 ${
                         locale === l
-                          ? 'text-[#4FD1C5] bg-[#4FD1C5]/10 font-semibold'
+                          ? 'text-[#0D6D6E] dark:text-[#4FD1C5] bg-[#0D6D6E]/10 dark:bg-[#4FD1C5]/10 font-semibold'
                           : isDark
                           ? 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
@@ -119,7 +124,7 @@ export default function Header() {
                     >
                       <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${
                         locale === l
-                          ? 'bg-[#4FD1C5]/20 text-[#4FD1C5]'
+                          ? 'bg-[#0D6D6E]/20 dark:bg-[#4FD1C5]/20 text-[#0D6D6E] dark:text-[#4FD1C5]'
                           : isDark
                           ? 'bg-white/10 text-gray-400'
                           : 'bg-gray-200 text-gray-500'
@@ -151,7 +156,7 @@ export default function Header() {
             </Link>
             <Link
               href="/login"
-              className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl hover:shadow-lg hover:shadow-[#4FD1C5]/30 hover:-translate-y-0.5 transition-all duration-200"
+              className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl hover:shadow-lg hover:shadow-[#0D6D6E]/30 hover:-translate-y-0.5 transition-all duration-200"
             >
               {t.header.auth.register}
             </Link>

@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/Header";
 import AuthAwareLink from "./components/AuthAwareLink";
-import { StatsSection, CtaSection } from "./components/StatsSection";
 import { useLocale } from "./i18n/LocaleContext";
 import RequestApprovalCard from "./components/RequestApprovalCard";
 import VideoModal from "./components/VideoModal";
@@ -95,6 +94,115 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── ABOUT ─────────────────────────────────────────────────────── */}
+      <section id="about" className="py-20 sm:py-28 bg-white dark:bg-[#111d2b] transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-16 space-y-4">
+            <span className="inline-block px-4 py-1.5 bg-[#4FD1C5]/10 text-[#0D6D6E] dark:text-[#4FD1C5] text-sm font-semibold rounded-full border border-[#4FD1C5]/20">
+              {t.about.badge}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white px-4">
+              {t.about.title}
+            </h2>
+            <p className="text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto px-4">
+              {t.about.description}
+            </p>
+          </div>
+
+          {/* Mission */}
+          <div className="max-w-4xl mx-auto mb-12 sm:mb-16 p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] text-white shadow-2xl shadow-teal-500/20">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">🎯</span>
+              <h3 className="text-xl sm:text-2xl font-bold">{t.about.mission.title}</h3>
+            </div>
+            <p className="text-base sm:text-lg text-teal-50 leading-relaxed">
+              {t.about.mission.text}
+            </p>
+          </div>
+
+          {/* Values */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {t.about.values.map((value, i) => (
+              <div
+                key={i}
+                className="group relative p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-xl hover:shadow-teal-500/10 transition-all duration-300"
+              >
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-4 sm:mb-5 shadow-lg shadow-teal-500/30 transition-transform duration-300">
+                  <span className="text-2xl">{value.emoji}</span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">{value.title}</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{value.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── HOW IT WORKS ──────────────────────────────────────────────── */}
+      <section id="how-it-works" className="py-20 sm:py-28 bg-gray-50 dark:bg-[#0f1923] transition-colors duration-300 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-5 dark:opacity-[0.02]">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#4FD1C5] rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#0D6D6E] rounded-full blur-3xl" />
+        </div>
+
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-12 sm:mb-16 space-y-4">
+            <span className="inline-block px-4 py-1.5 bg-[#4FD1C5]/10 text-[#0D6D6E] dark:text-[#4FD1C5] text-sm font-semibold rounded-full border border-[#4FD1C5]/20">
+              {t.howItWorks.badge}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white px-4">
+              {t.howItWorks.title}
+            </h2>
+            <p className="text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto px-4">
+              {t.howItWorks.description}
+            </p>
+          </div>
+
+          {/* Steps */}
+          <div className="max-w-5xl mx-auto">
+            <div className="relative">
+              {/* Connecting line */}
+              <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-[#0D6D6E] via-[#4FD1C5] to-[#0D6D6E] -translate-y-1/2 opacity-20" />
+              
+              <div className="grid lg:grid-cols-3 gap-8 sm:gap-10">
+                {t.howItWorks.steps.map((step, i) => (
+                  <div key={i} className="relative">
+                    <div className="relative p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-300 group">
+                      {/* Step number */}
+                      <div className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center shadow-lg shadow-teal-500/30 transition-transform duration-300">
+                        <span className="text-white font-black text-lg">{step.number}</span>
+                      </div>
+                      
+                      {/* Icon */}
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#4FD1C5]/10 to-[#0D6D6E]/10 dark:from-[#4FD1C5]/20 dark:to-[#0D6D6E]/20 flex items-center justify-center mb-5 sm:mb-6 border border-[#4FD1C5]/20">
+                        <span className="text-3xl sm:text-4xl">{step.icon}</span>
+                      </div>
+                      
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-3">{step.title}</h3>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bonus */}
+            <div className="mt-12 sm:mt-16 p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#0D6D6E]/5 to-[#4FD1C5]/5 border border-[#4FD1C5]/20 dark:border-[#4FD1C5]/10">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center shadow-lg shadow-teal-500/30 flex-shrink-0">
+                  <span className="text-2xl">✨</span>
+                </div>
+                <div className="text-center sm:text-left">
+                  <h4 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-1">{t.howItWorks.bonus.title}</h4>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">{t.howItWorks.bonus.text}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── FEATURES ─────────────────────────────────────────────────── */}
       <section id="features" className="py-20 sm:py-28 bg-white dark:bg-[#111d2b] transition-colors duration-300">
         <div className="container mx-auto px-4 sm:px-6">
@@ -114,14 +222,14 @@ export default function Home() {
             {t.features.items.map((f, i) => (
               <div
                 key={i}
-                className="group relative p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                className="group relative p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/0 to-[#0D6D6E]/0 group-hover:from-[#4FD1C5]/5 group-hover:to-[#0D6D6E]/5 transition-all duration-500 rounded-3xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/0 to-[#0D6D6E]/0 hover:from-[#4FD1C5]/5 hover:to-[#0D6D6E]/5 transition-all duration-500 rounded-3xl" />
                 <span className="absolute top-5 right-5 text-4xl sm:text-5xl font-black text-gray-50 dark:text-white/[0.04] select-none">
                   0{i + 1}
                 </span>
                 <div className="relative">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-5 sm:mb-6 shadow-lg shadow-teal-500/30 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-5 sm:mb-6 shadow-lg shadow-teal-500/30 transition-transform duration-300">
                     <span className="text-xl sm:text-2xl">{f.emoji}</span>
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">{f.title}</h3>
@@ -133,8 +241,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── STATS (клиентский — адаптируется к теме) ─────────────────── */}
-      <StatsSection />
+      {/* ─── STATS ─────────────────────────────────────────────────────── */}
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
+            {t.stats.items.map((stat, i) => (
+              <div key={i} className="text-center">
+                <div className="text-5xl sm:text-6xl font-black text-white mb-3 sm:mb-4">
+                  {stat.value}
+                </div>
+                <div className="text-base sm:text-lg text-teal-100 font-medium">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ─── PRICING ──────────────────────────────────────────────────── */}
       <section id="pricing" className="py-20 sm:py-28 bg-gray-50 dark:bg-[#0f1923] transition-colors duration-300">
@@ -169,8 +293,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── CTA (клиентский — адаптируется к теме) ──────────────────── */}
-      <CtaSection />
+      {/* ─── CTA ──────────────────────────────────────────────────────── */}
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[#0D6D6E]/5 via-[#4FD1C5]/5 to-[#10B981]/5 dark:from-[#0D6D6E]/10 dark:via-[#4FD1C5]/10 dark:to-[#10B981]/10 transition-colors duration-300">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white">
+              {t.cta.title}
+            </h2>
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              {t.cta.description}
+            </p>
+            <AuthAwareLink
+              className="inline-flex items-center gap-3 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-2xl font-bold text-base sm:text-lg shadow-2xl shadow-teal-500/40 hover:shadow-3xl hover:shadow-teal-500/50 hover:-translate-y-1 transition-all duration-300"
+            >
+              {t.cta.button}
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </AuthAwareLink>
+          </div>
+        </div>
+      </section>
 
       {/* ─── FOOTER ───────────────────────────────────────────────────── */}
       <footer id="contact" className="relative bg-[#0a1628] text-gray-400 pt-14 sm:pt-16 pb-8 overflow-hidden transition-colors duration-300">
@@ -203,7 +346,7 @@ export default function Home() {
                   <button
                     key={s.label}
                     aria-label={s.label}
-                    className="w-9 h-9 rounded-xl bg-white/10 hover:bg-[#4FD1C5]/20 hover:text-[#4FD1C5] flex items-center justify-center text-xs font-bold transition-colors duration-200"
+                    className="w-9 h-9 rounded-xl bg-white/10 hover:bg-[#0D6D6E]/80 hover:text-white flex items-center justify-center text-xs font-bold transition-colors duration-200"
                   >
                     {s.icon}
                   </button>
@@ -216,7 +359,7 @@ export default function Home() {
               <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">{t.footer.sections.product.title}</h4>
               <ul className="space-y-2.5 text-sm">
                 {t.footer.sections.product.links.map((link, i) => (
-                  <li key={i}><Link href={link.href} className="hover:text-[#4FD1C5] transition-colors">{link.label}</Link></li>
+                  <li key={i}><Link href={link.href} className="hover:text-[#0D6D6E] transition-colors">{link.label}</Link></li>
                 ))}
               </ul>
             </div>
@@ -226,7 +369,7 @@ export default function Home() {
               <h4 className="font-semibold text-white mb-4 text-sm sm:text-base">{t.footer.sections.company.title}</h4>
               <ul className="space-y-2.5 text-sm">
                 {t.footer.sections.company.links.map((link, i) => (
-                  <li key={i}><Link href={link.href} className="hover:text-[#4FD1C5] transition-colors">{link.label}</Link></li>
+                  <li key={i}><Link href={link.href} className="hover:text-[#0D6D6E] transition-colors">{link.label}</Link></li>
                 ))}
               </ul>
             </div>
@@ -245,8 +388,8 @@ export default function Home() {
           <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
             <p>{t.footer.bottom.copyright}</p>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-              <Link href="/privacy" className="hover:text-[#4FD1C5] transition-colors">{t.footer.bottom.privacy}</Link>
-              <Link href="/terms" className="hover:text-[#4FD1C5] transition-colors">{t.footer.bottom.terms}</Link>
+              <Link href="/privacy" className="hover:text-[#0D6D6E] transition-colors">{t.footer.bottom.privacy}</Link>
+              <Link href="/terms" className="hover:text-[#0D6D6E] transition-colors">{t.footer.bottom.terms}</Link>
             </div>
           </div>
         </div>
@@ -268,7 +411,7 @@ function PricingCard({ name, price, period, features, cta, href, popular, badge 
   features: string[]; cta: string; href: string; popular: boolean; badge?: string;
 }) {
   return (
-    <div className={`relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col transition-all duration-300 hover:-translate-y-1 ${
+    <div className={`relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col transition-all duration-300 ${
       popular
         ? "bg-gradient-to-b from-[#0D6D6E] to-[#0a5758] text-white shadow-2xl shadow-teal-700/40 sm:scale-105"
         : "bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:shadow-xl hover:shadow-teal-500/10"
