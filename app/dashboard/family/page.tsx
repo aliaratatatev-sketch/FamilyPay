@@ -67,16 +67,26 @@ export default function FamilyPage() {
       const data = await response.json();
       
       console.log('API Response:', { status: response.status, data });
+      console.log('Session user:', session?.user);
       
-      if (response.ok && data.families && data.families.length > 0) {
+      if (response.ok && data.families) {
+        console.log('Families received:', data.families.length);
         setFamilies(data.families);
-        loadFamilyDetails(data.families[0].id);
-      } else if (response.ok && data.families) {
-        console.log('Families array is empty:', data.families);
+        
+        if (data.families.length > 0) {
+          console.log('Loading details for first family:', data.families[0].name);
+          loadFamilyDetails(data.families[0].id);
+        } else {
+          console.log('No families found for user');
+          setFamilies([]);
+        }
+      } else {
+        console.error('Failed to load families:', response.status, data);
         setFamilies([]);
       }
     } catch (error) {
       console.error('Error loading families:', error);
+      setFamilies([]);
     } finally {
       setIsLoading(false);
     }

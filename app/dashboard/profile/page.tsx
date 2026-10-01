@@ -5,111 +5,31 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-interface UserProfile {
-  id: string;
-  email: string;
-  name: string | null;
-  phone: string | null;
-  image: string | null;
-  role: string;
-  createdAt: string;
-}
-
 export default function ProfilePage() {
-  const { data: session, status, update } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-  });
+  const [copied, setCopied] = useState(false);
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/login');
     }
     
-    if (status === 'authenticated') {
-      loadProfile();
+    if (status === 'authenticated' && session?.user) {
+      setUserId(session.user.id || '');
     }
-  }, [status, router]);
+  }, [status, router, session]);
 
-  const loadProfile = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/user/profile');
-      const data = await response.json();
-      
-      if (response.ok) {
-        setProfile(data.user);
-        setFormData({
-          name: data.user.name || '',
-          phone: data.user.phone || '',
-        });
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    } finally {
-      setIsLoading(false);
+  const handleCopyId = () => {
+    if (userId) {
+      navigator.clipboard.writeText(userId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    setError('');
-
-    try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка при сохранении');
-      }
-
-      setProfile(data.user);
-      setIsEditing(false);
-      
-      // Обновляем сессию
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          name: data.user.name,
-        },
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка при сохранении');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setFormData({
-      name: profile?.name || '',
-      phone: profile?.phone || '',
-    });
-    setIsEditing(false);
-    setError('');
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('Скопировано!');
-  };
-
-  if (status === 'loading' || isLoading) {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-gray-600 dark:text-gray-400 text-xl">Загрузка...</div>
@@ -117,7 +37,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (status === 'unauthenticated' || !profile) {
+  if (status === 'unauthenticated') {
     return null;
   }
 
@@ -135,85 +55,52 @@ export default function ProfilePage() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/dashboard"
-              className="text-gray-600 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition"
-            >
-              ← Назад
-            </Link>
-          </div>
+          <Link 
+            href="/dashboard"
+            className="text-gray-600 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition"
+          >
+            ← Назад на дашборд
+          </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 max-w-4xl">
+      <main className="container mx-auto px-6 py-8 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Личный кабинет
+            Мой профиль
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Управление профилем и настройками
+            Управление вашим профилем и настройками
           </p>
         </div>
 
         {/* Profile Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden mb-6">
-          {/* Header with Avatar */}
-          <div className="bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] p-8 text-white">
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-4xl font-bold border-4 border-white/30">
-                {profile.name?.charAt(0) || profile.email.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-1">
-                  {profile.name || 'Без имени'}
-                </h2>
-                <p className="text-white/80">{profile.email}</p>
-                <div className="flex gap-2 mt-2">
-                  <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
-                    {profile.role === 'ADMIN' ? '👑 Администратор' : '👤 Пользователь'}
-                  </span>
-                  <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
-                    С {new Date(profile.createdAt).toLocaleDateString('ru-RU')}
-                  </span>
-                </div>
+          {/* Header with gradient */}
+          <div className="h-32 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5]" />
+          
+          {/* Profile info */}
+          <div className="px-8 pb-8">
+            <div className="flex items-end justify-between -mt-16 mb-6">
+              <div className="w-32 h-32 rounded-2xl bg-white dark:bg-gray-800 border-4 border-white dark:border-gray-800 shadow-xl flex items-center justify-center">
+                <span className="text-5xl">
+                  {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0) || '👤'}
+                </span>
               </div>
             </div>
-          </div>
-
-          {/* Profile Info */}
-          <div className="p-8">
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
 
             <div className="space-y-6">
-              {/* User ID */}
+              {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  ID пользователя
+                  Имя
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={profile.id}
-                    readOnly
-                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                  />
-                  <button
-                    onClick={() => copyToClipboard(profile.id)}
-                    className="px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-                    title="Скопировать ID"
-                  >
-                    📋
-                  </button>
+                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {session?.user?.name || 'Не указано'}
+                  </p>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Используйте этот ID для приглашения в семью
-                </p>
               </div>
 
               {/* Email */}
@@ -221,106 +108,133 @@ export default function ProfilePage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email
                 </label>
-                <input
-                  type="email"
-                  value={profile.email}
-                  readOnly
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Email не может быть изменён
-                </p>
+                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {session?.user?.email || 'Не указано'}
+                  </p>
+                </div>
               </div>
 
-              {/* Name */}
+              {/* User ID */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Имя
+                  Ваш ID пользователя
                 </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="Введите ваше имя"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 disabled:dark:bg-gray-800 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Телефон
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="+7 (___) ___-__-__"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 disabled:dark:bg-gray-800 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              {isEditing ? (
-                <div className="flex gap-3">
+                <div className="flex gap-2">
+                  <div className="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <p className="text-gray-900 dark:text-white font-mono text-sm break-all">
+                      {userId || 'Загрузка...'}
+                    </p>
+                  </div>
                   <button
-                    onClick={handleCancel}
-                    disabled={isSaving}
-                    className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
+                    onClick={handleCopyId}
+                    className={`px-4 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${
+                      copied
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white hover:shadow-lg'
+                    }`}
                   >
-                    Отмена
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="flex-1 py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50"
-                  >
-                    {isSaving ? 'Сохранение...' : 'Сохранить'}
+                    {copied ? (
+                      <>
+                        <span>✓</span>
+                        <span>Скопировано!</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>📋</span>
+                        <span>Копировать</span>
+                      </>
+                    )}
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition"
-                >
-                  ✏️ Редактировать профиль
-                </button>
-              )}
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  💡 Используйте этот ID, чтобы другие пользователи могли добавить вас в свою семью
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6">
-            <div className="flex items-start gap-3">
-              <span className="text-3xl">💡</span>
-              <div>
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                  Приглашение по ID
-                </h3>
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  Теперь другие пользователи могут пригласить вас в семью используя ваш ID вместо email
-                </p>
-              </div>
+        {/* Info Box */}
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-500 dark:bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">ℹ️</span>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">
+                Как добавить участника в семью?
+              </h3>
+              <ol className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <li>1. Попросите пользователя скопировать его ID из профиля</li>
+                <li>2. Перейдите в раздел "Управление семьёй"</li>
+                <li>3. Нажмите кнопку "Пригласить"</li>
+                <li>4. Выберите "По ID" и вставьте скопированный ID</li>
+                <li>5. Выберите роль и нажмите "Добавить"</li>
+              </ol>
             </div>
           </div>
+        </div>
 
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-6">
-            <div className="flex items-start gap-3">
-              <span className="text-3xl">🔒</span>
+        {/* Security Section */}
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span>🔐</span>
+            Безопасность
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div>
-                <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">
-                  Безопасность
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                  Пароль
                 </h3>
-                <p className="text-sm text-green-800 dark:text-green-200">
-                  Ваш ID уникален и не может быть изменён. Никогда не делитесь паролем
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Последнее изменение: Неизвестно
                 </p>
               </div>
+              <button className="px-4 py-2 text-[#0D6D6E] dark:text-[#4FD1C5] border border-[#0D6D6E]/30 dark:border-[#4FD1C5]/30 rounded-lg hover:bg-[#0D6D6E]/10 dark:hover:bg-[#4FD1C5]/10 transition font-medium">
+                Изменить
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                  Двухфакторная аутентификация
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Дополнительный уровень безопасности
+                </p>
+              </div>
+              <button className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium">
+                Настроить
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Account Info */}
+        <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span>📊</span>
+            Информация об аккаунте
+          </h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+              <span className="text-gray-600 dark:text-gray-400">Дата регистрации</span>
+              <span className="text-gray-900 dark:text-white font-medium">Неизвестно</span>
+            </div>
+            <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+              <span className="text-gray-600 dark:text-gray-400">Роль</span>
+              <span className="text-gray-900 dark:text-white font-medium">
+                {session?.user?.role === 'SUPER_ADMIN' ? 'Супер-администратор' : 'Пользователь'}
+              </span>
+            </div>
+            <div className="flex justify-between py-2">
+              <span className="text-gray-600 dark:text-gray-400">Статус аккаунта</span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 rounded-full text-xs font-medium">
+                Активен
+              </span>
             </div>
           </div>
         </div>

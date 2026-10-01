@@ -4,27 +4,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { analyzeExpenseRequest, type ExpenseAnalysisRequest } from '@/lib/ai/ollama';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🤖 AI Endpoint called (Ollama)');
+    console.log('🤖 AI Endpoint called');
     
-    // Временно отключаем проверку авторизации для тестирования
-    // TODO: включить авторизацию в продакшене
-    /*
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Необходима авторизация' },
-        { status: 401 }
-      );
-    }
-    */
-
     // Получение данных из запроса
     const body = await request.json();
     const {
+      description,
       amount,
       category,
       comment,
@@ -32,73 +20,24 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Валидация
-    if (!amount || !category) {
+    if (!description) {
       return NextResponse.json(
-        { error: 'Отсутствуют обязательные поля' },
+        { error: 'Введите описание расхода' },
         { status: 400 }
       );
     }
 
-    // Временно пропускаем проверку доступа к семье для демо
-    // В продакшене нужно раскомментировать этот блок
-    /*
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        familyMembers: {
-          where: { familyId },
-          include: {
-            family: true
-          }
-        }
-      }
-    });
-
-    if (!user || user.familyMembers.length === 0) {
-      return NextResponse.json(
-        { error: 'Нет доступа к этой семье' },
-        { status: 403 }
-      );
-    }
-    */
-
-    // Сбор контекста для AI (упрощенная версия для демо)
-    
-    // Для полноценной работы нужно:
-    // 1. Реальный familyId из авторизации
-    // 2. Данные из БД (бюджеты, транзакции, цели)
-    
-    // Пока используем моковые данные для демонстрации
-    const budget = null;
-    const recentExpenses: any[] = [];
-    const monthlyIncome = { _sum: { amount: 100000 } }; // моковый доход
-    const totalSavings = 50000; // моковые сбережения
-    const goals: any[] = [];
-
-    // Формирование запроса к AI
-    const aiRequest: ExpenseAnalysisRequest = {
-      amount: parseFloat(amount),
-      category,
-      comment,
-      currentBudget: null, // пока без бюджета
-      recentExpenses: [],
-      monthlyIncome: monthlyIncome._sum.amount ? parseFloat(monthlyIncome._sum.amount.toString()) : 100000,
-      totalSavings,
-      goals: []
-    };
-
-    // Вызов AI анализа
-    const recommendation = await analyzeExpenseRequest(aiRequest);
+    // Симулируем AI анализ для демонстрации
+    // В реальной версии здесь будет вызов Ollama или другой AI модели
+    const analysis = analyzeExpenseText(description);
 
     return NextResponse.json({
       success: true,
-      recommendation,
-      context: {
-        budgetAvailable: null,
-        recentExpensesCount: 0,
-        monthlyIncome: 100000,
-        totalSavings: 50000
-      }
+      suggestedCategory: analysis.category,
+      categoryIcon: analysis.icon,
+      analysis: analysis.analysis,
+      suggestion: analysis.suggestion,
+      confidence: analysis.confidence
     });
 
   } catch (error) {
@@ -111,6 +50,87 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Функция анализа текста расхода
+function analyzeExpenseText(description: string) {
+  const lowerDesc = description.toLowerCase();
+  
+  // Простые правила для категоризации (в реальности будет ML-модель)
+  const categories = [
+    {
+      keywords: ['магнит', 'пятерочка', 'перекресток', 'продукты', 'еда', 'хлеб', 'молоко', 'овощи', 'мясо'],
+      category: 'Продукты питания',
+      icon: '🛒',
+      suggestion: 'Планируйте покупки заранее и используйте список покупок, чтобы избежать импульсивных трат'
+    },
+    {
+      keywords: ['кафе', 'ресторан', 'кофе', 'доставка', 'яндекс еда', 'delivery'],
+      category: 'Рестораны и кафе',
+      icon: '🍕',
+      suggestion: 'Попробуйте готовить дома чаще - это может сэкономить до 50% расходов на питание'
+    },
+    {
+      keywords: ['транспорт', 'такси', 'яндекс', 'метро', 'автобус', 'бензин', 'заправка'],
+      category: 'Транспорт',
+      icon: '🚗',
+      suggestion: 'Рассмотрите использование общественного транспорта или каршеринга для снижения расходов'
+    },
+    {
+      keywords: ['аптека', 'лекарства', 'больница', 'врач', 'медицина'],
+      category: 'Здоровье',
+      icon: '💊',
+      suggestion: 'Здоровье - приоритет. Рассмотрите покупку медицинской страховки для снижения непредвиденных расходов'
+    },
+    {
+      keywords: ['одежда', 'обувь', 'магазин', 'платье', 'куртка', 'джинсы'],
+      category: 'Одежда и обувь',
+      icon: '👔',
+      suggestion: 'Покупайте качественные вещи в сезонные распродажи - это выгоднее, чем частые покупки дешевых вещей'
+    },
+    {
+      keywords: ['кино', 'развлечения', 'концерт', 'театр', 'боулинг', 'игры'],
+      category: 'Развлечения',
+      icon: '🎮',
+      suggestion: 'Ищите бесплатные альтернативы: парки, бесплатные музеи, онлайн-трансляции концертов'
+    },
+    {
+      keywords: ['коммунальные', 'свет', 'вода', 'газ', 'интернет', 'телефон'],
+      category: 'Коммунальные услуги',
+      icon: '🏠',
+      suggestion: 'Установите счетчики и LED-лампы для экономии на коммунальных платежах'
+    },
+    {
+      keywords: ['подписка', 'netflix', 'spotify', 'youtube', 'сервис'],
+      category: 'Подписки',
+      icon: '📱',
+      suggestion: 'Проверьте все подписки и отмените неиспользуемые - часто мы забываем о них'
+    }
+  ];
+
+  // Поиск подходящей категории
+  for (const cat of categories) {
+    for (const keyword of cat.keywords) {
+      if (lowerDesc.includes(keyword)) {
+        return {
+          category: cat.category,
+          icon: cat.icon,
+          analysis: `На основе описания "${description}", ИИ определил, что это расход категории "${cat.category}".`,
+          suggestion: cat.suggestion,
+          confidence: 0.85
+        };
+      }
+    }
+  }
+
+  // Категория по умолчанию
+  return {
+    category: 'Прочие расходы',
+    icon: '💸',
+    analysis: `ИИ проанализировал описание "${description}" и отнес его к категории "Прочие расходы".`,
+    suggestion: 'Старайтесь быть более конкретными в описании расходов для лучшего анализа',
+    confidence: 0.5
+  };
 }
 
 // OPTIONS для CORS

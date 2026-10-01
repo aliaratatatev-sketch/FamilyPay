@@ -397,6 +397,43 @@ export default function DashboardPage() {
           )}
         </div>
 
+        {/* AI Assistant Banner */}
+        <div className="mb-8">
+          <Link href="/dashboard/ai-assistant">
+            <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 rounded-2xl shadow-xl p-6 hover:shadow-2xl transition group cursor-pointer overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32 group-hover:scale-110 transition-transform duration-500" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24 group-hover:scale-110 transition-transform duration-500" />
+              
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition">
+                    <span className="text-4xl">🤖</span>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-bold text-white">
+                        ИИ Финансовый Ассистент
+                      </h3>
+                      <span className="px-2 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full animate-pulse">
+                        NEW
+                      </span>
+                    </div>
+                    <p className="text-purple-100">
+                      Умный анализ расходов и персональные рекомендации
+                    </p>
+                  </div>
+                </div>
+                <div className="hidden sm:flex items-center gap-2 text-white">
+                  <span className="text-lg font-semibold">Попробовать</span>
+                  <svg className="w-6 h-6 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </div>
+
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Link href="/dashboard/transactions">
