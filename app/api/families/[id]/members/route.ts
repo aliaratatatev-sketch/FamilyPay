@@ -7,11 +7,11 @@ import { getCurrentUserId } from '@/lib/session';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getCurrentUserId();
-    const familyId = params.id;
+    const { id: familyId } = await params;
 
     // Проверяем, является ли пользователь членом семьи
     const member = await prisma.familyMember.findUnique({
@@ -71,11 +71,11 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const currentUserId = await getCurrentUserId();
-    const familyId = params.id;
+    const { id: familyId } = await params;
 
     // Проверяем права текущего пользователя
     const currentMember = await prisma.familyMember.findUnique({
@@ -142,24 +142,45 @@ export async function POST(
       );
     }
 
-    // Создаем нового члена семьи
-    const newMember = await prisma.familyMember.create({
-      data: {
-        familyId,
-        userId,
-        role: role || 'VIEWER',
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
+    // Получаем информацию о семье для уведомления
+    const family = await prisma.family.findUnique({
+      where: { id: familyId },
+      select: { id: true, name: true },
+    });
+
+    // Создаем нового члена семьи и уведомление в транзакции
+    const [newMember, notification] = await prisma.$transaction([
+      prisma.familyMember.create({
+        data: {
+          familyId,
+          userId,
+          role: role || 'VIEWER',
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
           },
         },
-      },
-    });
+      }),
+      prisma.notification.create({
+        data: {
+          userId,
+          type: 'FAMILY_INVITE',
+          title: 'Приглашение в семью',
+          message: `Вы были добавлены в семью "${family?.name || 'Без названия'}"`,
+          data: JSON.parse(JSON.stringify({
+            familyId,
+            familyName: family?.name,
+            role: role || 'VIEWER',
+          })),
+        },
+      }),
+    ]);
 
     return NextResponse.json({
       success: true,
@@ -177,7 +198,10 @@ export async function POST(
     }
     
     return NextResponse.json(
-      { error: 'Failed to add member' },
+      { 
+        error: 'Failed to add member',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

@@ -23,11 +23,11 @@ async function checkFamilyMembership(familyId: string, userId: string) {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getCurrentUserId();
-    const familyId = params.id;
+    const { id: familyId } = await params;
 
     // Проверяем, является ли пользователь членом семьи
     const member = await checkFamilyMembership(familyId, userId);
@@ -118,11 +118,11 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getCurrentUserId();
-    const familyId = params.id;
+    const { id: familyId } = await params;
     const body = await request.json();
 
     // Проверяем, является ли пользователь админом семьи
@@ -229,11 +229,11 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getCurrentUserId();
-    const familyId = params.id;
+    const { id: familyId } = await params;
 
     // Проверяем существование семьи
     const family = await prisma.family.findUnique({

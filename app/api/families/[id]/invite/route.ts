@@ -9,11 +9,11 @@ import { randomBytes } from 'crypto';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getCurrentUserId();
-    const familyId = params.id;
+    const { id: familyId } = await params;
     const body = await request.json();
     const { email, role = 'VIEWER' } = body;
 
@@ -162,11 +162,11 @@ export async function POST(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await getCurrentUserId();
-    const familyId = params.id;
+    const { id: familyId } = await params;
 
     // Проверяем права доступа
     const member = await prisma.familyMember.findUnique({

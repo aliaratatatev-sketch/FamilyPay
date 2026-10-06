@@ -4,8 +4,9 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import AdminAccessModal from '../components/AdminAccessModal';
-import CreateFamilyModal from '../components/CreateFamilyModal';
+import AdminAccessModal from '@/app/components/AdminAccessModal';
+import CreateFamilyModal from '@/app/components/CreateFamilyModal';
+import NotificationBell from '@/components/NotificationBell';
 
 interface Family {
   id: string;
@@ -188,57 +189,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold">
-              FP
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
-              FamilyPay
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Добро пожаловать,
-              </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                {session?.user?.name || session?.user?.email}
-              </p>
-            </div>
-
-            <Link
-              href="/dashboard/profile"
-              className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-2"
-            >
-              <span>👤</span>
-              <span>Профиль</span>
-            </Link>
-            
-            {isAdmin && (
-              <button
-                onClick={handleAdminPanelClick}
-                className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-lg hover:shadow-lg transition flex items-center gap-2"
-              >
-                <span>🔐</span>
-                <span>Админ-панель</span>
-              </button>
-            )}
-            
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-            >
-              Выйти
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <>
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8">
@@ -435,107 +386,282 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <Link href="/dashboard/transactions">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition group cursor-pointer">
-              <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+              <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition mx-auto">
                 <span className="text-2xl">💸</span>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                Добавить доход
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-center text-sm">
+                Доходы
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Зарплата, подработка
-              </p>
             </div>
           </Link>
 
           <Link href="/dashboard/transactions">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition group cursor-pointer">
-              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition mx-auto">
                 <span className="text-2xl">🛒</span>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                Добавить расход
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-center text-sm">
+                Расходы
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Покупки, счета
-              </p>
             </div>
           </Link>
 
           <Link href="/dashboard/accounts">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition group cursor-pointer">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition mx-auto">
                 <span className="text-2xl">💳</span>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-center text-sm">
                 Счета
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {stats ? `${stats.accountsCount} счетов` : 'Управление счетами'}
-              </p>
             </div>
           </Link>
 
-          <Link href="/dashboard/transactions">
+          <Link href="/dashboard/money-requests">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition group cursor-pointer">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <span className="text-2xl">📊</span>
+              <div className="w-12 h-12 rounded-xl bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition mx-auto">
+                <span className="text-2xl">💰</span>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                Транзакции
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-center text-sm">
+                Запросы
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {stats ? `${stats.transactionsCount} за месяц` : 'История операций'}
-              </p>
+            </div>
+          </Link>
+
+          <Link href="/dashboard/manage-requests">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition group cursor-pointer">
+              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition mx-auto">
+                <span className="text-2xl">👨‍💼</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-center text-sm">
+                Управление
+              </h3>
+            </div>
+          </Link>
+
+          <Link href="/dashboard/family">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition group cursor-pointer">
+              <div className="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/20 flex items-center justify-center mb-4 group-hover:scale-110 transition mx-auto">
+                <span className="text-2xl">👨‍👩‍👧‍👦</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-center text-sm">
+                Семья
+              </h3>
             </div>
           </Link>
         </div>
 
         {/* Recent Transactions */}
         {stats && stats.recentTransactions && stats.recentTransactions.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Transactions Widget */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Последние транзакции
+                </h2>
+                <Link 
+                  href="/dashboard/transactions"
+                  className="text-sm text-[#0D6D6E] dark:text-[#4FD1C5] hover:underline"
+                >
+                  Все →
+                </Link>
+              </div>
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                {stats.recentTransactions.slice(0, 5).map((transaction: any) => (
+                  <div key={transaction.id} className="py-3 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl">
+                        {transaction.category?.icon || (transaction.type === 'INCOME' ? '💰' : transaction.type === 'EXPENSE' ? '💸' : '🔄')}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 dark:text-white truncate">
+                        {transaction.description || transaction.category?.name || transaction.type}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {transaction.account.name} • {formatDate(transaction.date)}
+                      </p>
+                    </div>
+                    <div className={`font-semibold flex-shrink-0 ${
+                      transaction.type === 'INCOME' ? 'text-green-600' : 
+                      transaction.type === 'EXPENSE' ? 'text-red-600' : 
+                      'text-blue-600'
+                    }`}>
+                      {transaction.type === 'INCOME' ? '+' : transaction.type === 'EXPENSE' ? '-' : ''}
+                      {formatAmount(Number(transaction.amount), transaction.currency)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Active Goals Widget */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Финансовые цели
+                </h2>
+                <Link 
+                  href="/dashboard/goals"
+                  className="text-sm text-[#0D6D6E] dark:text-[#4FD1C5] hover:underline"
+                >
+                  Все →
+                </Link>
+              </div>
+              {stats.goals && stats.goals.active && stats.goals.active.length > 0 ? (
+                <div className="space-y-4">
+                  {stats.goals.active.slice(0, 3).map((goal: any) => {
+                    const progress = (Number(goal.currentAmount) / Number(goal.targetAmount)) * 100;
+                    return (
+                      <div key={goal.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-medium text-gray-900 dark:text-white">
+                            {goal.icon} {goal.name}
+                          </h3>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {progress.toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                          <div 
+                            className="bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] h-2 rounded-full transition-all"
+                            style={{ width: `${Math.min(progress, 100)}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                          <span>{formatAmount(Number(goal.currentAmount), goal.currency)}</span>
+                          <span>{formatAmount(Number(goal.targetAmount), goal.currency)}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-2">🎯</div>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Нет активных целей
+                  </p>
+                  <Link
+                    href="/dashboard/goals"
+                    className="inline-block px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-lg hover:shadow-lg transition"
+                  >
+                    Создать цель
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Accounts and Budgets */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Accounts Widget */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Последние транзакции
+                Счета
+              </h2>
+              <Link 
+                href="/dashboard/accounts"
+                className="text-sm text-[#0D6D6E] dark:text-[#4FD1C5] hover:underline"
+              >
+                Управление →
+              </Link>
+            </div>
+            {selectedFamily && selectedFamily.accounts && selectedFamily.accounts.length > 0 ? (
+              <div className="space-y-3">
+                {selectedFamily.accounts.slice(0, 4).map((account: any) => (
+                  <div key={account.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white">
+                        {account.icon || '💳'}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {account.name}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {account.type}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {formatAmount(Number(account.balance), account.currency)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-2">💳</div>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Нет счетов
+                </p>
+                <Link
+                  href="/dashboard/accounts"
+                  className="inline-block px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-lg hover:shadow-lg transition"
+                >
+                  Добавить счёт
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Top Expenses Widget */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Топ категорий
               </h2>
               <Link 
                 href="/dashboard/transactions"
                 className="text-sm text-[#0D6D6E] dark:text-[#4FD1C5] hover:underline"
               >
-                Смотреть все →
+                Подробнее →
               </Link>
             </div>
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {stats.recentTransactions.map((transaction: any) => (
-                <div key={transaction.id} className="py-3 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">
-                      {transaction.category?.icon || (transaction.type === 'INCOME' ? '💰' : transaction.type === 'EXPENSE' ? '💸' : '🔄')}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-white truncate">
-                      {transaction.description || transaction.category?.name || transaction.type}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {transaction.account.name} • {formatDate(transaction.date)}
-                    </p>
-                  </div>
-                  <div className={`font-semibold flex-shrink-0 ${
-                    transaction.type === 'INCOME' ? 'text-green-600' : 
-                    transaction.type === 'EXPENSE' ? 'text-red-600' : 
-                    'text-blue-600'
-                  }`}>
-                    {transaction.type === 'INCOME' ? '+' : transaction.type === 'EXPENSE' ? '-' : ''}
-                    {formatAmount(Number(transaction.amount), transaction.currency)}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {stats && stats.topExpenseCategories && stats.topExpenseCategories.length > 0 ? (
+              <div className="space-y-3">
+                {stats.topExpenseCategories.slice(0, 5).map((cat: any, index: number) => {
+                  const maxAmount = Number(stats.topExpenseCategories[0].total);
+                  const percentage = (Number(cat.total) / maxAmount) * 100;
+                  return (
+                    <div key={cat.category || index}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cat.icon} {cat.category || 'Без категории'}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {formatAmount(Number(cat.total), selectedFamily?.currency)}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full transition-all"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-2">📊</div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Нет данных о расходах
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Debug Info - только для администраторов */}
         {isAdmin && (
@@ -566,6 +692,6 @@ export default function DashboardPage() {
         onClose={() => setShowCreateFamilyModal(false)}
         onSuccess={handleFamilyCreated}
       />
-    </div>
+    </>
   );
 }

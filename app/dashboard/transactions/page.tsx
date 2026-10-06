@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import NotificationBell from '../../components/NotificationBell';
 
 interface Transaction {
   id: string;
@@ -12,6 +13,7 @@ interface Transaction {
   currency: string;
   description: string | null;
   date: string;
+  createdAt: string;
   account: {
     id: string;
     name: string;
@@ -29,17 +31,9 @@ interface Transaction {
   user: {
     id: string;
     name: string | null;
+    email: string | null;
     image: string | null;
   };
-}
-
-interface Account {
-  id: string;
-  name: string;
-  type: string;
-  balance: number;
-  currency: string;
-  icon: string | null;
 }
 
 interface Family {
@@ -48,18 +42,34 @@ interface Family {
   currency: string;
 }
 
+interface Account {
+  id: string;
+  name: string;
+  balance: number;
+  currency: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  type: string;
+  icon: string | null;
+  color: string | null;
+}
+
 export default function TransactionsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [families, setFamilies] = useState<Family[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedFamilyId, setSelectedFamilyId] = useState<string>('');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -74,13 +84,14 @@ export default function TransactionsPage() {
   useEffect(() => {
     if (selectedFamilyId) {
       loadAccounts(selectedFamilyId);
+      loadCategories(selectedFamilyId);
       loadTransactions();
     }
-  }, [selectedFamilyId, typeFilter, currentPage]);
+  }, [selectedFamilyId]);
 
   const loadFamilies = async () => {
     try {
-      const response = await fetch('/api/families');
+      const response = await fetch('/api/families?t=' + Date.now());
       const data = await response.json();
       
       if (response.ok && data.families && data.families.length > 0) {
@@ -105,23 +116,27 @@ export default function TransactionsPage() {
     }
   };
 
+  const loadCategories = async (familyId: string) => {
+    try {
+      const response = await fetch(`/api/categories?familyId=${familyId}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setCategories(data.categories || []);
+      }
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  };
+
   const loadTransactions = async () => {
-    if (!selectedFamilyId) return;
-    
     try {
       setIsLoading(true);
-      let url = `/api/transactions?familyId=${selectedFamilyId}&page=${currentPage}&pageSize=20`;
-      
-      if (typeFilter !== 'all') {
-        url += `&type=${typeFilter}`;
-      }
-      
-      const response = await fetch(url);
+      const response = await fetch(`/api/transactions?familyId=${selectedFamilyId}`);
       const data = await response.json();
       
       if (response.ok) {
         setTransactions(data.transactions || []);
-        setTotalPages(data.pagination?.totalPages || 1);
       }
     } catch (error) {
       console.error('Error loading transactions:', error);
@@ -130,25 +145,52 @@ export default function TransactionsPage() {
     }
   };
 
-  const getTransactionIcon = (type: string) => {
-    const icons: Record<string, string> = {
-      INCOME: '💰',
-      EXPENSE: '💸',
-      TRANSFER: '🔄',
-    };
-    return icons[type] || '💵';
+  const getFilteredTransactions = () => {
+    let filtered = transactions;
+
+    // Фильтр по типу
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter(t => t.type === typeFilter);
+    }
+
+    // Фильтр по дате
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      filtered = filtered.filter(t => {
+        const transactionDate = new Date(t.date);
+        
+        if (dateFilter === 'today') {
+          return transactionDate >= today;
+        } else if (dateFilter === 'week') {
+          const weekAgo = new Date(today);
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return transactionDate >= weekAgo;
+        } else if (dateFilter === 'month') {
+          const monthAgo = new Date(today);
+          monthAgo.setMonth(monthAgo.getMonth() - 1);
+          return transactionDate >= monthAgo;
+        }
+        
+        return true;
+      });
+    }
+
+    // Поиск
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.description?.toLowerCase().includes(query) ||
+        t.category?.name.toLowerCase().includes(query) ||
+        t.account.name.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
   };
 
-  const getTransactionTypeName = (type: string) => {
-    const names: Record<string, string> = {
-      INCOME: 'Доход',
-      EXPENSE: 'Расход',
-      TRANSFER: 'Перевод',
-    };
-    return names[type] || type;
-  };
-
-  const formatAmount = (amount: number, type: string, currency: string) => {
+  const formatAmount = (amount: number, currency: string) => {
     const symbols: Record<string, string> = {
       RUB: '₽',
       USD: '$',
@@ -158,14 +200,8 @@ export default function TransactionsPage() {
     
     const symbol = symbols[currency] || currency;
     const formatted = new Intl.NumberFormat('ru-RU').format(amount);
-    const sign = type === 'INCOME' ? '+' : type === 'EXPENSE' ? '-' : '';
-    const colorClass = type === 'INCOME' ? 'text-green-600' : type === 'EXPENSE' ? 'text-red-600' : 'text-blue-600';
     
-    return (
-      <span className={`font-semibold ${colorClass}`}>
-        {sign}{formatted} {symbol}
-      </span>
-    );
+    return `${formatted} ${symbol}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -179,8 +215,21 @@ export default function TransactionsPage() {
     } else if (date.toDateString() === yesterday.toDateString()) {
       return 'Вчера, ' + date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     } else {
-      return date.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' });
+      return date.toLocaleDateString('ru-RU', { 
+        day: 'numeric', 
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     }
+  };
+
+  const getTransactionStats = () => {
+    const filtered = getFilteredTransactions();
+    const income = filtered.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + Number(t.amount), 0);
+    const expense = filtered.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + Number(t.amount), 0);
+    
+    return { income, expense, total: income - expense, count: filtered.length };
   };
 
   if (status === 'loading') {
@@ -194,6 +243,10 @@ export default function TransactionsPage() {
   if (status === 'unauthenticated') {
     return null;
   }
+
+  const filteredTransactions = getFilteredTransactions();
+  const stats = getTransactionStats();
+  const selectedFamily = families.find(f => f.id === selectedFamilyId);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -210,6 +263,8 @@ export default function TransactionsPage() {
           </Link>
 
           <div className="flex items-center gap-4">
+            <NotificationBell />
+            
             <Link 
               href="/dashboard"
               className="text-gray-600 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition"
@@ -225,26 +280,56 @@ export default function TransactionsPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Транзакции
+              💰 Транзакции
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              История доходов и расходов
+              История всех операций
             </p>
           </div>
           
           <button
             onClick={() => setShowAddModal(true)}
-            disabled={!selectedFamilyId || accounts.length === 0}
-            className="px-6 py-3 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
           >
             <span>+</span>
             <span>Добавить</span>
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Всего операций</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.count}</div>
+          </div>
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow p-6">
+            <div className="text-sm text-green-800 dark:text-green-400 mb-1">Доходы</div>
+            <div className="text-2xl font-bold text-green-900 dark:text-green-300">
+              +{formatAmount(stats.income, selectedFamily?.currency || 'RUB')}
+            </div>
+          </div>
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow p-6">
+            <div className="text-sm text-red-800 dark:text-red-400 mb-1">Расходы</div>
+            <div className="text-2xl font-bold text-red-900 dark:text-red-300">
+              -{formatAmount(stats.expense, selectedFamily?.currency || 'RUB')}
+            </div>
+          </div>
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl shadow p-6">
+            <div className="text-sm text-blue-800 dark:text-blue-400 mb-1">Баланс</div>
+            <div className={`text-2xl font-bold ${
+              stats.total >= 0 
+                ? 'text-green-900 dark:text-green-300' 
+                : 'text-red-900 dark:text-red-300'
+            }`}>
+              {stats.total >= 0 ? '+' : ''}{formatAmount(stats.total, selectedFamily?.currency || 'RUB')}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          {/* Filters */}
+          <div className="mb-6 space-y-4">
+            {/* Family Selector */}
             {families.length > 1 && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -252,11 +337,8 @@ export default function TransactionsPage() {
                 </label>
                 <select
                   value={selectedFamilyId}
-                  onChange={(e) => {
-                    setSelectedFamilyId(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  onChange={(e) => setSelectedFamilyId(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   {families.map((family) => (
                     <option key={family.id} value={family.id}>
@@ -267,137 +349,157 @@ export default function TransactionsPage() {
               </div>
             )}
 
+            {/* Search */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Тип транзакции
+                Поиск
               </label>
-              <select
-                value={typeFilter}
-                onChange={(e) => {
-                  setTypeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Поиск по описанию, категории..."
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="all">Все транзакции</option>
-                <option value="INCOME">Доходы</option>
-                <option value="EXPENSE">Расходы</option>
-                <option value="TRANSFER">Переводы</option>
-              </select>
+              />
             </div>
-          </div>
-        </div>
 
-        {/* Transactions List */}
-        {!selectedFamilyId ? (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              Выберите семью для просмотра транзакций
-            </p>
-          </div>
-        ) : isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#0D6D6E] mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Загрузка...</p>
-          </div>
-        ) : transactions.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center">
-            <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-              <span className="text-4xl">💸</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Нет транзакций
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {accounts.length === 0 
-                ? 'Сначала создайте счёт' 
-                : 'Добавьте первую транзакцию'}
-            </p>
-            {accounts.length > 0 && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="px-6 py-3 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition"
-              >
-                Добавить транзакцию
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {transactions.map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer"
+            {/* Type Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Тип операции
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {(['all', 'INCOME', 'EXPENSE', 'TRANSFER'] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setTypeFilter(type)}
+                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                      typeFilter === type
+                        ? 'bg-[#0D6D6E] text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl flex-shrink-0">
-                        {transaction.category?.icon || getTransactionIcon(transaction.type)}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-                              {transaction.description || transaction.category?.name || getTransactionTypeName(transaction.type)}
-                            </h3>
-                            <div className="flex items-center gap-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
-                              <span className="flex items-center gap-1">
-                                {transaction.account.icon} {transaction.account.name}
-                              </span>
-                              <span>•</span>
-                              <span>{formatDate(transaction.date)}</span>
-                            </div>
-                          </div>
-
-                          <div className="text-right flex-shrink-0">
-                            <div className="text-lg">
-                              {formatAmount(Number(transaction.amount), transaction.type, transaction.currency)}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                              {getTransactionTypeName(transaction.type)}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    {type === 'all' ? 'Все' : type === 'INCOME' ? 'Доходы' : type === 'EXPENSE' ? 'Расходы' : 'Переводы'}
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-6 flex justify-center gap-2">
-                <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  ← Назад
-                </button>
-                <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
-                  Страница {currentPage} из {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Вперёд →
-                </button>
+            {/* Date Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Период
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {(['all', 'today', 'week', 'month'] as const).map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setDateFilter(period)}
+                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                      dateFilter === period
+                        ? 'bg-[#0D6D6E] text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {period === 'all' ? 'Все время' : period === 'today' ? 'Сегодня' : period === 'week' ? 'Неделя' : 'Месяц'}
+                  </button>
+                ))}
               </div>
-            )}
-          </>
-        )}
+            </div>
+          </div>
+
+          {/* Transactions List */}
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#0D6D6E] mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Загрузка транзакций...</p>
+            </div>
+          ) : filteredTransactions.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">💸</div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Нет транзакций
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {searchQuery || typeFilter !== 'all' || dateFilter !== 'all' 
+                  ? 'Попробуйте изменить фильтры'
+                  : 'Добавьте первую транзакцию'
+                }
+              </p>
+              {!searchQuery && typeFilter === 'all' && dateFilter === 'all' && (
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition"
+                >
+                  Добавить транзакцию
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredTransactions.map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+                >
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                    style={{ 
+                      backgroundColor: transaction.category?.color || transaction.account.color || '#10B981',
+                      opacity: 0.9 
+                    }}
+                  >
+                    {transaction.category?.icon || 
+                     transaction.account.icon || 
+                     (transaction.type === 'INCOME' ? '💰' : transaction.type === 'EXPENSE' ? '💸' : '🔄')}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {transaction.description || transaction.category?.name || 'Без описания'}
+                      </p>
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        transaction.type === 'INCOME' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                          : transaction.type === 'EXPENSE'
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                      }`}>
+                        {transaction.type === 'INCOME' ? 'Доход' : transaction.type === 'EXPENSE' ? 'Расход' : 'Перевод'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                      <span>{transaction.account.name}</span>
+                      {transaction.category && <span>• {transaction.category.name}</span>}
+                      <span>• {formatDate(transaction.date)}</span>
+                      <span>• {transaction.user.name || transaction.user.email}</span>
+                    </div>
+                  </div>
+
+                  <div className={`text-xl font-bold flex-shrink-0 ${
+                    transaction.type === 'INCOME' 
+                      ? 'text-green-600 dark:text-green-400' 
+                      : transaction.type === 'EXPENSE'
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-blue-600 dark:text-blue-400'
+                  }`}>
+                    {transaction.type === 'INCOME' ? '+' : transaction.type === 'EXPENSE' ? '-' : ''}
+                    {formatAmount(Number(transaction.amount), transaction.currency)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Add Transaction Modal */}
-      {showAddModal && (
+      {showAddModal && selectedFamily && (
         <AddTransactionModal
           familyId={selectedFamilyId}
+          currency={selectedFamily.currency}
           accounts={accounts}
+          categories={categories}
           onClose={() => setShowAddModal(false)}
           onSuccess={() => {
             setShowAddModal(false);
@@ -410,22 +512,25 @@ export default function TransactionsPage() {
   );
 }
 
-// Компонент модального окна добавления транзакции
-function AddTransactionModal({ 
+// Компонент добавления транзакции
+function AddTransactionModal({
   familyId,
+  currency,
   accounts,
-  onClose, 
-  onSuccess 
-}: { 
+  categories,
+  onClose,
+  onSuccess,
+}: {
   familyId: string;
+  currency: string;
   accounts: Account[];
-  onClose: () => void; 
+  categories: Category[];
+  onClose: () => void;
   onSuccess: () => void;
 }) {
-  const [transactionType, setTransactionType] = useState<'INCOME' | 'EXPENSE' | 'TRANSFER'>('EXPENSE');
   const [formData, setFormData] = useState({
+    type: 'EXPENSE' as 'INCOME' | 'EXPENSE' | 'TRANSFER',
     accountId: accounts[0]?.id || '',
-    toAccountId: '',
     categoryId: '',
     amount: '',
     description: '',
@@ -434,49 +539,16 @@ function AddTransactionModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Простые категории (позже можно вынести в API)
-  const categories = {
-    INCOME: [
-      { id: 'salary', name: 'Зарплата', icon: '💼' },
-      { id: 'freelance', name: 'Фриланс', icon: '💻' },
-      { id: 'investment', name: 'Инвестиции', icon: '📈' },
-      { id: 'gift', name: 'Подарок', icon: '🎁' },
-      { id: 'other_income', name: 'Другое', icon: '💰' },
-    ],
-    EXPENSE: [
-      { id: 'food', name: 'Продукты', icon: '🛒' },
-      { id: 'transport', name: 'Транспорт', icon: '🚗' },
-      { id: 'entertainment', name: 'Развлечения', icon: '🎉' },
-      { id: 'health', name: 'Здоровье', icon: '🏥' },
-      { id: 'education', name: 'Образование', icon: '📚' },
-      { id: 'bills', name: 'Счета', icon: '📄' },
-      { id: 'shopping', name: 'Покупки', icon: '🛍️' },
-      { id: 'other_expense', name: 'Другое', icon: '💸' },
-    ],
-  };
-
-  const currentCategories = transactionType === 'TRANSFER' ? [] : categories[transactionType];
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.accountId || !formData.amount) {
-      setError('Заполните все обязательные поля');
+      setError('Заполните обязательные поля');
       return;
     }
 
-    if (transactionType === 'TRANSFER' && !formData.toAccountId) {
-      setError('Выберите счёт получателя');
-      return;
-    }
-
-    if (transactionType === 'EXPENSE' && !formData.categoryId) {
-      setError('Выберите категорию');
-      return;
-    }
-
-    const amount = parseFloat(formData.amount);
-    if (isNaN(amount) || amount <= 0) {
+    const amountNum = parseFloat(formData.amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
       setError('Введите корректную сумму');
       return;
     }
@@ -493,12 +565,12 @@ function AddTransactionModal({
         body: JSON.stringify({
           familyId,
           accountId: formData.accountId,
-          toAccountId: transactionType === 'TRANSFER' ? formData.toAccountId : null,
           categoryId: formData.categoryId || null,
-          type: transactionType,
-          amount: amount,
-          description: formData.description || null,
-          date: formData.date ? new Date(formData.date).toISOString() : new Date().toISOString(),
+          type: formData.type,
+          amount: amountNum,
+          currency,
+          description: formData.description.trim() || null,
+          date: new Date(formData.date).toISOString(),
         }),
       });
 
@@ -516,9 +588,13 @@ function AddTransactionModal({
     }
   };
 
+  const filteredCategories = categories.filter(c => 
+    c.type === formData.type || formData.type === 'TRANSFER'
+  );
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative my-8">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative my-8">
         <button
           onClick={onClose}
           disabled={isLoading}
@@ -529,67 +605,50 @@ function AddTransactionModal({
 
         <div className="text-center mb-6">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">💸</span>
+            <span className="text-3xl">💰</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Новая транзакция
+            Добавить транзакцию
           </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Записать доход или расход
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Transaction Type */}
+          {/* Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Тип транзакции
+              Тип операции *
             </label>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { value: 'EXPENSE' as const, label: 'Расход', icon: '💸', color: 'red' },
-                { value: 'INCOME' as const, label: 'Доход', icon: '💰', color: 'green' },
-                { value: 'TRANSFER' as const, label: 'Перевод', icon: '🔄', color: 'blue' },
-              ].map((type) => (
+            <div className="grid grid-cols-3 gap-2">
+              {(['INCOME', 'EXPENSE', 'TRANSFER'] as const).map((type) => (
                 <button
-                  key={type.value}
+                  key={type}
                   type="button"
-                  onClick={() => {
-                    setTransactionType(type.value);
-                    setFormData({ ...formData, categoryId: '', toAccountId: '' });
-                  }}
+                  onClick={() => setFormData({ ...formData, type, categoryId: '' })}
                   disabled={isLoading}
                   className={`p-3 border-2 rounded-lg text-center transition ${
-                    transactionType === type.value
-                      ? 'border-[#0D6D6E] bg-[#0D6D6E]/10'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
+                    formData.type === type
+                      ? 'border-[#0D6D6E] bg-[#0D6D6E]/10 dark:bg-[#0D6D6E]/20'
+                      : 'border-gray-300 dark:border-gray-600'
                   }`}
                 >
-                  <div className="text-2xl mb-1">{type.icon}</div>
-                  <div className="text-sm font-medium">{type.label}</div>
+                  <div className="text-2xl mb-1">
+                    {type === 'INCOME' ? '💰' : type === 'EXPENSE' ? '💸' : '🔄'}
+                  </div>
+                  <div className="text-xs font-medium text-gray-900 dark:text-white">
+                    {type === 'INCOME' ? 'Доход' : type === 'EXPENSE' ? 'Расход' : 'Перевод'}
+                  </div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Amount */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Сумма *
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              placeholder="0.00"
-              disabled={isLoading}
-              className="w-full px-4 py-3 text-2xl font-semibold border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              autoFocus
-            />
-          </div>
-
           {/* Account */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {transactionType === 'TRANSFER' ? 'Со счёта *' : 'Счёт *'}
+              Счёт *
             </label>
             <select
               value={formData.accountId}
@@ -597,64 +656,68 @@ function AddTransactionModal({
               disabled={isLoading}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
+              <option value="">Выберите счёт</option>
               {accounts.map((account) => (
                 <option key={account.id} value={account.id}>
-                  {account.icon} {account.name} ({new Intl.NumberFormat('ru-RU').format(Number(account.balance))} {account.currency})
+                  {account.name} - {account.balance} {account.currency}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* To Account (for transfers) */}
-          {transactionType === 'TRANSFER' && (
+          {/* Category */}
+          {filteredCategories.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                На счёт *
+                Категория
               </label>
               <select
-                value={formData.toAccountId}
-                onChange={(e) => setFormData({ ...formData, toAccountId: e.target.value })}
+                value={formData.categoryId}
+                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 disabled={isLoading}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="">Выберите счёт</option>
-                {accounts
-                  .filter(acc => acc.id !== formData.accountId)
-                  .map((account) => (
-                    <option key={account.id} value={account.id}>
-                      {account.icon} {account.name}
-                    </option>
-                  ))}
+                <option value="">Без категории</option>
+                {filteredCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.icon} {category.name}
+                  </option>
+                ))}
               </select>
             </div>
           )}
 
-          {/* Category */}
-          {transactionType !== 'TRANSFER' && (
+          {/* Amount and Date */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Категория {transactionType === 'EXPENSE' ? '*' : ''}
+                Сумма ({currency}) *
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {currentCategories.map((category) => (
-                  <button
-                    key={category.id}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, categoryId: category.id })}
-                    disabled={isLoading}
-                    className={`p-3 border-2 rounded-lg text-center transition ${
-                      formData.categoryId === category.id
-                        ? 'border-[#0D6D6E] bg-[#0D6D6E]/10'
-                        : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
-                    }`}
-                  >
-                    <div className="text-2xl mb-1">{category.icon}</div>
-                    <div className="text-xs font-medium">{category.name}</div>
-                  </button>
-                ))}
-              </div>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                placeholder="0.00"
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
             </div>
-          )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Дата
+              </label>
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                disabled={isLoading}
+                max={new Date().toISOString().split('T')[0]}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+          </div>
 
           {/* Description */}
           <div>
@@ -665,22 +728,9 @@ function AddTransactionModal({
               type="text"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Комментарий к транзакции"
+              placeholder="Например: Покупка продуктов"
               disabled={isLoading}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
-          </div>
-
-          {/* Date */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Дата
-            </label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              disabled={isLoading}
+              maxLength={200}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
@@ -702,10 +752,10 @@ function AddTransactionModal({
             </button>
             <button
               type="submit"
-              disabled={isLoading || !formData.amount || !formData.accountId}
+              disabled={isLoading || !formData.accountId || !formData.amount}
               className="flex-1 py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50"
             >
-              {isLoading ? 'Создание...' : 'Создать'}
+              {isLoading ? 'Сохранение...' : 'Добавить'}
             </button>
           </div>
         </form>

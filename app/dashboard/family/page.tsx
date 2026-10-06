@@ -4,12 +4,13 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import NotificationBell from '../../components/NotificationBell';
 
 interface Family {
   id: string;
   name: string;
   currency: string;
-  createdBy: {
+  createdBy?: {
     id: string;
     name: string | null;
     email: string | null;
@@ -40,6 +41,18 @@ interface Invitation {
   expires: string;
 }
 
+interface Member {
+  id: string;
+  role: string;
+  joinedAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    image: string | null;
+  };
+}
+
 export default function FamilyPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -48,6 +61,11 @@ export default function FamilyPage() {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showRemoveMemberModal, setShowRemoveMemberModal] = useState(false);
+  const [showChangeRoleModal, setShowChangeRoleModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [userRole, setUserRole] = useState<string>('');
 
   useEffect(() => {
@@ -63,25 +81,34 @@ export default function FamilyPage() {
   const loadFamilies = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/families');
+      const response = await fetch(`/api/families?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+      
       const data = await response.json();
       
-      console.log('API Response:', { status: response.status, data });
-      console.log('Session user:', session?.user);
-      
       if (response.ok && data.families) {
-        console.log('Families received:', data.families.length);
         setFamilies(data.families);
         
         if (data.families.length > 0) {
-          console.log('Loading details for first family:', data.families[0].name);
-          loadFamilyDetails(data.families[0].id);
+          const firstFamily = data.families[0];
+          setSelectedFamily(firstFamily);
+          
+          const currentUserMember = firstFamily.members.find(
+            (m: any) => m.user.id === session?.user?.id
+          );
+          if (currentUserMember) {
+            setUserRole(currentUserMember.role);
+          }
+          
+          loadInvitations(firstFamily.id);
         } else {
-          console.log('No families found for user');
           setFamilies([]);
         }
       } else {
-        console.error('Failed to load families:', response.status, data);
         setFamilies([]);
       }
     } catch (error) {
@@ -89,21 +116,6 @@ export default function FamilyPage() {
       setFamilies([]);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const loadFamilyDetails = async (familyId: string) => {
-    try {
-      const response = await fetch(`/api/families/${familyId}`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setSelectedFamily(data.family);
-        setUserRole(data.userRole);
-        loadInvitations(familyId);
-      }
-    } catch (error) {
-      console.error('Error loading family details:', error);
     }
   };
 
@@ -140,6 +152,110 @@ export default function FamilyPage() {
     return colors[role] || colors.VIEWER;
   };
 
+  const handleDeleteFamily = async () => {
+    if (!selectedFamily) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/families/${selectedFamily.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        router.push('/dashboard');
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Ошибка при удалении семьи');
+      }
+    } catch (error) {
+      console.error('Error deleting family:', error);
+      alert('Ошибка при удалении семьи');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!selectedFamily || !selectedMember) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await fetch(
+        `/api/families/${selectedFamily.id}/members/${selectedMember.user.id}`,
+        { method: 'DELETE' }
+      );
+
+      if (response.ok) {
+        await loadFamilies();
+        setShowRemoveMemberModal(false);
+        setSelectedMember(null);
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Ошибка при удалении участника');
+      }
+    } catch (error) {
+      console.error('Error removing member:', error);
+      alert('Ошибка при удалении участника');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleChangeRole = async (newRole: string) => {
+    if (!selectedFamily || !selectedMember) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await fetch(
+        `/api/families/${selectedFamily.id}/members/${selectedMember.user.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ role: newRole }),
+        }
+      );
+
+      if (response.ok) {
+        await loadFamilies();
+        setShowChangeRoleModal(false);
+        setSelectedMember(null);
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Ошибка при изменении роли');
+      }
+    } catch (error) {
+      console.error('Error changing role:', error);
+      alert('Ошибка при изменении роли');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const canManageMember = (member: Member) => {
+    if (!selectedFamily || !session?.user?.id) return false;
+    
+    // Нельзя управлять создателем семьи
+    if (selectedFamily.createdBy?.id === member.user.id) return false;
+    
+    // Нельзя управлять самим собой
+    if (member.user.id === session.user.id) return false;
+    
+    // Только админы могут управлять участниками
+    return userRole === 'ADMIN';
+  };
+
+  const canLeaveFamily = () => {
+    if (!selectedFamily || !session?.user?.id) return false;
+    
+    // Создатель не может покинуть семью, только удалить её
+    return selectedFamily.createdBy?.id !== session.user.id;
+  };
+
+  const isCreator = selectedFamily && selectedFamily.createdBy && session?.user?.id === selectedFamily.createdBy.id;
+
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -163,29 +279,6 @@ export default function FamilyPage() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Создайте семью на главной странице, чтобы начать управлять финансами
           </p>
-          
-          {/* Отладочная информация */}
-          <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-left">
-            <p className="text-sm font-mono text-yellow-800 dark:text-yellow-200 mb-2">
-              <strong>Отладка:</strong>
-            </p>
-            <p className="text-xs font-mono text-yellow-700 dark:text-yellow-300 mb-1">
-              Email: {session?.user?.email || 'не определен'}
-            </p>
-            <p className="text-xs font-mono text-yellow-700 dark:text-yellow-300 mb-1">
-              Загружено семей: {families.length}
-            </p>
-            <button
-              onClick={() => {
-                console.log('Session:', session);
-                console.log('Families:', families);
-                alert('Проверьте консоль браузера (F12)');
-              }}
-              className="mt-2 text-xs px-3 py-1 bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100 rounded hover:bg-yellow-300 dark:hover:bg-yellow-700 transition"
-            >
-              Показать данные в консоли
-            </button>
-          </div>
           
           <Link
             href="/dashboard"
@@ -213,6 +306,8 @@ export default function FamilyPage() {
           </Link>
 
           <div className="flex items-center gap-4">
+            <NotificationBell />
+            
             <Link 
               href="/dashboard"
               className="text-gray-600 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition"
@@ -258,22 +353,34 @@ export default function FamilyPage() {
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Участники семьи
             </h2>
-            {(userRole === 'ADMIN' || userRole === 'PARENT') && (
-              <button
-                onClick={() => setShowInviteModal(true)}
-                className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
-              >
-                <span>+</span>
-                <span>Пригласить</span>
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {(userRole === 'ADMIN' || userRole === 'PARENT') && (
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
+                >
+                  <span>+</span>
+                  <span>Пригласить</span>
+                </button>
+              )}
+              {isCreator && (
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition flex items-center gap-2"
+                  title="Только создатель может удалить семью"
+                >
+                  <span>🗑️</span>
+                  <span>Удалить семью</span>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="space-y-4">
             {selectedFamily.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
               >
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                   {member.user.name?.charAt(0) || member.user.email?.charAt(0) || '?'}
@@ -282,6 +389,11 @@ export default function FamilyPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 dark:text-white">
                     {member.user.name || 'Без имени'}
+                    {selectedFamily.createdBy?.id === member.user.id && (
+                      <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full">
+                        👑 Создатель
+                      </span>
+                    )}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {member.user.email}
@@ -291,16 +403,59 @@ export default function FamilyPage() {
                   </p>
                 </div>
 
-                <span className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getRoleBadgeColor(member.role)}`}>
-                  {getRoleName(member.role)}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getRoleBadgeColor(member.role)}`}>
+                    {getRoleName(member.role)}
+                  </span>
+
+                  {canManageMember(member) && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          setSelectedMember(member);
+                          setShowChangeRoleModal(true);
+                        }}
+                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                        title="Изменить роль"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedMember(member);
+                          setShowRemoveMemberModal(true);
+                        }}
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                        title="Удалить участника"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {member.user.id === session?.user?.id && canLeaveFamily() && (
+                    <button
+                      onClick={() => {
+                        setSelectedMember(member);
+                        setShowRemoveMemberModal(true);
+                      }}
+                      className="px-3 py-1 text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition"
+                    >
+                      Покинуть
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Pending Invitations */}
-        {invitations.length > 0 && (
+        {invitations.length > 0 && (userRole === 'ADMIN' || userRole === 'PARENT') && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
               Активные приглашения
@@ -339,14 +494,51 @@ export default function FamilyPage() {
       </main>
 
       {/* Invite Modal */}
-      {showInviteModal && (
+      {showInviteModal && selectedFamily && (
         <InviteModal
           familyId={selectedFamily.id}
           onClose={() => setShowInviteModal(false)}
           onSuccess={() => {
             setShowInviteModal(false);
-            loadInvitations(selectedFamily.id);
+            loadFamilies();
           }}
+        />
+      )}
+
+      {/* Change Role Modal */}
+      {showChangeRoleModal && selectedMember && (
+        <ChangeRoleModal
+          member={selectedMember}
+          onClose={() => {
+            setShowChangeRoleModal(false);
+            setSelectedMember(null);
+          }}
+          onConfirm={handleChangeRole}
+          isLoading={isDeleting}
+        />
+      )}
+
+      {/* Remove Member Modal */}
+      {showRemoveMemberModal && selectedMember && (
+        <RemoveMemberModal
+          member={selectedMember}
+          isCurrentUser={selectedMember.user.id === session?.user?.id}
+          onClose={() => {
+            setShowRemoveMemberModal(false);
+            setSelectedMember(null);
+          }}
+          onConfirm={handleRemoveMember}
+          isLoading={isDeleting}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedFamily && (
+        <DeleteFamilyModal
+          familyName={selectedFamily.name}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteFamily}
+          isLoading={isDeleting}
         />
       )}
     </div>
@@ -425,7 +617,6 @@ function InviteModal({
     setError('');
 
     try {
-      // Добавляем участника напрямую по ID
       const response = await fetch(`/api/families/${familyId}/members`, {
         method: 'POST',
         headers: {
@@ -442,7 +633,7 @@ function InviteModal({
 
       setSuccess('Участник успешно добавлен в семью!');
       setTimeout(() => {
-        window.location.reload(); // Reload to show the new member
+        onSuccess();
       }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка при добавлении участника');
@@ -539,7 +730,7 @@ function InviteModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           disabled={isLoading}
@@ -690,12 +881,358 @@ function InviteModal({
             <button
               type="submit"
               disabled={isLoading || (inviteMethod === 'email' ? !email.trim() : !userId.trim())}
-              className="flex-1 py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {isLoading ? 'Отправка...' : inviteMethod === 'id' ? 'Добавить' : 'Пригласить'}
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Отправка...
+                </>
+              ) : (
+                inviteMethod === 'id' ? 'Добавить' : 'Пригласить'
+              )}
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// Компонент изменения роли
+function ChangeRoleModal({
+  member,
+  onClose,
+  onConfirm,
+  isLoading,
+}: {
+  member: Member;
+  onClose: () => void;
+  onConfirm: (newRole: string) => void;
+  isLoading: boolean;
+}) {
+  const [selectedRole, setSelectedRole] = useState(member.role);
+
+  const roles = [
+    { value: 'ADMIN', label: 'Администратор', description: 'Полный доступ к управлению', icon: '👑' },
+    { value: 'PARENT', label: 'Родитель', description: 'Управление финансами', icon: '👨‍💼' },
+    { value: 'TEEN', label: 'Подросток', description: 'Ограниченный доступ', icon: '👦' },
+    { value: 'VIEWER', label: 'Наблюдатель', description: 'Только просмотр', icon: '👀' },
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
+        <button
+          onClick={onClose}
+          disabled={isLoading}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl disabled:opacity-50"
+        >
+          ×
+        </button>
+
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">👤</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Изменить роль
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            {member.user.name || member.user.email}
+          </p>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            Выберите новую роль
+          </label>
+          <div className="space-y-2">
+            {roles.map((r) => (
+              <label
+                key={r.value}
+                className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition ${
+                  selectedRole === r.value
+                    ? 'border-[#0D6D6E] bg-[#0D6D6E]/10 dark:bg-[#0D6D6E]/20'
+                    : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value={r.value}
+                  checked={selectedRole === r.value}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  disabled={isLoading}
+                  className="mr-3"
+                />
+                <span className="text-2xl mr-2">{r.icon}</span>
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">{r.label}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{r.description}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
+          >
+            Отмена
+          </button>
+          <button
+            type="button"
+            onClick={() => onConfirm(selectedRole)}
+            disabled={isLoading || selectedRole === member.role}
+            className="flex-1 py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Изменение...
+              </>
+            ) : (
+              'Сохранить'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Компонент удаления участника
+function RemoveMemberModal({
+  member,
+  isCurrentUser,
+  onClose,
+  onConfirm,
+  isLoading,
+}: {
+  member: Member;
+  isCurrentUser: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+        <button
+          onClick={onClose}
+          disabled={isLoading}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl disabled:opacity-50"
+        >
+          ×
+        </button>
+
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">⚠️</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {isCurrentUser ? 'Покинуть семью?' : 'Удалить участника?'}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            {isCurrentUser 
+              ? 'Вы уверены, что хотите покинуть эту семью?'
+              : `Вы уверены, что хотите удалить ${member.user.name || member.user.email}?`
+            }
+          </p>
+        </div>
+
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+          <p className="text-sm text-red-800 dark:text-red-200 font-semibold mb-2">
+            ⚠️ Внимание!
+          </p>
+          <ul className="text-sm text-red-700 dark:text-red-300 space-y-1 list-disc list-inside">
+            {isCurrentUser ? (
+              <>
+                <li>Вы потеряете доступ ко всем данным семьи</li>
+                <li>Вам потребуется новое приглашение для возврата</li>
+              </>
+            ) : (
+              <>
+                <li>Участник потеряет доступ ко всем данным семьи</li>
+                <li>Это действие можно отменить только новым приглашением</li>
+              </>
+            )}
+          </ul>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
+          >
+            Отмена
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 py-3 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Удаление...
+              </>
+            ) : (
+              <>
+                <span>🗑️</span>
+                <span>{isCurrentUser ? 'Покинуть' : 'Удалить'}</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Компонент удаления семьи
+function DeleteFamilyModal({
+  familyName,
+  onClose,
+  onConfirm,
+  isLoading,
+}: {
+  familyName: string;
+  onClose: () => void;
+  onConfirm: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+        <button
+          onClick={onClose}
+          disabled={isLoading}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl disabled:opacity-50"
+        >
+          ×
+        </button>
+
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">⚠️</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Удалить семью?
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Вы уверены, что хотите удалить семью <strong>"{familyName}"</strong>?
+          </p>
+        </div>
+
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+          <p className="text-sm text-red-800 dark:text-red-200 font-semibold mb-2">
+            ⚠️ Это действие нельзя отменить!
+          </p>
+          <ul className="text-sm text-red-700 dark:text-red-300 space-y-1 list-disc list-inside">
+            <li>Все данные семьи будут удалены</li>
+            <li>Все участники потеряют доступ</li>
+            <li>Все счета, транзакции и цели будут удалены</li>
+            <li>Восстановить данные будет невозможно</li>
+          </ul>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
+          >
+            Отмена
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 py-3 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Удаление...
+              </>
+            ) : (
+              <>
+                <span>🗑️</span>
+                <span>Удалить навсегда</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

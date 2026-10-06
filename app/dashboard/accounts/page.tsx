@@ -259,42 +259,35 @@ export default function AccountsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {accounts.map((account) => (
-              <div
+              <AccountCard
                 key={account.id}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition cursor-pointer"
-                style={{
-                  borderLeft: account.color ? `4px solid ${account.color}` : undefined,
+                account={account}
+                onEdit={() => {
+                  // TODO: Implement edit
                 }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl">
-                    {getAccountIcon(account.type, account.icon)}
-                  </div>
-                  <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
-                    {getAccountTypeName(account.type)}
-                  </span>
-                </div>
-
-                <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-1">
-                  {account.name}
-                </h3>
-                
-                {account.description && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    {account.description}
-                  </p>
-                )}
-
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                  {formatBalance(Number(account.balance), account.currency)}
-                </p>
-
-                <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-xs text-gray-500 dark:text-gray-500">
-                    {account.family.name}
-                  </p>
-                </div>
-              </div>
+                onDelete={async () => {
+                  if (confirm(`Удалить счёт "${account.name}"?`)) {
+                    try {
+                      const response = await fetch(`/api/accounts/${account.id}`, {
+                        method: 'DELETE',
+                      });
+                      
+                      if (response.ok) {
+                        loadAccounts(selectedFamilyId);
+                      } else {
+                        const data = await response.json();
+                        alert(data.error || 'Ошибка при удалении счёта');
+                      }
+                    } catch (error) {
+                      console.error('Error deleting account:', error);
+                      alert('Ошибка при удалении счёта');
+                    }
+                  }
+                }}
+                formatBalance={formatBalance}
+                getAccountIcon={getAccountIcon}
+                getAccountTypeName={getAccountTypeName}
+              />
             ))}
           </div>
         )}
@@ -581,6 +574,105 @@ function CreateAccountModal({
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+
+// Компонент карточки счёта с действиями
+function AccountCard({
+  account,
+  onEdit,
+  onDelete,
+  formatBalance,
+  getAccountIcon,
+  getAccountTypeName,
+}: {
+  account: Account;
+  onEdit: () => void;
+  onDelete: () => void;
+  formatBalance: (balance: number, currency: string) => string;
+  getAccountIcon: (type: string, customIcon?: string | null) => string;
+  getAccountTypeName: (type: string) => string;
+}) {
+  const [showMenu, setShowMenu] = useState(false);
+
+  return (
+    <div
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition relative group"
+      style={{
+        borderLeft: account.color ? `4px solid ${account.color}` : undefined,
+      }}
+    >
+      {/* Actions Menu */}
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition"
+        >
+          ⋮
+        </button>
+        
+        {showMenu && (
+          <>
+            <div 
+              className="fixed inset-0 z-10" 
+              onClick={() => setShowMenu(false)}
+            />
+            <div className="absolute right-0 top-10 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 py-2 z-20">
+              <button
+                onClick={() => {
+                  setShowMenu(false);
+                  onEdit();
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2"
+              >
+                <span>✏️</span>
+                <span>Редактировать</span>
+              </button>
+              <button
+                onClick={() => {
+                  setShowMenu(false);
+                  onDelete();
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+              >
+                <span>🗑️</span>
+                <span>Удалить</span>
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="flex items-start justify-between mb-4">
+        <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl">
+          {getAccountIcon(account.type, account.icon)}
+        </div>
+        <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+          {getAccountTypeName(account.type)}
+        </span>
+      </div>
+
+      <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-1">
+        {account.name}
+      </h3>
+      
+      {account.description && (
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+          {account.description}
+        </p>
+      )}
+
+      <p className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+        {formatBalance(Number(account.balance), account.currency)}
+      </p>
+
+      <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+        <p className="text-xs text-gray-500 dark:text-gray-500">
+          {account.family.name}
+        </p>
       </div>
     </div>
   );

@@ -42,6 +42,8 @@ model User {
   notifications    Notification[]
   activityLogs     ActivityLog[]
   createdFamilies  Family[]       @relation("FamilyCreator")
+  requestedMoney   MoneyRequest[] @relation("RequestedMoney")
+  approvedMoney    MoneyRequest[] @relation("ApprovedMoney")
   
   @@map("users")
 }
@@ -136,6 +138,7 @@ model Family {
   goals           Goal[]
   recurringItems  RecurringTransaction[]
   invitations     FamilyInvitation[]
+  moneyRequests   MoneyRequest[]
   
   @@map("families")
 }
@@ -435,16 +438,70 @@ model GoalAllocation {
 }
 
 // ============================================
+// ЗАПРОСЫ НА ДЕНЬГИ
+// ============================================
+
+enum MoneyRequestStatus {
+  PENDING    // Ожидает рассмотрения
+  APPROVED   // Одобрен
+  REJECTED   // Отклонен
+  COMPLETED  // Завершен (деньги переведены)
+  CANCELLED  // Отменен отправителем
+}
+
+model MoneyRequest {
+  id          String             @id @default(cuid())
+  familyId    String
+  requesterId String             // Кто запрашивает (обычно ребенок/подросток)
+  approverId  String?            // Кто одобрил/отклонил (родитель/админ)
+  
+  amount      Decimal            @db.Decimal(12, 2)
+  currency    String             @default("RUB")
+  title       String             // Краткое название (на что нужны деньги)
+  description String?            // Подробное описание
+  
+  status      MoneyRequestStatus @default(PENDING)
+  
+  // Связь с транзакцией после выполнения
+  transactionId String?          @unique
+  
+  // Когда и кем обработан запрос
+  processedAt   DateTime?
+  
+  // Причина отклонения
+  rejectionReason String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Связи
+  family    Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  requester User   @relation("RequestedMoney", fields: [requesterId], references: [id], onDelete: Cascade)
+  approver  User?  @relation("ApprovedMoney", fields: [approverId], references: [id], onDelete: SetNull)
+  
+  @@index([familyId, status])
+  @@index([requesterId])
+  @@index([approverId])
+  @@map("money_requests")
+}
+
+// ============================================
 // УВЕДОМЛЕНИЯ
 // ============================================
 
 enum NotificationType {
   BUDGET_ALERT      // Превышение бюджета
   GOAL_MILESTONE    // Прогресс по цели
+  GOAL_CREATED      // Новая цель создана
+  GOAL_UPDATED      // Цель обновлена
+  GOAL_COMPLETED    // Цель достигнута
   RECURRING_DUE     // Подошла дата повторяющейся транзакции
   LOW_BALANCE       // Низкий баланс
   LARGE_EXPENSE     // Большая трата
   FAMILY_INVITE     // Приглашение в семью
+  MONEY_REQUEST     // Новый запрос на деньги
+  REQUEST_APPROVED  // Запрос одобрен
+  REQUEST_REJECTED  // Запрос отклонен
   SYSTEM            // Системное уведомление
 }
 
@@ -455,6 +512,7 @@ model Notification {
   title     String
   message   String
   data      Json?            // Дополнительные данные
+  relatedId String?          // ID связанной сущности (цель, запрос и т.д.)
   isRead    Boolean          @default(false)
   
   createdAt DateTime @default(now())

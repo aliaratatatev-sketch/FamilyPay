@@ -8,12 +8,11 @@ import { getCurrentUserId } from '@/lib/session';
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
     const currentUserId = await getCurrentUserId();
-    const familyId = params.id;
-    const targetUserId = params.userId;
+    const { id: familyId, userId: targetUserId } = await params;
     const body = await request.json();
     const { role } = body;
 
@@ -135,12 +134,11 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
     const currentUserId = await getCurrentUserId();
-    const familyId = params.id;
-    const targetUserId = params.userId;
+    const { id: familyId, userId: targetUserId } = await params;
 
     // Проверяем права текущего пользователя
     const currentMember = await prisma.familyMember.findUnique({

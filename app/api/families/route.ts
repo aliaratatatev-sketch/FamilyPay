@@ -8,6 +8,8 @@ import { getCurrentUserId } from '@/lib/session';
 export async function GET() {
   try {
     const userId = await getCurrentUserId();
+    
+    console.log('📋 Fetching families for user:', userId);
 
     const families = await prisma.family.findMany({
       where: {
@@ -18,6 +20,14 @@ export async function GET() {
         },
       },
       include: {
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
         members: {
           include: {
             user: {
@@ -54,9 +64,11 @@ export async function GET() {
       },
     });
 
+    console.log('✅ Found families:', families.length);
+    
     return NextResponse.json({ families });
   } catch (error) {
-    console.error('Error fetching families:', error);
+    console.error('❌ Error fetching families:', error);
     
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json(
@@ -149,6 +161,13 @@ export async function POST(request: NextRequest) {
           },
         },
       },
+    });
+
+    console.log('✅ Family created successfully:', {
+      familyId: family.id,
+      name: family.name,
+      creatorId: userId,
+      membersCount: family.members.length,
     });
 
     return NextResponse.json({ family }, { status: 201 });
