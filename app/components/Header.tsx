@@ -145,7 +145,7 @@ export default function Header() {
 
             {/* Auth buttons */}
             <Link
-              href="/login"
+              href="/login?mode=login"
               className={`hidden sm:block px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 ${
                 isDark
                   ? 'text-gray-200 hover:text-[#4FD1C5] hover:bg-white/10'
@@ -155,7 +155,7 @@ export default function Header() {
               {t.header.auth.login}
             </Link>
             <Link
-              href="/login"
+              href="/login?mode=register"
               className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl hover:shadow-lg hover:shadow-[#0D6D6E]/30 hover:-translate-y-0.5 transition-all duration-200"
             >
               {t.header.auth.register}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LocaleProvider, useLocale } from '../i18n/LocaleContext';
 import { adminTranslations, Locale, localeNames, locales } from '../i18n';
@@ -55,8 +56,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         <div className="h-full px-4 py-6 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold text-lg">
-              FP
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md">
+              <Image
+                src="/logo.png"
+                alt="FamilyPay"
+                width={40}
+                height={40}
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900 dark:text-white">FamilyPay</h1>

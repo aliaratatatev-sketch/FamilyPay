@@ -162,31 +162,7 @@ export default function AIAssistantPage() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold">
-              FP
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
-              FamilyPay
-            </span>
-          </Link>
-
-          <Link 
-            href="/dashboard"
-            className="text-gray-600 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition"
-          >
-            ← Назад на дашборд
-          </Link>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 max-w-5xl">
+  return (\n    <>\n      {/* Main Content */}\n      <main className="container mx-auto px-6 py-8 max-w-5xl">
         {/* Hero Section */}
         <div className="mb-8 text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-4 shadow-lg">
@@ -476,7 +452,5 @@ export default function AIAssistantPage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
-  );
+      </main>`n    </>`n  );
 }

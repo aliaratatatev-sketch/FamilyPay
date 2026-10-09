@@ -17,8 +17,17 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Проверяем наличие ошибки в URL параметрах
+  // Проверяем параметры URL
   useEffect(() => {
+    // Проверяем режим (login/register)
+    const modeParam = searchParams.get('mode');
+    if (modeParam === 'register') {
+      setMode('register');
+    } else if (modeParam === 'login') {
+      setMode('login');
+    }
+
+    // Проверяем наличие ошибки в URL параметрах
     const errorParam = searchParams.get('error');
     if (errorParam === 'AccessDenied') {
       setError('Доступ запрещен. Ваш аккаунт не зарегистрирован в системе.');
@@ -144,8 +153,11 @@ export default function LoginPage() {
           {mode !== 'verify' && (
             <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mb-6">
               <button
-                onClick={() => setMode('login')}
-                className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all duration-200 ${
+                onClick={() => {
+                  setMode('login');
+                  window.history.pushState({}, '', '/login?mode=login');
+                }}
+                className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all duration-200 text-center ${
                   mode === 'login'
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -154,8 +166,11 @@ export default function LoginPage() {
                 Войти
               </button>
               <button
-                onClick={() => setMode('register')}
-                className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all duration-200 ${
+                onClick={() => {
+                  setMode('register');
+                  window.history.pushState({}, '', '/login?mode=register');
+                }}
+                className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all duration-200 text-center ${
                   mode === 'register'
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'

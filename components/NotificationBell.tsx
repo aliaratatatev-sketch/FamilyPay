@@ -124,6 +124,38 @@ export default function NotificationBell() {
     return icons[type] || "🔔";
   };
 
+  const getNotificationLink = (notification: Notification) => {
+    switch (notification.type) {
+      case "MONEY_REQUEST":
+        // Переход на страницу управления запросами для родителей
+        return notification.relatedId 
+          ? `/dashboard/manage-requests?requestId=${notification.relatedId}`
+          : "/dashboard/manage-requests";
+      case "REQUEST_APPROVED":
+      case "REQUEST_REJECTED":
+        // Переход на страницу своих запросов для детей
+        return notification.relatedId 
+          ? `/dashboard/money-requests?requestId=${notification.relatedId}`
+          : "/dashboard/money-requests";
+      case "BUDGET_ALERT":
+        return "/dashboard/budgets";
+      case "GOAL_CREATED":
+      case "GOAL_UPDATED":
+      case "GOAL_COMPLETED":
+      case "GOAL_MILESTONE":
+        return notification.relatedId 
+          ? `/dashboard/goals?id=${notification.relatedId}`
+          : "/dashboard/goals";
+      case "FAMILY_INVITE":
+        return "/dashboard/family";
+      case "LOW_BALANCE":
+      case "LARGE_EXPENSE":
+        return "/dashboard/accounts";
+      default:
+        return "/dashboard/notifications";
+    }
+  };
+
   const getRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -185,14 +217,16 @@ export default function NotificationBell() {
               </div>
             ) : (
               notifications.map((notification) => (
-                <div
+                <Link
                   key={notification.id}
+                  href={getNotificationLink(notification)}
                   onClick={() => {
                     if (!notification.isRead) {
                       markAsRead(notification.id);
                     }
+                    setIsOpen(false);
                   }}
-                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
+                  className={`block p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
                     !notification.isRead ? "bg-blue-50" : ""
                   }`}
                 >
@@ -228,7 +262,7 @@ export default function NotificationBell() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>

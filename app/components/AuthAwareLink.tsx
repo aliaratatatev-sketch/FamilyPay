@@ -9,11 +9,12 @@ interface AuthAwareLinkProps {
   className?: string;
   unauthenticatedHref?: string;
   authenticatedHref?: string;
+  mode?: 'login' | 'register';
 }
 
 /**
  * Кнопка-ссылка, которая направляет пользователя:
- * - Если НЕ залогинен → на страницу входа (/login)
+ * - Если НЕ залогинен → на страницу входа (/login) или регистрации (/login?mode=register)
  * - Если залогинен → на дашборд (/dashboard)
  */
 export default function AuthAwareLink({
@@ -21,10 +22,16 @@ export default function AuthAwareLink({
   className = '',
   unauthenticatedHref = '/login',
   authenticatedHref = '/dashboard',
+  mode,
 }: AuthAwareLinkProps) {
   const { data: session, status } = useSession();
 
-  const href = status === 'authenticated' ? authenticatedHref : unauthenticatedHref;
+  let href = status === 'authenticated' ? authenticatedHref : unauthenticatedHref;
+  
+  // Если указан mode и пользователь не аутентифицирован, добавляем параметр mode
+  if (status !== 'authenticated' && mode && !href.includes('?')) {
+    href = `${href}?mode=${mode}`;
+  }
 
   return (
     <Link href={href} className={className}>

@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import NotificationBell from '../../components/NotificationBell';
 
 interface MoneyRequest {
   id: string;
@@ -70,6 +69,27 @@ export default function ManageRequestsPage() {
     }
   }, [selectedFamily, filter]);
 
+  useEffect(() => {
+    // Проверяем URL параметры для автоскролла к конкретному запросу
+    const params = new URLSearchParams(window.location.search);
+    const requestId = params.get('requestId');
+    
+    if (requestId && requests.length > 0) {
+      // Небольшая задержка для рендеринга
+      setTimeout(() => {
+        const element = document.getElementById(`request-${requestId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Добавляем временную подсветку
+          element.style.boxShadow = '0 0 0 3px rgba(13, 109, 110, 0.3)';
+          setTimeout(() => {
+            element.style.boxShadow = '';
+          }, 2000);
+        }
+      }, 300);
+    }
+  }, [requests]);
+
   const loadFamilies = async () => {
     try {
       const response = await fetch('/api/families?t=' + Date.now());
@@ -102,6 +122,8 @@ export default function ManageRequestsPage() {
       if (filter === 'pending') {
         params.append('status', 'PENDING');
       }
+
+      // НЕ добавляем requesterId - нужны ВСЕ запросы семьи для управления
 
       const response = await fetch(`/api/money-requests?${params}`);
       const data = await response.json();
@@ -165,33 +187,7 @@ export default function ManageRequestsPage() {
   const pendingCount = requests.filter(r => r.status === 'PENDING').length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold">
-              FP
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
-              FamilyPay
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <NotificationBell />
-            
-            <Link 
-              href="/dashboard"
-              className="text-gray-600 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition"
-            >
-              ← Назад
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
+    <>
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -312,6 +308,7 @@ export default function ManageRequestsPage() {
                 
                 return (
                   <div
+                    id={`request-${request.id}`}
                     key={request.id}
                     className={`border-2 rounded-xl p-5 transition ${
                       isPending
@@ -380,26 +377,33 @@ export default function ManageRequestsPage() {
                     )}
 
                     {isPending && (
-                      <div className="flex gap-2 ml-16">
+                      <div className="flex flex-col gap-2 ml-16">
                         <button
                           onClick={() => {
                             setSelectedRequest(request);
                             setShowApproveModal(true);
                           }}
-                          className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition flex items-center gap-2"
+                          className="w-full px-6 py-3 bg-[#0D6D6E] text-white font-semibold rounded-lg hover:bg-[#0a5555] transition"
                         >
-                          <span>✅</span>
-                          <span>Одобрить</span>
+                          Одобрить
+                        </button>
+                        <button
+                          onClick={() => {
+                            // Postpone functionality - just close without any action
+                            alert('Запрос отложен для последующего рассмотрения');
+                          }}
+                          className="w-full px-6 py-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                        >
+                          Отложить
                         </button>
                         <button
                           onClick={() => {
                             setSelectedRequest(request);
                             setShowRejectModal(true);
                           }}
-                          className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition flex items-center gap-2"
+                          className="w-full px-6 py-3 text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-300 transition"
                         >
-                          <span>❌</span>
-                          <span>Отклонить</span>
+                          Отклонить
                         </button>
                       </div>
                     )}
@@ -443,7 +447,7 @@ export default function ManageRequestsPage() {
           }}
         />
       )}
-    </div>
+    </>
   );
 }
 

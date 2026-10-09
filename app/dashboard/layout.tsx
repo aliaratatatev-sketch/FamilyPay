@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import NotificationBell from "@/components/NotificationBell";
 import { Home, User, LogOut, Shield } from "lucide-react";
 
@@ -49,8 +50,14 @@ export default function DashboardLayout({
       <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-40">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold">
-              FP
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md">
+              <Image
+                src="/logo.png"
+                alt="FamilyPay"
+                width={40}
+                height={40}
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
               FamilyPay

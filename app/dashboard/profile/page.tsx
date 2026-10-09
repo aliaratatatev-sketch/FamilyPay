@@ -41,31 +41,7 @@ export default function ProfilePage() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold">
-              FP
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
-              FamilyPay
-            </span>
-          </Link>
-
-          <Link 
-            href="/dashboard"
-            className="text-gray-600 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition"
-          >
-            ← Назад на дашборд
-          </Link>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 max-w-3xl">
+  return (\n    <>\n      {/* Main Content */}\n      <main className="container mx-auto px-6 py-8 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Мой профиль
@@ -238,7 +214,5 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
-  );
+      </main>`n    </>`n  );
 }

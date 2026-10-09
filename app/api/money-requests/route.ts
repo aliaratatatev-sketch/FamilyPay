@@ -220,6 +220,7 @@ export async function POST(request: NextRequest) {
       type: 'MONEY_REQUEST' as const,
       title: 'Новый запрос на деньги',
       message: `${moneyRequest.requester.name || moneyRequest.requester.email} запрашивает ${amount} ${family.currency} на "${title}"`,
+      relatedId: moneyRequest.id, // ID запроса для навигации
       data: JSON.parse(JSON.stringify({
         moneyRequestId: moneyRequest.id,
         familyId,
