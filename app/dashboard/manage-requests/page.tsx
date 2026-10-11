@@ -140,11 +140,11 @@ export default function ManageRequestsPage() {
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      PENDING: { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400', icon: '⏳', text: 'Ожидает' },
-      APPROVED: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400', icon: '✅', text: 'Одобрено' },
-      REJECTED: { color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400', icon: '❌', text: 'Отклонено' },
-      COMPLETED: { color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400', icon: '💰', text: 'Выполнено' },
-      CANCELLED: { color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300', icon: '🚫', text: 'Отменено' },
+      PENDING: { color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', text: 'Ожидает' },
+      APPROVED: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', text: 'Одобрено' },
+      REJECTED: { color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', text: 'Отклонено' },
+      COMPLETED: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', text: 'Выполнено' },
+      CANCELLED: { color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300', text: 'Отменено' },
     };
     return badges[status as keyof typeof badges] || badges.PENDING;
   };
@@ -186,6 +186,42 @@ export default function ManageRequestsPage() {
   const selectedFamilyData = families.find(f => f.id === selectedFamily);
   const pendingCount = requests.filter(r => r.status === 'PENDING').length;
 
+  // Функция для склонения слова "запрос"
+  const getRequestWord = (count: number): string => {
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+      return 'запросов';
+    }
+
+    if (lastDigit === 1) {
+      return 'запрос';
+    }
+
+    if (lastDigit >= 2 && lastDigit <= 4) {
+      return 'запроса';
+    }
+
+    return 'запросов';
+  };
+
+  // Функция для склонения глагола "ожидать"
+  const getWaitVerb = (count: number): string => {
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+      return 'ожидают';
+    }
+
+    if (lastDigit === 1) {
+      return 'ожидает';
+    }
+
+    return 'ожидают';
+  };
+
   return (
     <>
       <main className="container mx-auto px-6 py-8">
@@ -225,7 +261,7 @@ export default function ManageRequestsPage() {
               <span className="text-2xl">⚠️</span>
               <div>
                 <p className="font-semibold text-yellow-900 dark:text-yellow-200">
-                  {pendingCount} {pendingCount === 1 ? 'запрос ожидает' : 'запросов ожидают'} вашего решения
+                  {pendingCount} {getRequestWord(pendingCount)} {getWaitVerb(pendingCount)} вашего решения
                 </p>
                 <p className="text-sm text-yellow-800 dark:text-yellow-300">
                   Рассмотрите запросы как можно скорее
@@ -301,7 +337,7 @@ export default function ManageRequestsPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {requests.map((request) => {
                 const badge = getStatusBadge(request.status);
                 const isPending = request.status === 'PENDING';
@@ -310,101 +346,98 @@ export default function ManageRequestsPage() {
                   <div
                     id={`request-${request.id}`}
                     key={request.id}
-                    className={`border-2 rounded-xl p-5 transition ${
-                      isPending
-                        ? 'border-yellow-300 dark:border-yellow-700 bg-yellow-50/50 dark:bg-yellow-900/10'
-                        : 'border-gray-200 dark:border-gray-700'
+                    className={`py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition ${
+                      isPending ? 'bg-yellow-50/30 dark:bg-yellow-900/5' : ''
                     }`}
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-start gap-4 flex-1">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                          {request.requester.name?.charAt(0) || request.requester.email?.charAt(0) || '?'}
+                    <div className="flex items-center gap-4">
+                      {/* Avatar */}
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-semibold flex-shrink-0">
+                        {request.requester.name?.charAt(0) || request.requester.email?.charAt(0) || '?'}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                            {request.title}
+                          </h3>
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${badge.color}`}>
+                            {badge.text}
+                          </span>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {request.title}
-                            </h3>
-                            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${badge.color}`}>
-                              <span>{badge.icon}</span>
-                              <span>{badge.text}</span>
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                            От: {request.requester.name || request.requester.email}
-                          </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {request.requester.name || request.requester.email}
                           {request.description && (
-                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                              {request.description}
-                            </p>
+                            <span className="ml-2 text-gray-500 dark:text-gray-500">
+                              • {request.description.length > 50 ? request.description.slice(0, 50) + '...' : request.description}
+                            </span>
                           )}
-                          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-                            <span>📅 {new Date(request.createdAt).toLocaleDateString('ru-RU', { 
-                              day: 'numeric',
-                              month: 'long',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}</span>
-                            {request.processedAt && (
-                              <span>✓ {new Date(request.processedAt).toLocaleDateString('ru-RU')}</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right ml-4">
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {request.amount} {request.currency}
-                        </div>
-                      </div>
-                    </div>
-
-                    {request.approver && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3 ml-16">
-                        <span>👤</span>
-                        <span>
-                          {request.status === 'REJECTED' ? 'Отклонил' : 'Одобрил'}: {request.approver.name || request.approver.email}
-                        </span>
-                      </div>
-                    )}
-
-                    {request.status === 'REJECTED' && request.rejectionReason && (
-                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-3 ml-16">
-                        <p className="text-sm text-red-800 dark:text-red-200">
-                          <strong>Причина отклонения:</strong> {request.rejectionReason}
                         </p>
                       </div>
-                    )}
 
-                    {isPending && (
-                      <div className="flex flex-col gap-2 ml-16">
-                        <button
-                          onClick={() => {
-                            setSelectedRequest(request);
-                            setShowApproveModal(true);
-                          }}
-                          className="w-full px-6 py-3 bg-[#0D6D6E] text-white font-semibold rounded-lg hover:bg-[#0a5555] transition"
-                        >
-                          Одобрить
-                        </button>
-                        <button
-                          onClick={() => {
-                            // Postpone functionality - just close without any action
-                            alert('Запрос отложен для последующего рассмотрения');
-                          }}
-                          className="w-full px-6 py-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition"
-                        >
-                          Отложить
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedRequest(request);
-                            setShowRejectModal(true);
-                          }}
-                          className="w-full px-6 py-3 text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-300 transition"
-                        >
-                          Отклонить
-                        </button>
+                      {/* Amount */}
+                      <div className="text-right flex-shrink-0 min-w-[100px]">
+                        <div className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                          {request.amount} {request.currency}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(request.createdAt).toLocaleDateString('ru-RU', { 
+                            day: 'numeric',
+                            month: 'short'
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      {isPending ? (
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setShowApproveModal(true);
+                            }}
+                            className="px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg hover:bg-green-600 transition"
+                          >
+                            Одобрить
+                          </button>
+                          <button
+                            onClick={() => {
+                              alert('Запрос отложен для последующего рассмотрения');
+                            }}
+                            className="px-3 py-2 text-gray-600 dark:text-gray-400 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                          >
+                            Отложить
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setShowRejectModal(true);
+                            }}
+                            className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-gray-700 dark:hover:text-gray-300 transition"
+                          >
+                            Отклонить
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex-shrink-0 min-w-[140px] text-right">
+                          {request.approver && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {request.status === 'REJECTED' ? 'Отклонил' : 'Одобрил'}:
+                              <br />
+                              {request.approver.name || request.approver.email}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Rejection Reason */}
+                    {request.status === 'REJECTED' && request.rejectionReason && (
+                      <div className="ml-14 mt-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2">
+                        <p className="text-xs text-red-800 dark:text-red-200">
+                          <strong>Причина:</strong> {request.rejectionReason}
+                        </p>
                       </div>
                     )}
                   </div>
