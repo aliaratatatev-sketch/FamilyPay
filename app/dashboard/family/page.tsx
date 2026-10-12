@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
 
 interface Family {
   id: string;
@@ -55,6 +56,7 @@ interface Member {
 export default function FamilyPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useDashboardLocale();
   const [families, setFamilies] = useState<Family[]>([]);
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -258,7 +260,7 @@ export default function FamilyPage() {
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400 text-xl">Загрузка...</div>
+        <div className="text-gray-600 dark:text-gray-400 text-xl">{t.loading}</div>
       </div>
     );
   }
@@ -303,21 +305,39 @@ export default function FamilyPage() {
           </p>
         </div>
 
-        {/* Family Info */}
-        <div className="bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] rounded-2xl shadow-lg p-8 text-white mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h3 className="text-sm opacity-90 mb-1">Участников</h3>
-              <p className="text-3xl font-bold">👥 {selectedFamily.members.length}</p>
+        {/* Family Info - Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Участники */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl">
+                👥
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm opacity-90 mb-1">Счетов</h3>
-              <p className="text-3xl font-bold">💳 {selectedFamily.accounts.length}</p>
+            <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Участники</h3>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily.members.length}</p>
+          </div>
+
+          {/* Счета */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-2xl">
+                💳
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm opacity-90 mb-1">Транзакций</h3>
-              <p className="text-3xl font-bold">💰 {selectedFamily._count.transactions}</p>
+            <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Счета</h3>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily.accounts.length}</p>
+          </div>
+
+          {/* Транзакции */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white text-2xl">
+                💰
+              </div>
             </div>
+            <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Транзакции</h3>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily._count.transactions}</p>
           </div>
         </div>
 
@@ -417,7 +437,7 @@ export default function FamilyPage() {
                         setSelectedMember(member);
                         setShowRemoveMemberModal(true);
                       }}
-                      className="px-3 py-1 text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition"
+                      className="px-3 py-1.5 text-sm border border-orange-300 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition font-medium"
                     >
                       Покинуть
                     </button>
