@@ -32,8 +32,6 @@ interface MoneyRequest {
     name: string;
     currency: string;
   };
-  aiRecommendation?: string | null;
-  aiLoading?: boolean;
 }
 
 interface Family {
@@ -51,9 +49,6 @@ export default function ManageRequestsPage() {
   const [selectedFamily, setSelectedFamily] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'pending' | 'all'>('pending');
-  const [showApproveModal, setShowApproveModal] = useState(false);
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<MoneyRequest | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -131,66 +126,11 @@ export default function ManageRequestsPage() {
       if (response.ok) {
         const requestsData = data.requests || [];
         setRequests(requestsData);
-        
-        // Загружаем AI-рекомендации для pending запросов
-        if (requestsData.length > 0) {
-          loadAIRecommendations(requestsData);
-        }
       }
     } catch (error) {
       console.error('Error loading requests:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const loadAIRecommendations = async (requestsList: MoneyRequest[]) => {
-    const pendingRequests = requestsList.filter(r => r.status === 'PENDING');
-    
-    if (pendingRequests.length === 0) return;
-
-    // Получаем общий баланс семьи
-    const selectedFamilyData = families.find(f => f.id === selectedFamily);
-    const totalBalance = selectedFamilyData?.accounts?.reduce((sum, acc) => sum + acc.balance, 0) || 0;
-
-    // Загружаем рекомендации параллельно
-    for (const req of pendingRequests) {
-      // Помечаем как загружающиеся
-      setRequests(prev => prev.map(r => 
-        r.id === req.id ? { ...r, aiLoading: true } : r
-      ));
-
-      try {
-        const response = await fetch('/api/ai/analyze-request', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: req.title,
-            amount: req.amount,
-            currency: req.currency,
-            description: req.description,
-            familyBalance: totalBalance
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setRequests(prev => prev.map(r => 
-            r.id === req.id 
-              ? { ...r, aiRecommendation: data.recommendation, aiLoading: false }
-              : r
-          ));
-        } else {
-          setRequests(prev => prev.map(r => 
-            r.id === req.id ? { ...r, aiLoading: false } : r
-          ));
-        }
-      } catch (error) {
-        console.error('Error loading AI recommendation:', error);
-        setRequests(prev => prev.map(r => 
-          r.id === req.id ? { ...r, aiLoading: false } : r
-        ));
-      }
     }
   };
 
@@ -448,32 +388,12 @@ export default function ManageRequestsPage() {
                       {/* Actions */}
                       {isPending ? (
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <button
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setShowApproveModal(true);
-                            }}
-                            className="px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg hover:bg-green-600 transition"
+                          <Link
+                            href={`/dashboard/manage-requests/${request.id}`}
+                            className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white text-sm font-semibold rounded-lg hover:shadow-lg transition"
                           >
-                            Одобрить
-                          </button>
-                          <button
-                            onClick={() => {
-                              alert('Запрос отложен для последующего рассмотрения');
-                            }}
-                            className="px-3 py-2 text-gray-600 dark:text-gray-400 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                          >
-                            Отложить
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setShowRejectModal(true);
-                            }}
-                            className="px-3 py-2 text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-gray-700 dark:hover:text-gray-300 transition"
-                          >
-                            Отклонить
-                          </button>
+                            Рассмотреть
+                          </Link>
                         </div>
                       ) : (
                         <div className="flex-shrink-0 min-w-[140px] text-right">
@@ -496,35 +416,6 @@ export default function ManageRequestsPage() {
                         </p>
                       </div>
                     )}
-
-                    {/* AI Recommendation */}
-                    {isPending && (
-                      <div className="ml-14 mt-3">
-                        {request.aiLoading ? (
-                          <div className="bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800 rounded-lg p-3 flex items-start gap-2">
-                            <svg className="animate-spin h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                            </svg>
-                            <span className="text-xs text-purple-700 dark:text-purple-300">AI анализирует запрос...</span>
-                          </div>
-                        ) : request.aiRecommendation ? (
-                          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
-                            <div className="flex items-start gap-2">
-                              <span className="text-lg flex-shrink-0">💡</span>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold text-purple-900 dark:text-purple-200 mb-1">
-                                  AI-Совет родителю
-                                </p>
-                                <p className="text-xs text-purple-800 dark:text-purple-300 leading-relaxed">
-                                  {request.aiRecommendation}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -532,345 +423,6 @@ export default function ManageRequestsPage() {
           )}
         </div>
       </main>
-
-      {/* Approve Modal */}
-      {showApproveModal && selectedRequest && selectedFamilyData && (
-        <ApproveModal
-          request={selectedRequest}
-          family={selectedFamilyData}
-          onClose={() => {
-            setShowApproveModal(false);
-            setSelectedRequest(null);
-          }}
-          onSuccess={() => {
-            setShowApproveModal(false);
-            setSelectedRequest(null);
-            loadRequests();
-          }}
-        />
-      )}
-
-      {/* Reject Modal */}
-      {showRejectModal && selectedRequest && (
-        <RejectModal
-          request={selectedRequest}
-          onClose={() => {
-            setShowRejectModal(false);
-            setSelectedRequest(null);
-          }}
-          onSuccess={() => {
-            setShowRejectModal(false);
-            setSelectedRequest(null);
-            loadRequests();
-          }}
-        />
-      )}
     </>
-  );
-}
-
-// Компонент одобрения запроса
-function ApproveModal({
-  request,
-  family,
-  onClose,
-  onSuccess,
-}: {
-  request: MoneyRequest;
-  family: Family;
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
-  const [selectedAccount, setSelectedAccount] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleApprove = async () => {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const response = await fetch(`/api/money-requests/${request.id}/approve`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          accountId: selectedAccount || undefined,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка при одобрении запроса');
-      }
-
-      onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка при одобрении запроса');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
-        <button
-          onClick={onClose}
-          disabled={isLoading}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl disabled:opacity-50"
-        >
-          ×
-        </button>
-
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">✅</span>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Одобрить запрос?
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            {request.requester.name || request.requester.email} просит {request.amount} {request.currency}
-          </p>
-        </div>
-
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
-          <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
-            📝 {request.title}
-          </p>
-          {request.description && (
-            <p className="text-sm text-blue-800 dark:text-blue-300">
-              {request.description}
-            </p>
-          )}
-        </div>
-
-        {family.accounts && family.accounts.length > 0 && (
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Списать со счета (необязательно)
-            </label>
-            <select
-              value={selectedAccount}
-              onChange={(e) => setSelectedAccount(e.target.value)}
-              disabled={isLoading}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value="">Только одобрить (не списывать)</option>
-              {family.accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name} - {account.balance} {account.currency}
-                </option>
-              ))}
-            </select>
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              💡 Если выбрать счет, деньги будут автоматически списаны и создана транзакция
-            </p>
-          </div>
-        )}
-
-        {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
-          >
-            Отмена
-          </button>
-          <button
-            type="button"
-            onClick={handleApprove}
-            disabled={isLoading}
-            className="flex-1 py-3 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Одобрение...
-              </>
-            ) : (
-              <>
-                <span>✅</span>
-                <span>Одобрить</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Компонент отклонения запроса
-function RejectModal({
-  request,
-  onClose,
-  onSuccess,
-}: {
-  request: MoneyRequest;
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
-  const [reason, setReason] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleReject = async () => {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const response = await fetch(`/api/money-requests/${request.id}/reject`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          reason: reason.trim() || undefined,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка при отклонении запроса');
-      }
-
-      onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка при отклонении запроса');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
-        <button
-          onClick={onClose}
-          disabled={isLoading}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl disabled:opacity-50"
-        >
-          ×
-        </button>
-
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">❌</span>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Отклонить запрос?
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            {request.requester.name || request.requester.email} просит {request.amount} {request.currency}
-          </p>
-        </div>
-
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
-          <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
-            📝 {request.title}
-          </p>
-          {request.description && (
-            <p className="text-sm text-blue-800 dark:text-blue-300">
-              {request.description}
-            </p>
-          )}
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Причина отклонения (необязательно)
-          </label>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Объясните, почему вы отклоняете этот запрос..."
-            disabled={isLoading}
-            rows={3}
-            maxLength={500}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
-          />
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            💡 Рекомендуем указать причину, чтобы ребенок понял ваше решение
-          </p>
-        </div>
-
-        {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
-          >
-            Отмена
-          </button>
-          <button
-            type="button"
-            onClick={handleReject}
-            disabled={isLoading}
-            className="flex-1 py-3 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Отклонение...
-              </>
-            ) : (
-              <>
-                <span>❌</span>
-                <span>Отклонить</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }

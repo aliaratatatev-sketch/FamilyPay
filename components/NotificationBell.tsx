@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Bell, X, Check, Trash2 } from "lucide-react";
+import { Bell, X, Check, Trash2, DollarSign, CheckCircle, XCircle, AlertTriangle, Target, TrendingUp, Trophy, Star, Users, CreditCard, Zap, Info } from "lucide-react";
 import Link from "next/link";
 
 interface Notification {
@@ -107,21 +107,21 @@ export default function NotificationBell() {
   };
 
   const getNotificationIcon = (type: string) => {
-    const icons: { [key: string]: string } = {
-      MONEY_REQUEST: "💰",
-      REQUEST_APPROVED: "✅",
-      REQUEST_REJECTED: "❌",
-      BUDGET_ALERT: "⚠️",
-      GOAL_CREATED: "🎯",
-      GOAL_UPDATED: "📈",
-      GOAL_COMPLETED: "🎉",
-      GOAL_MILESTONE: "⭐",
-      FAMILY_INVITE: "👨‍👩‍👧‍👦",
-      LOW_BALANCE: "💳",
-      LARGE_EXPENSE: "💸",
-      SYSTEM: "ℹ️",
+    const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
+      MONEY_REQUEST: DollarSign,
+      REQUEST_APPROVED: CheckCircle,
+      REQUEST_REJECTED: XCircle,
+      BUDGET_ALERT: AlertTriangle,
+      GOAL_CREATED: Target,
+      GOAL_UPDATED: TrendingUp,
+      GOAL_COMPLETED: Trophy,
+      GOAL_MILESTONE: Star,
+      FAMILY_INVITE: Users,
+      LOW_BALANCE: CreditCard,
+      LARGE_EXPENSE: Zap,
+      SYSTEM: Info,
     };
-    return icons[type] || "🔔";
+    return iconMap[type] || Bell;
   };
 
   const getNotificationLink = (notification: Notification) => {
@@ -232,8 +232,11 @@ export default function NotificationBell() {
                 >
                   <div className="flex items-start gap-3">
                     {/* Icon */}
-                    <div className="text-2xl flex-shrink-0">
-                      {getNotificationIcon(notification.type)}
+                    <div className="flex-shrink-0">
+                      {(() => {
+                        const IconComponent = getNotificationIcon(notification.type);
+                        return <IconComponent className="w-5 h-5 text-blue-600" />;
+                      })()}
                     </div>
 
                     {/* Content */}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { Users, DollarSign, Target, Bell, AlertTriangle, Zap, Info, Mail } from 'lucide-react';
 
 interface Notification {
   id: string;
@@ -103,24 +104,16 @@ export default function NotificationBell() {
   };
 
   const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'FAMILY_INVITE':
-        return '👨‍👩‍👧‍👦';
-      case 'BUDGET_ALERT':
-        return '💰';
-      case 'GOAL_MILESTONE':
-        return '🎯';
-      case 'RECURRING_DUE':
-        return '🔔';
-      case 'LOW_BALANCE':
-        return '⚠️';
-      case 'LARGE_EXPENSE':
-        return '💸';
-      case 'SYSTEM':
-        return 'ℹ️';
-      default:
-        return '📬';
-    }
+    const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
+      FAMILY_INVITE: Users,
+      BUDGET_ALERT: DollarSign,
+      GOAL_MILESTONE: Target,
+      RECURRING_DUE: Bell,
+      LOW_BALANCE: AlertTriangle,
+      LARGE_EXPENSE: Zap,
+      SYSTEM: Info,
+    };
+    return iconMap[type] || Mail;
   };
 
   const getTimeSince = (dateString: string) => {
@@ -198,26 +191,28 @@ export default function NotificationBell() {
             <div className="overflow-y-auto flex-1">
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-                  <div className="text-5xl mb-3">📭</div>
+                  <Mail className="w-12 h-12 mb-3" />
                   <p className="text-sm">Нет уведомлений</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {notifications.map(notification => (
-                    <div
-                      key={notification.id}
-                      className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                        !notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        {/* Иконка */}
-                        <div className="text-2xl flex-shrink-0 mt-0.5">
-                          {getNotificationIcon(notification.type)}
-                        </div>
+                  {notifications.map(notification => {
+                    const IconComponent = getNotificationIcon(notification.type);
+                    return (
+                      <div
+                        key={notification.id}
+                        className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                          !notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {/* Иконка */}
+                          <div className="flex-shrink-0 mt-0.5">
+                            <IconComponent className="w-5 h-5 text-blue-600" />
+                          </div>
 
-                        {/* Содержимое */}
-                        <div className="flex-1 min-w-0">
+                          {/* Содержимое */}
+                          <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
                               {notification.title}
@@ -270,7 +265,8 @@ export default function NotificationBell() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  );
+                  })}
                 </div>
               )}
             </div>

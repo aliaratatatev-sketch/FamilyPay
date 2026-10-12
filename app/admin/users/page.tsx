@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { DollarSign, TrendingUp, Target } from 'lucide-react';
 
 interface User {
   id: string;
@@ -182,9 +183,9 @@ export default function UsersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-3 text-sm text-gray-600 dark:text-gray-400">
-                        <span>💸 {user._count.transactions}</span>
-                        <span>📈 {user._count.budgets}</span>
-                        <span>🎯 {user._count.goals}</span>
+                        <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {user._count.transactions}</span>
+                        <span className="flex items-center gap-1"><TrendingUp className="w-4 h-4" /> {user._count.budgets}</span>
+                        <span className="flex items-center gap-1"><Target className="w-4 h-4" /> {user._count.goals}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">

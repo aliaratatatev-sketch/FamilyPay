@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Target, CheckCircle, Trophy } from 'lucide-react';
 
 interface Goal {
   id: string;
@@ -99,19 +100,21 @@ export default function GoalsPage() {
         </button>
         <button
           onClick={() => setStatusFilter('ACTIVE')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
             statusFilter === 'ACTIVE' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' : 'bg-white dark:bg-[#111d2b] border border-gray-200 dark:border-white/10'
           }`}
         >
-          🎯 Активные
+          <Target className="w-4 h-4" />
+          Активные
         </button>
         <button
           onClick={() => setStatusFilter('COMPLETED')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
             statusFilter === 'COMPLETED' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' : 'bg-white dark:bg-[#111d2b] border border-gray-200 dark:border-white/10'
           }`}
         >
-          ✅ Достигнутые
+          <CheckCircle className="w-4 h-4" />
+          Достигнутые
         </button>
       </div>
 
@@ -129,11 +132,8 @@ export default function GoalsPage() {
               <div key={goal.id} className="p-6 rounded-2xl bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:shadow-lg transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                      style={{ backgroundColor: goal.color ? `${goal.color}20` : '#4FD1C520' }}
-                    >
-                      {goal.icon || '🎯'}
+                    <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-xl">
+                      <Trophy className="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900 dark:text-white">{goal.name}</h3>

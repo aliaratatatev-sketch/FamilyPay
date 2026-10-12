@@ -11,6 +11,9 @@ import {
   Search,
   CheckCheck,
   X,
+  CheckCircle2,
+  XCircle,
+  Users,
 } from "lucide-react";
 
 interface Notification {
@@ -25,14 +28,26 @@ interface Notification {
 
 const NOTIFICATION_TYPES = {
   MONEY_REQUEST: { icon: "💰", label: "Запрос на деньги", color: "bg-blue-100 text-blue-600" },
-  REQUEST_APPROVED: { icon: "✅", label: "Запрос одобрен", color: "bg-green-100 text-green-600" },
-  REQUEST_REJECTED: { icon: "❌", label: "Запрос отклонён", color: "bg-red-100 text-red-600" },
+  REQUEST_APPROVED: { 
+    icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />, 
+    label: "Запрос одобрен", 
+    color: "bg-green-100 text-green-600" 
+  },
+  REQUEST_REJECTED: { 
+    icon: <XCircle className="w-5 h-5 text-red-500" />, 
+    label: "Запрос отклонён", 
+    color: "bg-red-100 text-red-600" 
+  },
   BUDGET_ALERT: { icon: "⚠️", label: "Превышение бюджета", color: "bg-orange-100 text-orange-600" },
   GOAL_CREATED: { icon: "🎯", label: "Новая цель", color: "bg-purple-100 text-purple-600" },
   GOAL_UPDATED: { icon: "📈", label: "Цель обновлена", color: "bg-blue-100 text-blue-600" },
   GOAL_COMPLETED: { icon: "🎉", label: "Цель достигнута", color: "bg-green-100 text-green-600" },
   GOAL_MILESTONE: { icon: "⭐", label: "Прогресс по цели", color: "bg-yellow-100 text-yellow-600" },
-  FAMILY_INVITE: { icon: "👨‍👩‍👧‍👦", label: "Приглашение в семью", color: "bg-pink-100 text-pink-600" },
+  FAMILY_INVITE: { 
+    icon: <Users className="w-5 h-5 text-blue-500" />, 
+    label: "Приглашение в семью", 
+    color: "bg-pink-100 text-pink-600" 
+  },
   LOW_BALANCE: { icon: "💳", label: "Низкий баланс", color: "bg-red-100 text-red-600" },
   LARGE_EXPENSE: { icon: "💸", label: "Большая трата", color: "bg-orange-100 text-orange-600" },
   SYSTEM: { icon: "ℹ️", label: "Системное", color: "bg-gray-100 text-gray-600" },
@@ -373,7 +388,7 @@ export default function NotificationsPage() {
                     />
 
                     {/* Icon */}
-                    <div className="text-3xl flex-shrink-0">{typeInfo.icon}</div>
+                    <div className="flex-shrink-0">{typeInfo.icon}</div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">

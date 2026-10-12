@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { TrendingDown, TrendingUp, ArrowRightLeft, Zap } from 'lucide-react';
 
 interface Transaction {
   id: string;
@@ -61,10 +62,10 @@ export default function TransactionsPage() {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'INCOME': return '📥';
-      case 'EXPENSE': return '📤';
-      case 'TRANSFER': return '🔄';
-      default: return '💸';
+      case 'INCOME': return TrendingUp;
+      case 'EXPENSE': return TrendingDown;
+      case 'TRANSFER': return ArrowRightLeft;
+      default: return Zap;
     }
   };
 
@@ -155,7 +156,10 @@ export default function TransactionsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${getTypeColor(tx.type)}`}>
-                        <span>{getTypeIcon(tx.type)}</span>
+                        {(() => {
+                          const IconComponent = getTypeIcon(tx.type);
+                          return <IconComponent className="w-3 h-3" />;
+                        })()}
                         {getTypeLabel(tx.type)}
                       </span>
                     </td>

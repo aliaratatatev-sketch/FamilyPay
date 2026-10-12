@@ -17,9 +17,9 @@
       "dark": "Dark"
     },
     "language": {
-      "ru": "🇷🇺 RU",
-      "kg": "🇰🇬 KR",
-      "en": "🇬🇧 EN"
+      "ru": "рџ‡·рџ‡є RU",
+      "kg": "рџ‡°рџ‡¬ KR",
+      "en": "рџ‡¬рџ‡§ EN"
     }
   },
   "auth": {
@@ -45,7 +45,7 @@
       "login": "Log In",
       "register": "Sign Up"
     },
-    "backHome": "← Back to home"
+    "backHome": "в†ђ Back to home"
   },
   "hero": {
     "badge": "A new level of family finances",
@@ -68,12 +68,12 @@
         "part1": "Achieve financial goals",
         "part2": "together as a family"
       },
-      "description": "Plan, save, and control — together it's easier"
+      "description": "Plan, save, and control вЂ” together it's easier"
     }
   },
   "about": {
     "badge": "About",
-    "title": "FamilyPay — your reliable financial assistant",
+    "title": "FamilyPay вЂ” your reliable financial assistant",
     "description": "We've created a platform that helps families manage finances easily and transparently",
     "mission": {
       "title": "Our Mission",
@@ -81,22 +81,22 @@
     },
     "values": [
       {
-        "emoji": "🤝",
+        "icon": "рџ¤ќ",
         "title": "Transparency",
         "description": "All family members see the complete financial picture in real-time."
       },
       {
-        "emoji": "🔒",
+        "icon": "рџ”’",
         "title": "Security",
         "description": "Your data is protected by modern encryption technologies."
       },
       {
-        "emoji": "💡",
+        "icon": "рџ’Ў",
         "title": "Simplicity",
         "description": "Intuitive interface that's clear to every family member."
       },
       {
-        "emoji": "📈",
+        "icon": "рџ“€",
         "title": "Efficiency",
         "description": "Smart tools for achieving your financial goals."
       }
@@ -111,19 +111,19 @@
         "number": "01",
         "title": "Create Account",
         "description": "Sign up and create a family space. Invite family members with one link.",
-        "icon": "👤"
+        "icon": "рџ‘¤"
       },
       {
         "number": "02",
         "title": "Set Up Accounts",
         "description": "Add bank cards, cash, and other accounts. Create expense categories for your needs.",
-        "icon": "💳"
+        "icon": "рџ’і"
       },
       {
         "number": "03",
         "title": "Manage Together",
         "description": "All family members add expenses, track the budget, and save for common goals in real-time.",
-        "icon": "🎯"
+        "icon": "рџЋЇ"
       }
     ],
     "bonus": {
@@ -137,32 +137,32 @@
     "description": "Powerful tools for budget control and achieving financial goals",
     "items": [
       {
-        "emoji": "👨‍👩‍👧‍👦",
+        "icon": "рџ‘ЁвЂЌрџ‘©вЂЌрџ‘§вЂЌрџ‘¦",
         "title": "Shared Access",
         "description": "Add family members with different access levels. Everyone sees the complete financial picture."
       },
       {
-        "emoji": "📊",
+        "icon": "рџ“Љ",
         "title": "Expense Analytics",
         "description": "Detailed statistics by category. Understand where your money goes and optimize spending."
       },
       {
-        "emoji": "🎯",
+        "icon": "рџЋЇ",
         "title": "Budgets & Limits",
         "description": "Plan expenses by category. Get notifications when limits are exceeded."
       },
       {
-        "emoji": "💳",
+        "icon": "рџ’і",
         "title": "Multiple Accounts",
-        "description": "Cash, cards, savings, investments — manage all accounts in one place."
+        "description": "Cash, cards, savings, investments вЂ” manage all accounts in one place."
       },
       {
-        "emoji": "🚀",
+        "icon": "рџљЂ",
         "title": "Financial Goals",
         "description": "Save for vacation, a car, or education. Track your progress towards goals."
       },
       {
-        "emoji": "🔄",
+        "icon": "рџ”„",
         "title": "Automation",
         "description": "Set up recurring transactions. Salary, payments, and subscriptions are added automatically."
       }
@@ -220,7 +220,7 @@
         ],
         "cta": "Try Free",
         "popular": true,
-        "badge": "⭐ Popular"
+        "badge": "в­ђ Popular"
       },
       {
         "name": "Premium",
@@ -278,9 +278,10 @@
       }
     },
     "bottom": {
-      "copyright": "© 2026 FamilyPay. All rights reserved.",
+      "copyright": "В© 2026 FamilyPay. All rights reserved.",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
     }
   }
 }
+

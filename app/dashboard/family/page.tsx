@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
+import { Users, CreditCard, DollarSign, Trash2, Crown, Mail, CheckCircle, Info, AlertTriangle, Eye, Baby, User } from 'lucide-react';
 
 interface Family {
   id: string;
@@ -310,8 +311,8 @@ export default function FamilyPage() {
           {/* Участники */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl">
-                👥
+              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 p-3 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <Users className="w-6 h-6" />
               </div>
             </div>
             <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Участники</h3>
@@ -321,8 +322,8 @@ export default function FamilyPage() {
           {/* Счета */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-2xl">
-                💳
+              <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/20 p-3 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                <CreditCard className="w-6 h-6" />
               </div>
             </div>
             <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Счета</h3>
@@ -332,8 +333,8 @@ export default function FamilyPage() {
           {/* Транзакции */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white text-2xl">
-                💰
+              <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-900/20 p-3 flex items-center justify-center text-green-600 dark:text-green-400">
+                <DollarSign className="w-6 h-6" />
               </div>
             </div>
             <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Транзакции</h3>
@@ -363,7 +364,7 @@ export default function FamilyPage() {
                   className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition flex items-center gap-2"
                   title="Только создатель может удалить семью"
                 >
-                  <span>🗑️</span>
+                  <Trash2 className="w-4 h-4" />
                   <span>Удалить семью</span>
                 </button>
               )}
@@ -384,8 +385,9 @@ export default function FamilyPage() {
                   <p className="font-semibold text-gray-900 dark:text-white">
                     {member.user.name || 'Без имени'}
                     {selectedFamily.createdBy?.id === member.user.id && (
-                      <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full">
-                        👑 Создатель
+                      <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full inline-flex items-center gap-1">
+                        <Crown className="w-3 h-3" />
+                        Создатель
                       </span>
                     )}
                   </p>
@@ -559,10 +561,10 @@ function InviteModal({
   const [inviteLink, setInviteLink] = useState('');
 
   const roles = [
-    { value: 'ADMIN', label: 'Администратор', description: 'Полный доступ к управлению', icon: '👑' },
-    { value: 'PARENT', label: 'Родитель', description: 'Управление финансами', icon: '👨‍💼' },
-    { value: 'TEEN', label: 'Подросток', description: 'Ограниченный доступ', icon: '👦' },
-    { value: 'VIEWER', label: 'Наблюдатель', description: 'Только просмотр', icon: '👀' },
+    { value: 'ADMIN', label: 'Администратор', description: 'Полный доступ к управлению', icon: 'Crown' },
+    { value: 'PARENT', label: 'Родитель', description: 'Управление финансами', icon: 'User' },
+    { value: 'TEEN', label: 'Подросток', description: 'Ограниченный доступ', icon: 'Baby' },
+    { value: 'VIEWER', label: 'Наблюдатель', description: 'Только просмотр', icon: 'Eye' },
   ];
 
   const handleSubmitByEmail = async (e: React.FormEvent) => {
@@ -649,7 +651,7 @@ function InviteModal({
 
           <div className="text-center mb-6">
             <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">✉️</span>
+              <Mail className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Приглашение создано!
@@ -682,9 +684,10 @@ function InviteModal({
             </div>
           </div>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6 flex items-start gap-2">
+            <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              💡 Ссылка действительна 7 дней. Пользователь должен быть зарегистрирован с email <strong>{email}</strong>
+              Ссылка действительна 7 дней. Пользователь должен быть зарегистрирован с email <strong>{email}</strong>
             </p>
           </div>
 
@@ -708,7 +711,7 @@ function InviteModal({
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
           <div className="text-center">
             <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">✅</span>
+              <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Успешно!
@@ -797,8 +800,9 @@ function InviteModal({
                 className="w-full px-4 py-3 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 autoFocus
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                💡 Попросите пользователя скопировать ID из его профиля
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1">
+                <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                <span>Попросите пользователя скопировать ID из его профиля</span>
               </p>
             </div>
           ) : (
@@ -818,8 +822,9 @@ function InviteModal({
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 autoFocus
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                ⚠️ Будет создана ссылка-приглашение (действует 7 дней)
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1">
+                <AlertTriangle className="w-3 h-3 mt-0.5 text-yellow-600 flex-shrink-0" />
+                <span>Будет создана ссылка-приглашение (действует 7 дней)</span>
               </p>
             </div>
           )}
@@ -923,10 +928,10 @@ function ChangeRoleModal({
   const [selectedRole, setSelectedRole] = useState(member.role);
 
   const roles = [
-    { value: 'ADMIN', label: 'Администратор', description: 'Полный доступ к управлению', icon: '👑' },
-    { value: 'PARENT', label: 'Родитель', description: 'Управление финансами', icon: '👨‍💼' },
-    { value: 'TEEN', label: 'Подросток', description: 'Ограниченный доступ', icon: '👦' },
-    { value: 'VIEWER', label: 'Наблюдатель', description: 'Только просмотр', icon: '👀' },
+    { value: 'ADMIN', label: 'Администратор', description: 'Полный доступ к управлению', icon: 'Crown' },
+    { value: 'PARENT', label: 'Родитель', description: 'Управление финансами', icon: 'User' },
+    { value: 'TEEN', label: 'Подросток', description: 'Ограниченный доступ', icon: 'Baby' },
+    { value: 'VIEWER', label: 'Наблюдатель', description: 'Только просмотр', icon: 'Eye' },
   ];
 
   return (
@@ -1057,7 +1062,7 @@ function RemoveMemberModal({
 
         <div className="text-center mb-6">
           <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">⚠️</span>
+            <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {isCurrentUser ? 'Покинуть семью?' : 'Удалить участника?'}
@@ -1071,8 +1076,9 @@ function RemoveMemberModal({
         </div>
 
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-          <p className="text-sm text-red-800 dark:text-red-200 font-semibold mb-2">
-            ⚠️ Внимание!
+          <p className="text-sm text-red-800 dark:text-red-200 font-semibold mb-2 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" />
+            Внимание!
           </p>
           <ul className="text-sm text-red-700 dark:text-red-300 space-y-1 list-disc list-inside">
             {isCurrentUser ? (
@@ -1126,7 +1132,7 @@ function RemoveMemberModal({
               </>
             ) : (
               <>
-                <span>🗑️</span>
+                <Trash2 className="w-4 h-4" />
                 <span>{isCurrentUser ? 'Покинуть' : 'Удалить'}</span>
               </>
             )}
@@ -1162,7 +1168,7 @@ function DeleteFamilyModal({
 
         <div className="text-center mb-6">
           <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">⚠️</span>
+            <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Удалить семью?

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Wallet, Banknote, CreditCard, PiggyBank, TrendingUp, AlertCircle } from 'lucide-react';
 
 interface Account {
   id: string;
@@ -22,12 +23,12 @@ interface Account {
 }
 
 const ACCOUNT_TYPES = [
-  { value: 'CASH', label: 'Наличные', icon: '💵' },
-  { value: 'BANK_ACCOUNT', label: 'Банковский счёт', icon: '🏦' },
-  { value: 'CARD', label: 'Карта', icon: '💳' },
-  { value: 'SAVINGS', label: 'Накопления', icon: '🏦' },
-  { value: 'INVESTMENT', label: 'Инвестиции', icon: '📈' },
-  { value: 'DEBT', label: 'Долг', icon: '💰' },
+  { value: 'CASH', label: 'Наличные', IconComponent: Wallet },
+  { value: 'BANK_ACCOUNT', label: 'Банковский счёт', IconComponent: Banknote },
+  { value: 'CARD', label: 'Карта', IconComponent: CreditCard },
+  { value: 'SAVINGS', label: 'Накопления', IconComponent: PiggyBank },
+  { value: 'INVESTMENT', label: 'Инвестиции', IconComponent: TrendingUp },
+  { value: 'DEBT', label: 'Долг', IconComponent: AlertCircle },
 ];
 
 export default function AccountsPage() {
@@ -43,7 +44,7 @@ export default function AccountsPage() {
     currency: 'RUB',
     description: '',
     color: '#4FD1C5',
-    icon: '💵',
+    iconType: 'CASH',
     isActive: true
   });
 
@@ -107,7 +108,7 @@ export default function AccountsPage() {
       currency: 'RUB',
       description: '',
       color: '#4FD1C5',
-      icon: '💵',
+      iconType: 'CASH',
       isActive: true
     });
   };
@@ -122,7 +123,7 @@ export default function AccountsPage() {
       currency: account.currency,
       description: account.description || '',
       color: account.color || '#4FD1C5',
-      icon: account.icon || '💳',
+      iconType: account.type,
       isActive: account.isActive
     });
     setShowModal(true);
@@ -164,11 +165,12 @@ export default function AccountsPage() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                    style={{ backgroundColor: account.color ? `${account.color}20` : '#4FD1C520' }}
-                  >
-                    {account.icon || '💳'}
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl">
+                    {(() => {
+                      const accountType = ACCOUNT_TYPES.find(t => t.value === account.type);
+                      const IconComp = accountType?.IconComponent || CreditCard;
+                      return <IconComp className="w-6 h-6 text-blue-600" />;
+                    })()}
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -267,13 +269,12 @@ export default function AccountsPage() {
                 <select
                   value={formData.type}
                   onChange={(e) => {
-                    const type = ACCOUNT_TYPES.find(t => t.value === e.target.value);
-                    setFormData({ ...formData, type: e.target.value, icon: type?.icon || '💳' });
+                    setFormData({ ...formData, type: e.target.value, iconType: e.target.value });
                   }}
                   className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f1923] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#4FD1C5]"
                 >
                   {ACCOUNT_TYPES.map(type => (
-                    <option key={type.value} value={type.value}>{type.icon} {type.label}</option>
+                    <option key={type.value} value={type.value}>{type.label}</option>
                   ))}
                 </select>
               </div>
@@ -312,15 +313,6 @@ export default function AccountsPage() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Иконка</label>
-                  <input
-                    type="text"
-                    value={formData.icon}
-                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f1923] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#4FD1C5]"
-                  />
-                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Цвет</label>
                   <input

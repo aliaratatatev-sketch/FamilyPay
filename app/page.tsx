@@ -8,6 +8,22 @@ import AuthAwareLink from "./components/AuthAwareLink";
 import { useLocale } from "./i18n/LocaleContext";
 import RequestApprovalCard from "./components/RequestApprovalCard";
 import VideoModal from "./components/VideoModal";
+import { Target, Mail, Phone, MapPin, Handshake, Lock, Lightbulb, TrendingUp, User, CreditCard, Users, BarChart3, Rocket, RefreshCw, Sparkles } from "lucide-react";
+
+// Маппинг имён иконок на компоненты
+const iconComponents: Record<string, React.ComponentType<{ className?: string }>> = {
+  Handshake,
+  Lock,
+  Lightbulb,
+  TrendingUp,
+  User,
+  CreditCard,
+  Target,
+  Users,
+  BarChart3,
+  Rocket,
+  RefreshCw
+};
 
 export default function Home() {
   const { t } = useLocale();
@@ -114,7 +130,7 @@ export default function Home() {
           {/* Mission */}
           <div className="max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-16 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] text-white shadow-2xl shadow-teal-500/20">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <span className="text-2xl sm:text-3xl">🎯</span>
+              <Target className="w-7 h-7 sm:w-8 sm:h-8" />
               <h3 className="text-lg sm:text-xl md:text-2xl font-bold">{t.about.mission.title}</h3>
             </div>
             <p className="text-sm sm:text-base md:text-lg text-teal-50 leading-relaxed">
@@ -124,18 +140,21 @@ export default function Home() {
 
           {/* Values */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {t.about.values.map((value, i) => (
-              <div
-                key={i}
-                className="group relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-xl hover:shadow-teal-500/10 transition-all duration-300"
-              >
-                <div className="w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-3 sm:mb-4 md:mb-5 shadow-lg shadow-teal-500/30">
-                  <span className="text-xl sm:text-2xl">{value.emoji}</span>
+            {t.about.values.map((value: any, i: number) => {
+              const IconComponent = iconComponents[value.icon] || Lightbulb;
+              return (
+                <div
+                  key={i}
+                  className="group relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-xl hover:shadow-teal-500/10 transition-all duration-300"
+                >
+                  <div className="w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-3 sm:mb-4 md:mb-5 shadow-lg shadow-teal-500/30">
+                    <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">{value.title}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{value.description}</p>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">{value.title}</h3>
-                <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{value.description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -168,24 +187,27 @@ export default function Home() {
               <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-[#0D6D6E] via-[#4FD1C5] to-[#0D6D6E] -translate-y-1/2 opacity-20" />
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
-                {t.howItWorks.steps.map((step, i) => (
-                  <div key={i} className="relative">
-                    <div className="relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-300 group">
-                      {/* Step number */}
-                      <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center shadow-lg shadow-teal-500/30">
-                        <span className="text-white font-black text-base sm:text-lg">{step.number}</span>
+                {t.howItWorks.steps.map((step: any, i: number) => {
+                  const IconComponent = iconComponents[step.icon] || User;
+                  return (
+                    <div key={i} className="relative">
+                      <div className="relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-300 group">
+                        {/* Step number */}
+                        <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center shadow-lg shadow-teal-500/30">
+                          <span className="text-white font-black text-base sm:text-lg">{step.number}</span>
+                        </div>
+                        
+                        {/* Icon */}
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#4FD1C5]/10 to-[#0D6D6E]/10 dark:from-[#4FD1C5]/20 dark:to-[#0D6D6E]/20 flex items-center justify-center mb-4 sm:mb-5 md:mb-6 border border-[#4FD1C5]/20">
+                          <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-[#0D6D6E] dark:text-[#4FD1C5]" />
+                        </div>
+                        
+                        <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">{step.title}</h3>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{step.description}</p>
                       </div>
-                      
-                      {/* Icon */}
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#4FD1C5]/10 to-[#0D6D6E]/10 dark:from-[#4FD1C5]/20 dark:to-[#0D6D6E]/20 flex items-center justify-center mb-4 sm:mb-5 md:mb-6 border border-[#4FD1C5]/20">
-                        <span className="text-2xl sm:text-3xl md:text-4xl">{step.icon}</span>
-                      </div>
-                      
-                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">{step.title}</h3>
-                      <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{step.description}</p>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -193,7 +215,7 @@ export default function Home() {
             <div className="mt-8 sm:mt-12 md:mt-16 p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl bg-gradient-to-r from-[#0D6D6E]/5 to-[#4FD1C5]/5 border border-[#4FD1C5]/20 dark:border-[#4FD1C5]/10">
               <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-6">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center shadow-lg shadow-teal-500/30 flex-shrink-0">
-                  <span className="text-xl sm:text-2xl">✨</span>
+                  <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
                 <div className="text-center sm:text-left">
                   <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">{t.howItWorks.bonus.title}</h4>
@@ -221,24 +243,27 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {t.features.items.map((f, i) => (
-              <div
-                key={i}
-                className="group relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/0 to-[#0D6D6E]/0 hover:from-[#4FD1C5]/5 hover:to-[#0D6D6E]/5 transition-all duration-500 rounded-3xl" />
-                <span className="absolute top-4 sm:top-5 right-4 sm:right-5 text-3xl sm:text-4xl md:text-5xl font-black text-gray-50 dark:text-white/[0.04] select-none">
-                  0{i + 1}
-                </span>
-                <div className="relative">
-                  <div className="w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-4 sm:mb-5 md:mb-6 shadow-lg shadow-teal-500/30">
-                    <span className="text-lg sm:text-xl md:text-2xl">{f.emoji}</span>
+            {t.features.items.map((f: any, i: number) => {
+              const IconComponent = iconComponents[f.icon] || Lightbulb;
+              return (
+                <div
+                  key={i}
+                  className="group relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/0 to-[#0D6D6E]/0 hover:from-[#4FD1C5]/5 hover:to-[#0D6D6E]/5 transition-all duration-500 rounded-3xl" />
+                  <span className="absolute top-4 sm:top-5 right-4 sm:right-5 text-3xl sm:text-4xl md:text-5xl font-black text-gray-50 dark:text-white/[0.04] select-none">
+                    0{i + 1}
+                  </span>
+                  <div className="relative">
+                    <div className="w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-4 sm:mb-5 md:mb-6 shadow-lg shadow-teal-500/30">
+                      <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    </div>
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">{f.title}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{f.description}</p>
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">{f.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{f.description}</p>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -380,9 +405,9 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">{t.footer.sections.contacts.title}</h4>
               <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm">
-                <li className="flex items-start gap-2"><span>✉️</span><span>{t.footer.sections.contacts.email}</span></li>
-                <li className="flex items-start gap-2"><span>📞</span><span>{t.footer.sections.contacts.phone}</span></li>
-                <li className="flex items-start gap-2"><span>📍</span><span>{t.footer.sections.contacts.address}</span></li>
+                <li className="flex items-start gap-2"><Mail className="w-4 h-4 flex-shrink-0 mt-0.5" /><span>{t.footer.sections.contacts.email}</span></li>
+                <li className="flex items-start gap-2"><Phone className="w-4 h-4 flex-shrink-0 mt-0.5" /><span>{t.footer.sections.contacts.phone}</span></li>
+                <li className="flex items-start gap-2"><MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" /><span>{t.footer.sections.contacts.address}</span></li>
               </ul>
             </div>
           </div>

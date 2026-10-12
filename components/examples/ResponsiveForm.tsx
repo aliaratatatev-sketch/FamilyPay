@@ -175,11 +175,11 @@ export default function ResponsiveForm() {
             "
           >
             <option value="">Выберите категорию</option>
-            <option value="food">🍕 Еда</option>
-            <option value="transport">🚗 Транспорт</option>
-            <option value="entertainment">🎬 Развлечения</option>
-            <option value="shopping">🛍️ Покупки</option>
-            <option value="bills">💡 Счета</option>
+            <option value="food">Еда</option>
+            <option value="transport">Транспорт</option>
+            <option value="entertainment">Развлечения</option>
+            <option value="shopping">Покупки</option>
+            <option value="bills">Счета</option>
           </select>
         </div>
       </div>

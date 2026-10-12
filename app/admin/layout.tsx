@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LocaleProvider, useLocale } from '../i18n/LocaleContext';
 import { adminTranslations, Locale, localeNames, locales } from '../i18n';
+import { BarChart3, Users, Home, Folder, CreditCard, TrendingUp, Target, DollarSign, LogOut } from 'lucide-react';
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -39,14 +40,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   };
 
   const navigation = [
-    { name: t.nav.dashboard, href: '/admin', icon: '📊' },
-    { name: t.nav.users, href: '/admin/users', icon: '👥' },
-    { name: t.nav.families, href: '/admin/families', icon: '👨‍👩‍👧‍👦' },
-    { name: t.nav.categories, href: '/admin/categories', icon: '📁' },
-    { name: t.nav.accounts, href: '/admin/accounts', icon: '💳' },
-    { name: t.nav.transactions, href: '/admin/transactions', icon: '💸' },
-    { name: t.nav.budgets, href: '/admin/budgets', icon: '📈' },
-    { name: t.nav.goals, href: '/admin/goals', icon: '🎯' },
+    { name: t.nav.dashboard, href: '/admin', icon: BarChart3 },
+    { name: t.nav.users, href: '/admin/users', icon: Users },
+    { name: t.nav.families, href: '/admin/families', icon: Home },
+    { name: t.nav.categories, href: '/admin/categories', icon: Folder },
+    { name: t.nav.accounts, href: '/admin/accounts', icon: CreditCard },
+    { name: t.nav.transactions, href: '/admin/transactions', icon: DollarSign },
+    { name: t.nav.budgets, href: '/admin/budgets', icon: TrendingUp },
+    { name: t.nav.goals, href: '/admin/goals', icon: Target },
   ];
 
   return (
@@ -75,6 +76,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           <nav className="space-y-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
@@ -85,7 +87,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
                   }`}
                 >
-                  <span className="text-xl">{item.icon}</span>
+                  <Icon className="w-5 h-5" />
                   <span>{item.name}</span>
                 </Link>
               );
@@ -103,17 +105,19 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     await fetch('/api/admin/logout-admin', { method: 'POST' });
                     window.location.href = '/dashboard';
                   }}
-                  className="w-full text-xs text-[#0D6D6E] dark:text-[#4FD1C5] font-medium hover:underline text-left"
+                  className="w-full flex items-center gap-2 text-xs text-[#0D6D6E] dark:text-[#4FD1C5] font-medium hover:underline text-left"
                 >
-                  🚪 Выйти из админ-панели
+                  <LogOut className="w-3 h-3" />
+                  Выйти из админ-панели
                 </button>
                 <button 
                   onClick={async () => {
                     await fetch('/api/auth/logout', { method: 'POST' });
                     window.location.href = '/login';
                   }}
-                  className="w-full text-xs text-red-600 dark:text-red-400 font-medium hover:underline text-left"
+                  className="w-full flex items-center gap-2 text-xs text-red-600 dark:text-red-400 font-medium hover:underline text-left"
                 >
+                  <LogOut className="w-3 h-3" />
                   {t.header.logout}
                 </button>
               </div>

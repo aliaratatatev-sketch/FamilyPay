@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
   Home,
@@ -21,8 +21,12 @@ import {
   ChevronRight,
   Menu,
   X,
+  UserCircle,
+  Crown,
+  Baby
 } from 'lucide-react';
 import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
+import AdminAccessModal from '@/app/components/AdminAccessModal';
 
 interface NavigationItem {
   name: string;
@@ -38,10 +42,13 @@ interface NavigationItem {
 export default function Sidebar() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useDashboardLocale();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [hasAdminAccess, setHasAdminAccess] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
   const [userFamilyRole, setUserFamilyRole] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -74,6 +81,7 @@ export default function Sidebar() {
       const response = await fetch('/api/admin/check-access');
       const data = await response.json();
       setIsAdmin(data.isAdmin || false);
+      setHasAdminAccess(data.hasAccess || false);
     } catch (error) {
       console.error('Error checking admin access:', error);
     }
@@ -128,6 +136,20 @@ export default function Sidebar() {
     }
 
     return false;
+  };
+
+  const handleAdminClick = (e: React.MouseEvent, item: NavigationItem) => {
+    // Если это админ панель и нет доступа - показываем модальное окно
+    if (item.systemAdmin && !hasAdminAccess) {
+      e.preventDefault();
+      setShowAdminModal(true);
+    }
+  };
+
+  const handleAdminModalClose = () => {
+    setShowAdminModal(false);
+    // Перезагружаем статус доступа
+    checkAdminAccess();
   };
 
   const isActive = (href: string) => {
@@ -232,6 +254,7 @@ export default function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
+                    onClick={(e) => handleAdminClick(e, item)}
                     className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                       active
                         ? 'bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white shadow-lg shadow-teal-500/20'
@@ -290,11 +313,11 @@ export default function Sidebar() {
                   <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                     {session?.user?.name || 'Пользователь'}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {userFamilyRole === 'CHILD' ? '👦 Ребенок' : 
-                     userFamilyRole === 'PARENT' ? '👨‍💼 Родитель' : 
-                     userFamilyRole === 'ADMIN' ? '👑 Администратор' : 
-                     '👤 Пользователь'}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate flex items-center gap-1">
+                    {userFamilyRole === 'CHILD' ? <><Baby className="w-3 h-3" /> Ребенок</> : 
+                     userFamilyRole === 'PARENT' ? <><User className="w-3 h-3" /> Родитель</> : 
+                     userFamilyRole === 'ADMIN' ? <><Crown className="w-3 h-3" /> Администратор</> : 
+                     <><UserCircle className="w-3 h-3" /> Пользователь</>}
                   </p>
                 </div>
               </div>
@@ -323,6 +346,12 @@ export default function Sidebar() {
 
       {/* Spacer for main content - hide on mobile */}
       <div className={`hidden lg:block ${isCollapsed ? 'w-20' : 'w-64'} flex-shrink-0 transition-all duration-300`} />
+
+      {/* Admin Access Modal */}
+      <AdminAccessModal 
+        isOpen={showAdminModal} 
+        onClose={handleAdminModalClose}
+      />
     </>
   );
 }

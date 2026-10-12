@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import NotificationBell from '../../components/NotificationBell';
 import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
+import { DollarSign, TrendingUp, TrendingDown, ArrowRightLeft, Wallet } from 'lucide-react';
 
 interface Transaction {
   id: string;
@@ -276,8 +277,9 @@ export default function TransactionsPage() {
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              💰 {t.transactionsPage.title}
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <DollarSign className="w-8 h-8" />
+              {t.transactionsPage.title}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               {t.transactionsPage.subtitle}
@@ -413,7 +415,9 @@ export default function TransactionsPage() {
             </div>
           ) : filteredTransactions.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">💸</div>
+              <div className="mb-4 flex justify-center">
+                <Wallet className="w-16 h-16 text-gray-300 dark:text-gray-600" />
+              </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Нет транзакций
               </h3>
@@ -447,7 +451,7 @@ export default function TransactionsPage() {
                   >
                     {transaction.category?.icon || 
                      transaction.account.icon || 
-                     (transaction.type === 'INCOME' ? '💰' : transaction.type === 'EXPENSE' ? '💸' : '🔄')}
+                     (transaction.type === 'INCOME' ? <TrendingUp className="w-5 h-5" /> : transaction.type === 'EXPENSE' ? <TrendingDown className="w-5 h-5" /> : <ArrowRightLeft className="w-5 h-5" />)}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -601,8 +605,8 @@ function AddTransactionModal({
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">💰</span>
+          <div className="w-16 h-16 rounded-full bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center mx-auto mb-4">
+            <DollarSign className="w-8 h-8 text-teal-600 dark:text-teal-400" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Добавить транзакцию
@@ -631,8 +635,8 @@ function AddTransactionModal({
                       : 'border-gray-300 dark:border-gray-600'
                   }`}
                 >
-                  <div className="text-2xl mb-1">
-                    {type === 'INCOME' ? '💰' : type === 'EXPENSE' ? '💸' : '🔄'}
+                  <div className="text-2xl mb-1 flex justify-center">
+                    {type === 'INCOME' ? <TrendingUp className="w-6 h-6" /> : type === 'EXPENSE' ? <TrendingDown className="w-6 h-6" /> : <ArrowRightLeft className="w-6 h-6" />}
                   </div>
                   <div className="text-xs font-medium text-gray-900 dark:text-white">
                     {type === 'INCOME' ? 'Доход' : type === 'EXPENSE' ? 'Расход' : 'Перевод'}

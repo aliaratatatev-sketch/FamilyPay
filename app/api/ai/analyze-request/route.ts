@@ -1,6 +1,8 @@
 /**
  * API: AI анализ запроса на деньги для родителя
  * POST /api/ai/analyze-request
+ * 
+ * ВАЖНО: Вся математика рассчитывается на TypeScript ДО вызова Ollama
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,41 +11,62 @@ const OLLAMA_API_URL = 'http://localhost:11434/api/chat';
 const OLLAMA_MODEL = 'mistral:latest';
 
 interface AnalyzeRequest {
+  requestId: string;
   title: string;
   amount: number;
   currency: string;
-  description?: string;
-  familyBalance: number;
+  description?: string | null;
+  accountId: string;
+  accountBalance: number;
+  accountName: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: AnalyzeRequest = await request.json();
-    const { title, amount, currency, description, familyBalance } = body;
+    const { 
+      requestId, 
+      title, 
+      amount, 
+      currency, 
+      description, 
+      accountId, 
+      accountBalance, 
+      accountName 
+    } = body;
 
-    // Системный промпт для AI
+    // ✅ ВСЯ МАТЕМАТИКА СТРОГО НА TYPESCRIPT
+    const exactPercent = Math.round((amount / accountBalance) * 100);
+    const remainingBalance = accountBalance - amount;
+
+    // Системный промпт для AI с ЗАПРЕТОМ на самостоятельные вычисления
     const systemPrompt = `Ты — финансовый советник для родителей в приложении FamilyPay.
 
 ЗАДАЧА: Дай короткую рекомендацию родителю по запросу ребёнка на деньги.
 
-ПРАВИЛА:
+⛔ СТРОГИЕ ПРАВИЛА:
+- Используй ТОЛЬКО переданные точные математические данные (exactPercent%, remainingBalance).
+- НЕ вычисляй проценты заново. НЕ пересчитывай остаток.
 - Отвечай ОЧЕНЬ коротко: 1-2 предложения.
-- Оцени процент от баланса.
-- Не упоминай банки, инвестиции, документы.
-- Формат: "Запрашиваемая сумма составляет X% от баланса. [Рекомендация]."
-- Рекомендация: "Рекомендуем одобрять" / "Можно одобрить частично" / "Лучше отложить"
+- НЕ упоминай банки, инвестиции, документы.
+- Рекомендация: "Рекомендуем одобрить" / "Можно одобрить частично" / "Лучше отложить"
 - Будь конкретным и практичным.`;
 
     const userMessage = `Ребёнок просит: "${title}"${description ? ` (${description})` : ''}
-Сумма: ${amount} ${currency}
-Баланс семьи: ${familyBalance} ${currency}
+Запрошенная сумма: ${amount} ${currency}
+Счет: ${accountName}
+Баланс счета: ${accountBalance} ${currency}
+Точный процент от баланса: ${exactPercent}%
+Остаток после покупки: ${remainingBalance} ${currency}
 
-Дай короткую рекомендацию родителю (1-2 предложения).`;
+Дай короткую рекомендацию родителю (1-2 предложения), используя ТОЛЬКО эти данные.`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userMessage }
     ];
+
+    let aiRecommendation = '';
 
     try {
       const ollamaResponse = await fetch(OLLAMA_API_URL, {
@@ -60,43 +83,37 @@ export async function POST(request: NextRequest) {
         }),
       });
 
-      if (!ollamaResponse.ok) {
-        throw new Error(`Ollama API error: ${ollamaResponse.status}`);
+      if (ollamaResponse.ok) {
+        const data = await ollamaResponse.json();
+        aiRecommendation = data.message?.content?.trim() || '';
       }
-
-      const data = await ollamaResponse.json();
-      const aiRecommendation = data.message?.content?.trim();
-
-      if (aiRecommendation) {
-        return NextResponse.json({
-          success: true,
-          recommendation: aiRecommendation
-        });
-      }
-
-      throw new Error('No response from AI');
-
     } catch (ollamaError) {
       console.error('❌ Ollama error:', ollamaError);
-      
-      // Fallback расчёт
-      const percentage = ((amount / familyBalance) * 100).toFixed(1);
-      let recommendation = '';
-      
-      if (parseFloat(percentage) > 20) {
-        recommendation = `Запрашиваемая сумма составляет ${percentage}% от баланса. Это довольно много — лучше одобрить частично или отложить.`;
-      } else if (parseFloat(percentage) > 10) {
-        recommendation = `Запрашиваемая сумма составляет ${percentage}% от баланса. Можно одобрить частично.`;
-      } else {
-        recommendation = `Запрашиваемая сумма составляет ${percentage}% от баланса. Рекомендуем одобрить.`;
-      }
-
-      return NextResponse.json({
-        success: true,
-        recommendation: recommendation,
-        fallback: true
-      });
     }
+
+    // Fallback если Ollama не ответила
+    if (!aiRecommendation) {
+      if (exactPercent > 50) {
+        aiRecommendation = `Запрашиваемая сумма составляет ${exactPercent}% от баланса счета. Это очень много — лучше отложить или одобрить частично.`;
+      } else if (exactPercent > 20) {
+        aiRecommendation = `Запрашиваемая сумма составляет ${exactPercent}% от баланса. Можно одобрить частично, оставив резерв.`;
+      } else {
+        aiRecommendation = `Запрашиваемая сумма составляет ${exactPercent}% от баланса. Рекомендуем одобрить.`;
+      }
+    }
+
+    // Возвращаем полный анализ с готовыми расчётами
+    return NextResponse.json({
+      success: true,
+      analysis: {
+        recommendation: aiRecommendation,
+        exactPercent: exactPercent,
+        remainingBalance: remainingBalance,
+        requestAmount: amount,
+        accountBalance: accountBalance,
+        accountName: accountName,
+      }
+    });
 
   } catch (error) {
     console.error('Error in analyze-request:', error);

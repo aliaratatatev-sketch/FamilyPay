@@ -5,7 +5,7 @@ import { getCurrentUserId } from '@/lib/session';
 /**
  * POST /api/money-requests/:id/approve - Одобрить запрос на деньги
  * Body: {
- *   accountId?: string - из какого счета перевести (опционально)
+ *   paymentMethod?: string - метод оплаты (sber, odengi, mbank, cash)
  * }
  */
 export async function POST(
@@ -16,7 +16,7 @@ export async function POST(
     const userId = await getCurrentUserId();
     const { id } = await params;
     const body = await request.json();
-    const { accountId } = body;
+    const { paymentMethod } = body;
 
     const moneyRequest = await prisma.moneyRequest.findUnique({
       where: { id },
@@ -70,53 +70,91 @@ export async function POST(
       );
     }
 
-    // Если указан счет, создаем транзакцию
+    // MockBank: Имитация банковского перевода
     let transaction = null;
-    if (accountId) {
-      // Проверяем, что счет существует и принадлежит семье
-      const account = await prisma.financialAccount.findFirst({
-        where: {
-          id: accountId,
-          familyId: moneyRequest.familyId,
-        },
+    if (paymentMethod) {
+      const bankNames: Record<string, string> = {
+        sber: 'Сбер',
+        odengi: 'О!Деньги',
+        mbank: 'MBANK',
+        cash: 'Наличные',
+      };
+
+      // Ищем любой счет семьи для привязки транзакции (требование схемы)
+      const familyAccount = await prisma.financialAccount.findFirst({
+        where: { familyId: moneyRequest.familyId },
       });
 
-      if (!account) {
-        return NextResponse.json(
-          { error: 'Account not found or does not belong to this family' },
-          { status: 404 }
-        );
+      if (!familyAccount) {
+        // Если нет счетов, просто одобряем без транзакции
+        const updatedRequest = await prisma.moneyRequest.update({
+          where: { id },
+          data: {
+            status: 'APPROVED',
+            approverId: userId,
+            processedAt: new Date(),
+          },
+          include: {
+            requester: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+            approver: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
+            },
+            family: {
+              select: {
+                id: true,
+                name: true,
+                currency: true,
+              },
+            },
+          },
+        });
+
+        await prisma.notification.create({
+          data: {
+            userId: moneyRequest.requesterId,
+            type: 'REQUEST_APPROVED',
+            title: 'Запрос одобрен! ✅',
+            message: `Ваш запрос на ${moneyRequest.amount} ${moneyRequest.currency} для "${moneyRequest.title}" одобрен`,
+            data: JSON.parse(JSON.stringify({
+              moneyRequestId: id,
+              familyId: moneyRequest.familyId,
+              familyName: moneyRequest.family.name,
+              amount: moneyRequest.amount,
+              title: moneyRequest.title,
+            })),
+          },
+        });
+
+        return NextResponse.json({
+          success: true,
+          request: updatedRequest,
+          message: 'Money request approved successfully',
+        });
       }
 
-      // Проверяем баланс
-      if (Number(account.balance) < Number(moneyRequest.amount)) {
-        return NextResponse.json(
-          { error: 'Insufficient balance in the selected account' },
-          { status: 400 }
-        );
-      }
-
-      // Создаем транзакцию
+      // Создаем транзакцию с информацией о банке
       transaction = await prisma.transaction.create({
         data: {
           familyId: moneyRequest.familyId,
-          accountId,
+          accountId: familyAccount.id,
           userId,
           type: 'EXPENSE',
           amount: moneyRequest.amount,
           currency: moneyRequest.currency,
-          description: `${moneyRequest.title} (запрос от ${moneyRequest.requester.name || moneyRequest.requester.email})`,
+          description: `${moneyRequest.title} (через ${bankNames[paymentMethod] || paymentMethod}) - запрос от ${moneyRequest.requester.name || moneyRequest.requester.email}`,
           date: new Date(),
-        },
-      });
-
-      // Обновляем баланс счета
-      await prisma.financialAccount.update({
-        where: { id: accountId },
-        data: {
-          balance: {
-            decrement: moneyRequest.amount,
-          },
         },
       });
     }

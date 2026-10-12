@@ -1,20 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getCurrentUserId } from '@/lib/session';
-
 /**
- * GET /api/money-requests/:id - Получить детали запроса
+ * API: Получение одного запроса на деньги
+ * GET /api/money-requests/[id]
  */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import prisma from '@/lib/prisma';
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getCurrentUserId();
-    const { id } = await params;
+    const session = await getServerSession(authOptions);
 
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { id: requestId } = await context.params;
+
+    // Получаем запрос с полной информацией
     const moneyRequest = await prisma.moneyRequest.findUnique({
-      where: { id },
+      where: { id: requestId },
       include: {
         requester: {
           select: {
@@ -29,7 +41,6 @@ export async function GET(
             id: true,
             name: true,
             email: true,
-            image: true,
           },
         },
         family: {
@@ -44,18 +55,16 @@ export async function GET(
 
     if (!moneyRequest) {
       return NextResponse.json(
-        { error: 'Money request not found' },
+        { error: 'Request not found' },
         { status: 404 }
       );
     }
 
-    // Проверяем доступ - пользователь должен быть членом семьи
-    const member = await prisma.familyMember.findUnique({
+    // Проверяем доступ: должен быть членом семьи
+    const member = await prisma.familyMember.findFirst({
       where: {
-        familyId_userId: {
-          familyId: moneyRequest.familyId,
-          userId,
-        },
+        familyId: moneyRequest.familyId,
+        userId: session.user.id,
       },
     });
 
@@ -66,87 +75,15 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ request: moneyRequest });
-  } catch (error) {
-    console.error('Error fetching money request:', error);
-    
-    if (error instanceof Error && error.message === 'Unauthorized') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    return NextResponse.json(
-      { error: 'Failed to fetch money request' },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * DELETE /api/money-requests/:id - Отменить запрос (только автор)
- */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const userId = await getCurrentUserId();
-    const { id } = await params;
-
-    const moneyRequest = await prisma.moneyRequest.findUnique({
-      where: { id },
-    });
-
-    if (!moneyRequest) {
-      return NextResponse.json(
-        { error: 'Money request not found' },
-        { status: 404 }
-      );
-    }
-
-    // Проверяем, что это автор запроса
-    if (moneyRequest.requesterId !== userId) {
-      return NextResponse.json(
-        { error: 'Only the requester can cancel this request' },
-        { status: 403 }
-      );
-    }
-
-    // Можно отменить только PENDING запросы
-    if (moneyRequest.status !== 'PENDING') {
-      return NextResponse.json(
-        { error: 'Can only cancel pending requests' },
-        { status: 400 }
-      );
-    }
-
-    // Отменяем запрос
-    await prisma.moneyRequest.update({
-      where: { id },
-      data: {
-        status: 'CANCELLED',
-        updatedAt: new Date(),
-      },
-    });
-
     return NextResponse.json({
       success: true,
-      message: 'Money request cancelled successfully',
+      request: moneyRequest,
     });
+
   } catch (error) {
-    console.error('Error cancelling money request:', error);
-    
-    if (error instanceof Error && error.message === 'Unauthorized') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
+    console.error('Error fetching money request:', error);
     return NextResponse.json(
-      { error: 'Failed to cancel money request' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
