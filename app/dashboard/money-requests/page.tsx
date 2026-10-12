@@ -72,13 +72,18 @@ export default function MoneyRequestsPage() {
       const data = await response.json();
       
       if (response.ok && data.families) {
-        setFamilies(data.families);
-        if (data.families.length > 0) {
-          setSelectedFamily(data.families[0].id);
+        const familiesArray = Array.isArray(data.families) ? data.families : [];
+        setFamilies(familiesArray);
+        if (familiesArray.length > 0) {
+          setSelectedFamily(familiesArray[0].id);
         }
+      } else {
+        console.error('Failed to fetch families:', response.statusText);
+        setFamilies([]);
       }
     } catch (error) {
       console.error('Error loading families:', error);
+      setFamilies([]);
     }
   };
 
@@ -98,10 +103,14 @@ export default function MoneyRequestsPage() {
       const data = await response.json();
       
       if (response.ok) {
-        setRequests(data.requests || []);
+        setRequests(Array.isArray(data.requests) ? data.requests : []);
+      } else {
+        console.error('Failed to fetch requests:', response.statusText);
+        setRequests([]);
       }
     } catch (error) {
       console.error('Error loading requests:', error);
+      setRequests([]);
     } finally {
       setIsLoading(false);
     }
@@ -217,31 +226,35 @@ export default function MoneyRequestsPage() {
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Мои запросы
             </h2>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
-            >
-              <span>+</span>
-              <span>Новый запрос</span>
-            </button>
+            {requests.length > 0 && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
+              >
+                <span>+</span>
+                <span>Новый запрос</span>
+              </button>
+            )}
           </div>
 
           {/* Filters */}
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-            {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
-                  filter === f
-                    ? 'bg-[#0D6D6E] text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                {f === 'all' ? 'Все' : f === 'pending' ? 'Ожидают' : f === 'approved' ? 'Одобрено' : 'Отклонено'}
-              </button>
-            ))}
-          </div>
+          {requests.length > 0 && (
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+              {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
+                    filter === f
+                      ? 'bg-[#0D6D6E] text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {f === 'all' ? 'Все' : f === 'pending' ? 'Ожидают' : f === 'approved' ? 'Одобрено' : 'Отклонено'}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Requests List */}
           {requests.length === 0 ? (
