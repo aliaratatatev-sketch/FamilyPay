@@ -378,6 +378,90 @@ function CreateRequestModal({
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [aiEvaluation, setAiEvaluation] = useState<{
+    category: string;
+    approvalChance: string;
+    reason: string;
+  } | null>(null);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evaluationTimeout, setEvaluationTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // Функция для получения AI-оценки с debounce
+  const evaluateRequest = async (requestTitle: string, requestAmount: string, requestDescription: string) => {
+    if (!requestTitle.trim() || !requestAmount) {
+      setAiEvaluation(null);
+      return;
+    }
+
+    const amountNum = parseFloat(requestAmount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      setAiEvaluation(null);
+      return;
+    }
+
+    setIsEvaluating(true);
+
+    try {
+      const response = await fetch('/api/ai/evaluate-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: requestTitle.trim(),
+          amount: amountNum,
+          description: requestDescription.trim() || undefined
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAiEvaluation({
+          category: data.category,
+          approvalChance: data.approvalChance,
+          reason: data.reason
+        });
+      }
+    } catch (error) {
+      console.error('Error evaluating request:', error);
+    } finally {
+      setIsEvaluating(false);
+    }
+  };
+
+  // Debounce для AI-оценки
+  const handleInputChange = (field: 'title' | 'amount' | 'description', value: string) => {
+    if (field === 'title') setTitle(value);
+    if (field === 'amount') setAmount(value);
+    if (field === 'description') setDescription(value);
+    
+    setError('');
+
+    // Очищаем предыдущий таймер
+    if (evaluationTimeout) {
+      clearTimeout(evaluationTimeout);
+    }
+
+    // Устанавливаем новый таймер (1 секунда задержка)
+    const newTimeout = setTimeout(() => {
+      const currentTitle = field === 'title' ? value : title;
+      const currentAmount = field === 'amount' ? value : amount;
+      const currentDescription = field === 'description' ? value : description;
+      evaluateRequest(currentTitle, currentAmount, currentDescription);
+    }, 1000);
+
+    setEvaluationTimeout(newTimeout);
+  };
+
+  const getChanceColor = (chance: string) => {
+    if (chance === 'Высокий') return 'text-green-600 dark:text-green-400';
+    if (chance === 'Средний') return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
+  };
+
+  const getChanceIcon = (chance: string) => {
+    if (chance === 'Высокий') return '✅';
+    if (chance === 'Средний') return '⚠️';
+    return '❌';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -455,10 +539,7 @@ function CreateRequestModal({
             <input
               type="text"
               value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                setError('');
-              }}
+              onChange={(e) => handleInputChange('title', e.target.value)}
               placeholder="Например: Поход в кино"
               disabled={isLoading}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -474,10 +555,7 @@ function CreateRequestModal({
             <input
               type="number"
               value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value);
-                setError('');
-              }}
+              onChange={(e) => handleInputChange('amount', e.target.value)}
               placeholder="0.00"
               disabled={isLoading}
               step="0.01"
@@ -492,7 +570,7 @@ function CreateRequestModal({
             </label>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Дополнительная информация..."
               disabled={isLoading}
               rows={3}
@@ -503,6 +581,53 @@ function CreateRequestModal({
               {description.length}/500 символов
             </p>
           </div>
+
+          {/* AI Evaluation */}
+          {(isEvaluating || aiEvaluation) && (
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <span className="text-lg flex-shrink-0">💡</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-purple-900 dark:text-purple-200 mb-2">
+                    AI-Оценка запроса
+                  </p>
+                  {isEvaluating ? (
+                    <div className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4 text-purple-500" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span className="text-xs text-purple-700 dark:text-purple-300">Анализирую запрос...</span>
+                    </div>
+                  ) : aiEvaluation ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-medium text-purple-800 dark:text-purple-300">
+                          Категория:
+                        </span>
+                        <span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded-full">
+                          {aiEvaluation.category}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-xs font-medium text-purple-800 dark:text-purple-300 flex-shrink-0">
+                          Шанс одобрения:
+                        </span>
+                        <div className="flex-1">
+                          <span className={`text-xs font-bold ${getChanceColor(aiEvaluation.approvalChance)}`}>
+                            {getChanceIcon(aiEvaluation.approvalChance)} {aiEvaluation.approvalChance}
+                          </span>
+                          <p className="text-xs text-purple-700 dark:text-purple-300 mt-1">
+                            {aiEvaluation.reason}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">

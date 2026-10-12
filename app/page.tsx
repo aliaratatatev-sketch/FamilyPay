@@ -401,7 +401,7 @@ export default function Home() {
       <VideoModal 
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        videoUrl="/gemini_generated_video_aa514352.mp4"
+        videoUrl="/1012 (1).mp4"
       />
     </div>
   );

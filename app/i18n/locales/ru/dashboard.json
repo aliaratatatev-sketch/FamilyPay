@@ -1,0 +1,184 @@
+{
+  "welcome": {
+    "title": "Личный кабинет",
+    "subtitle": "Управляйте финансами вашей семьи"
+  },
+  "stats": {
+    "totalBalance": "Общий баланс",
+    "monthExpenses": "Расходы за месяц",
+    "activeGoals": "Активные цели",
+    "completed": "завершено"
+  },
+  "welcomeCard": {
+    "title": "Добро пожаловать в FamilyPay",
+    "noFamilies": {
+      "description": "Начните управлять финансами вашей семьи прямо сейчас. Создайте первую семью, добавьте счета и начните отслеживать расходы.",
+      "button": "Создать семью"
+    },
+    "hasFamilies": {
+      "count_one": "семья",
+      "count_few": "семьи",
+      "count_many": "семей",
+      "manage": "Управление →",
+      "createAnother": "+ Создать ещё одну семью"
+    }
+  },
+  "aiAssistant": {
+    "title": "ИИ Финансовый Ассистент",
+    "description": "Умный анализ расходов и персональные рекомендации для вашего бюджета",
+    "badge": "NEW",
+    "button": "Попробовать"
+  },
+  "sections": {
+    "recentTransactions": "Последние транзакции",
+    "financialGoals": "Финансовые цели",
+    "accounts": "Счета",
+    "topCategories": "Топ категорий",
+    "viewAll": "Все →",
+    "manage": "Управление →",
+    "details": "Подробнее →"
+  },
+  "accountsPage": {
+    "title": "Счета",
+    "subtitle": "Управляйте финансовыми счетами",
+    "addButton": "+ Добавить счёт",
+    "totalBalance": "Общий баланс",
+    "totalAccounts": "Счетов",
+    "totalTransactions": "Транзакций",
+    "noAccounts": "Нет счетов",
+    "noAccountsDescription": "У вас пока нет счетов",
+    "selectFamily": "Выберите семью:",
+    "accountName": "Название счёта",
+    "accountType": "Тип счёта",
+    "balance": "Баланс",
+    "actions": "Действия",
+    "edit": "Изменить",
+    "delete": "Удалить",
+    "default": "Основной"
+  },
+  "transactionsPage": {
+    "title": "Транзакции",
+    "subtitle": "История всех операций",
+    "addButton": "+ Добавить транзакцию",
+    "filters": {
+      "family": "Семья:",
+      "account": "Счёт:",
+      "category": "Категория:",
+      "type": "Тип:",
+      "allAccounts": "Все счета",
+      "allCategories": "Все категории",
+      "allTypes": "Все типы"
+    },
+    "stats": {
+      "totalIncome": "Общий доход",
+      "totalExpense": "Общий расход",
+      "netAmount": "Разница",
+      "transactionsCount": "Транзакций"
+    },
+    "table": {
+      "date": "Дата",
+      "description": "Описание",
+      "category": "Категория",
+      "account": "Счёт",
+      "amount": "Сумма",
+      "actions": "Действия"
+    },
+    "noTransactions": "Нет транзакций",
+    "noTransactionsDescription": "История транзакций пуста",
+    "types": {
+      "INCOME": "Доход",
+      "EXPENSE": "Расход",
+      "TRANSFER": "Перевод"
+    }
+  },
+  "budgetsPage": {
+    "title": "Бюджеты",
+    "subtitle": "Управление семейными бюджетами",
+    "addButton": "+ Создать бюджет",
+    "noBudgets": "Нет бюджетов",
+    "noBudgetsDescription": "У вас пока нет бюджетов",
+    "selectFamily": "Выберите семью:",
+    "spent": "Потрачено",
+    "remaining": "Осталось",
+    "exceeded": "Превышено",
+    "period": {
+      "MONTHLY": "Месяц",
+      "WEEKLY": "Неделя",
+      "YEARLY": "Год"
+    },
+    "limit": "Лимит",
+    "category": "Категория"
+  },
+  "goalsPage": {
+    "title": "Финансовые цели",
+    "subtitle": "Отслеживайте свои цели",
+    "addButton": "+ Создать цель",
+    "noGoals": "Нет целей",
+    "noGoalsDescription": "У вас пока нет финансовых целей",
+    "selectFamily": "Выберите семью:",
+    "progress": "Прогресс",
+    "target": "Цель",
+    "current": "Текущая сумма",
+    "contribute": "Внести",
+    "status": {
+      "ACTIVE": "Активна",
+      "COMPLETED": "Завершена",
+      "CANCELLED": "Отменена"
+    }
+  },
+  "familyPage": {
+    "title": "Управление семьей",
+    "subtitle": "Настройки и участники",
+    "members": "Участники",
+    "inviteCode": "Код приглашения",
+    "copyCode": "Скопировать код",
+    "copied": "Скопировано!",
+    "settings": "Настройки семьи",
+    "currency": "Валюта",
+    "name": "Название",
+    "save": "Сохранить"
+  },
+  "sidebar": {
+    "home": "Главная",
+    "accounts": "Счета",
+    "transactions": "Транзакции",
+    "budgets": "Бюджеты",
+    "goals": "Цели",
+    "family": "Семья",
+    "myRequests": "Мои запросы",
+    "manageRequests": "Управление запросами",
+    "aiAssistant": "ИИ Ассистент",
+    "notifications": "Уведомления",
+    "profile": "Профиль",
+    "adminPanel": "Админ-панель"
+  },
+  "transactions": {
+    "types": {
+      "INCOME": "Доход",
+      "EXPENSE": "Расход",
+      "TRANSFER": "Перевод"
+    }
+  },
+  "goals": {
+    "noGoals": "Нет активных целей",
+    "createButton": "Создать цель"
+  },
+  "accounts": {
+    "noAccounts": "Нет счетов",
+    "addButton": "Добавить счёт",
+    "types": {
+      "CASH": "Наличные",
+      "CARD": "Карта",
+      "BANK": "Банк",
+      "SAVINGS": "Накопления"
+    }
+  },
+  "categories": {
+    "noData": "Нет данных о расходах"
+  },
+  "loading": "Загрузка...",
+  "date": {
+    "today": "Сегодня",
+    "yesterday": "Вчера"
+  }
+}

@@ -41,7 +41,10 @@ export default function ProfilePage() {
     return null;
   }
 
-  return (\n    <>\n      {/* Main Content */}\n      <main className="container mx-auto px-6 py-8 max-w-3xl">
+  return (
+    <>
+      {/* Main Content */}
+      <main className="container mx-auto px-6 py-8 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Мой профиль
@@ -214,5 +217,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </main>`n    </>`n  );
+      </main>
+    </>
+  );
 }

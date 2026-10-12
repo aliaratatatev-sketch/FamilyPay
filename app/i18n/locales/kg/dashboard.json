@@ -1,0 +1,184 @@
+{
+  "welcome": {
+    "title": "Жеке кабинет",
+    "subtitle": "Үй-бүлөңүздүн каржысын башкарыңыз"
+  },
+  "stats": {
+    "totalBalance": "Жалпы баланс",
+    "monthExpenses": "Айдын чыгымдары",
+    "activeGoals": "Активдүү максаттар",
+    "completed": "аяктады"
+  },
+  "welcomeCard": {
+    "title": "FamilyPay'га кош келиңиз",
+    "noFamilies": {
+      "description": "Үй-бүлөңүздүн каржысын башкарууну азыр эле баштаңыз. Биринчи үй-бүлөнү түзүңүз, эсептерди кошуңуз жана чыгымдарды көзөмөлдөөнү баштаңыз.",
+      "button": "Үй-бүлө түзүү"
+    },
+    "hasFamilies": {
+      "count_one": "үй-бүлө",
+      "count_few": "үй-бүлө",
+      "count_many": "үй-бүлө",
+      "manage": "Башкаруу →",
+      "createAnother": "+ Дагы бир үй-бүлө түзүү"
+    }
+  },
+  "aiAssistant": {
+    "title": "ИИ Каржылык Ассистент",
+    "description": "Чыгымдарды акылдуу талдоо жана бюджетиңиз үчүн жеке сунуштар",
+    "badge": "ЖАҢЫ",
+    "button": "Сынап көрүү"
+  },
+  "sections": {
+    "recentTransactions": "Акыркы транзакциялар",
+    "financialGoals": "Каржылык максаттар",
+    "accounts": "Эсептер",
+    "topCategories": "Топ категориялар",
+    "viewAll": "Баары →",
+    "manage": "Башкаруу →",
+    "details": "Кененирээк →"
+  },
+  "accountsPage": {
+    "title": "Эсептер",
+    "subtitle": "Каржылык эсептерди башкаруу",
+    "addButton": "+ Эсеп кошуу",
+    "totalBalance": "Жалпы баланс",
+    "totalAccounts": "Эсептер",
+    "totalTransactions": "Транзакциялар",
+    "noAccounts": "Эсептер жок",
+    "noAccountsDescription": "Сизде али эсептер жок",
+    "selectFamily": "Үй-бүлө тандаңыз:",
+    "accountName": "Эсептин аталышы",
+    "accountType": "Эсептин түрү",
+    "balance": "Баланс",
+    "actions": "Аракеттер",
+    "edit": "Өзгөртүү",
+    "delete": "Өчүрүү",
+    "default": "Негизги"
+  },
+  "transactionsPage": {
+    "title": "Транзакциялар",
+    "subtitle": "Бардык операциялардын тарыхы",
+    "addButton": "+ Транзакция кошуу",
+    "filters": {
+      "family": "Үй-бүлө:",
+      "account": "Эсеп:",
+      "category": "Категория:",
+      "type": "Түрү:",
+      "allAccounts": "Бардык эсептер",
+      "allCategories": "Бардык категориялар",
+      "allTypes": "Бардык түрлөр"
+    },
+    "stats": {
+      "totalIncome": "Жалпы киреше",
+      "totalExpense": "Жалпы чыгым",
+      "netAmount": "Айырма",
+      "transactionsCount": "Транзакциялар"
+    },
+    "table": {
+      "date": "Дата",
+      "description": "Сүрөттөмө",
+      "category": "Категория",
+      "account": "Эсеп",
+      "amount": "Сумма",
+      "actions": "Аракеттер"
+    },
+    "noTransactions": "Транзакциялар жок",
+    "noTransactionsDescription": "Транзакциялардын тарыхы бош",
+    "types": {
+      "INCOME": "Киреше",
+      "EXPENSE": "Чыгым",
+      "TRANSFER": "Которуу"
+    }
+  },
+  "budgetsPage": {
+    "title": "Бюджеттер",
+    "subtitle": "Үй-бүлө бюджеттерин башкаруу",
+    "addButton": "+ Бюджет түзүү",
+    "noBudgets": "Бюджеттер жок",
+    "noBudgetsDescription": "Сизде али бюджеттер жок",
+    "selectFamily": "Үй-бүлө тандаңыз:",
+    "spent": "Коротулду",
+    "remaining": "Калды",
+    "exceeded": "Ашты",
+    "period": {
+      "MONTHLY": "Ай",
+      "WEEKLY": "Жума",
+      "YEARLY": "Жыл"
+    },
+    "limit": "Лимит",
+    "category": "Категория"
+  },
+  "goalsPage": {
+    "title": "Каржылык максаттар",
+    "subtitle": "Максаттарыңызды көзөмөлдөңүз",
+    "addButton": "+ Максат түзүү",
+    "noGoals": "Максаттар жок",
+    "noGoalsDescription": "Сизде али каржылык максаттар жок",
+    "selectFamily": "Үй-бүлө тандаңыз:",
+    "progress": "Прогресс",
+    "target": "Максат",
+    "current": "Учурдагы сумма",
+    "contribute": "Кошуу",
+    "status": {
+      "ACTIVE": "Активдүү",
+      "COMPLETED": "Аяктады",
+      "CANCELLED": "Жокко чыгарылды"
+    }
+  },
+  "familyPage": {
+    "title": "Үй-бүлөнү башкаруу",
+    "subtitle": "Тууралоолор жана катышуучулар",
+    "members": "Катышуучулар",
+    "inviteCode": "Чакыруу коду",
+    "copyCode": "Кодду көчүрүү",
+    "copied": "Көчүрүлдү!",
+    "settings": "Үй-бүлө тууралоолору",
+    "currency": "Валюта",
+    "name": "Аталышы",
+    "save": "Сактоо"
+  },
+  "sidebar": {
+    "home": "Башкы бет",
+    "accounts": "Эсептер",
+    "transactions": "Транзакциялар",
+    "budgets": "Бюджеттер",
+    "goals": "Максаттар",
+    "family": "Үй-бүлө",
+    "myRequests": "Менин суроо-талаптарым",
+    "manageRequests": "Суроо-талаптарды башкаруу",
+    "aiAssistant": "ИИ Ассистент",
+    "notifications": "Билдирүүлөр",
+    "profile": "Профиль",
+    "adminPanel": "Админ панель"
+  },
+  "transactions": {
+    "types": {
+      "INCOME": "Киреше",
+      "EXPENSE": "Чыгым",
+      "TRANSFER": "Которуу"
+    }
+  },
+  "goals": {
+    "noGoals": "Активдүү максаттар жок",
+    "createButton": "Максат түзүү"
+  },
+  "accounts": {
+    "noAccounts": "Эсептер жок",
+    "addButton": "Эсеп кошуу",
+    "types": {
+      "CASH": "Накталай",
+      "CARD": "Карта",
+      "BANK": "Банк",
+      "SAVINGS": "Жыйымдар"
+    }
+  },
+  "categories": {
+    "noData": "Чыгымдар жөнүндө маалымат жок"
+  },
+  "loading": "Жүктөлүүдө...",
+  "date": {
+    "today": "Бүгүн",
+    "yesterday": "Кечээ"
+  }
+}

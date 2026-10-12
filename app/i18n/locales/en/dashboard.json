@@ -1,0 +1,184 @@
+{
+  "welcome": {
+    "title": "Dashboard",
+    "subtitle": "Manage your family finances"
+  },
+  "stats": {
+    "totalBalance": "Total Balance",
+    "monthExpenses": "Monthly Expenses",
+    "activeGoals": "Active Goals",
+    "completed": "completed"
+  },
+  "welcomeCard": {
+    "title": "Welcome to FamilyPay",
+    "noFamilies": {
+      "description": "Start managing your family finances right now. Create your first family, add accounts, and start tracking expenses.",
+      "button": "Create Family"
+    },
+    "hasFamilies": {
+      "count_one": "family",
+      "count_few": "families",
+      "count_many": "families",
+      "manage": "Manage →",
+      "createAnother": "+ Create Another Family"
+    }
+  },
+  "aiAssistant": {
+    "title": "AI Financial Assistant",
+    "description": "Smart expense analysis and personalized recommendations for your budget",
+    "badge": "NEW",
+    "button": "Try It"
+  },
+  "sections": {
+    "recentTransactions": "Recent Transactions",
+    "financialGoals": "Financial Goals",
+    "accounts": "Accounts",
+    "topCategories": "Top Categories",
+    "viewAll": "View All →",
+    "manage": "Manage →",
+    "details": "Details →"
+  },
+  "accountsPage": {
+    "title": "Accounts",
+    "subtitle": "Manage financial accounts",
+    "addButton": "+ Add Account",
+    "totalBalance": "Total Balance",
+    "totalAccounts": "Accounts",
+    "totalTransactions": "Transactions",
+    "noAccounts": "No accounts",
+    "noAccountsDescription": "You don't have any accounts yet",
+    "selectFamily": "Select family:",
+    "accountName": "Account Name",
+    "accountType": "Account Type",
+    "balance": "Balance",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "default": "Default"
+  },
+  "transactionsPage": {
+    "title": "Transactions",
+    "subtitle": "History of all operations",
+    "addButton": "+ Add Transaction",
+    "filters": {
+      "family": "Family:",
+      "account": "Account:",
+      "category": "Category:",
+      "type": "Type:",
+      "allAccounts": "All accounts",
+      "allCategories": "All categories",
+      "allTypes": "All types"
+    },
+    "stats": {
+      "totalIncome": "Total Income",
+      "totalExpense": "Total Expense",
+      "netAmount": "Net Amount",
+      "transactionsCount": "Transactions"
+    },
+    "table": {
+      "date": "Date",
+      "description": "Description",
+      "category": "Category",
+      "account": "Account",
+      "amount": "Amount",
+      "actions": "Actions"
+    },
+    "noTransactions": "No transactions",
+    "noTransactionsDescription": "Transaction history is empty",
+    "types": {
+      "INCOME": "Income",
+      "EXPENSE": "Expense",
+      "TRANSFER": "Transfer"
+    }
+  },
+  "budgetsPage": {
+    "title": "Budgets",
+    "subtitle": "Manage family budgets",
+    "addButton": "+ Create Budget",
+    "noBudgets": "No budgets",
+    "noBudgetsDescription": "You don't have any budgets yet",
+    "selectFamily": "Select family:",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "exceeded": "Exceeded",
+    "period": {
+      "MONTHLY": "Month",
+      "WEEKLY": "Week",
+      "YEARLY": "Year"
+    },
+    "limit": "Limit",
+    "category": "Category"
+  },
+  "goalsPage": {
+    "title": "Financial Goals",
+    "subtitle": "Track your goals",
+    "addButton": "+ Create Goal",
+    "noGoals": "No goals",
+    "noGoalsDescription": "You don't have any financial goals yet",
+    "selectFamily": "Select family:",
+    "progress": "Progress",
+    "target": "Target",
+    "current": "Current Amount",
+    "contribute": "Contribute",
+    "status": {
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "familyPage": {
+    "title": "Family Management",
+    "subtitle": "Settings and members",
+    "members": "Members",
+    "inviteCode": "Invite Code",
+    "copyCode": "Copy code",
+    "copied": "Copied!",
+    "settings": "Family Settings",
+    "currency": "Currency",
+    "name": "Name",
+    "save": "Save"
+  },
+  "sidebar": {
+    "home": "Home",
+    "accounts": "Accounts",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "goals": "Goals",
+    "family": "Family",
+    "myRequests": "My Requests",
+    "manageRequests": "Manage Requests",
+    "aiAssistant": "AI Assistant",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "adminPanel": "Admin Panel"
+  },
+  "transactions": {
+    "types": {
+      "INCOME": "Income",
+      "EXPENSE": "Expense",
+      "TRANSFER": "Transfer"
+    }
+  },
+  "goals": {
+    "noGoals": "No active goals",
+    "createButton": "Create Goal"
+  },
+  "accounts": {
+    "noAccounts": "No accounts",
+    "addButton": "Add Account",
+    "types": {
+      "CASH": "Cash",
+      "CARD": "Card",
+      "BANK": "Bank",
+      "SAVINGS": "Savings"
+    }
+  },
+  "categories": {
+    "noData": "No expense data"
+  },
+  "loading": "Loading...",
+  "date": {
+    "today": "Today",
+    "yesterday": "Yesterday"
+  }
+}

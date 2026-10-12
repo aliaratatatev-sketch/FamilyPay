@@ -61,10 +61,14 @@ export default function NotificationsPage() {
       const res = await fetch("/api/notifications");
       if (res.ok) {
         const data = await res.json();
-        setNotifications(data);
+        setNotifications(Array.isArray(data) ? data : []);
+      } else {
+        console.error("Failed to fetch notifications:", res.statusText);
+        setNotifications([]);
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -168,7 +172,7 @@ export default function NotificationsPage() {
   };
 
   // Filter notifications
-  const filteredNotifications = notifications.filter((notification) => {
+  const filteredNotifications = Array.isArray(notifications) ? notifications.filter((notification) => {
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -188,9 +192,9 @@ export default function NotificationsPage() {
     if (filterType !== "ALL" && notification.type !== filterType) return false;
 
     return true;
-  });
+  }) : [];
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = Array.isArray(notifications) ? notifications.filter((n) => !n.isRead).length : 0;
 
   if (loading) {
     return (

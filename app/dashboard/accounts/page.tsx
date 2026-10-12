@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
 
 interface Account {
   id: string;
@@ -31,6 +32,7 @@ interface Family {
 export default function AccountsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useDashboardLocale();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [families, setFamilies] = useState<Family[]>([]);
   const [selectedFamilyId, setSelectedFamilyId] = useState<string>('all');
@@ -54,10 +56,14 @@ export default function AccountsPage() {
       const data = await response.json();
       
       if (response.ok) {
-        setFamilies(data.families || []);
+        setFamilies(Array.isArray(data.families) ? data.families : []);
+      } else {
+        console.error('Failed to fetch families:', response.statusText);
+        setFamilies([]);
       }
     } catch (error) {
       console.error('Error loading families:', error);
+      setFamilies([]);
     }
   };
 
@@ -72,10 +78,14 @@ export default function AccountsPage() {
       const data = await response.json();
       
       if (response.ok) {
-        setAccounts(data.accounts || []);
+        setAccounts(Array.isArray(data.accounts) ? data.accounts : []);
+      } else {
+        console.error('Failed to fetch accounts:', response.statusText);
+        setAccounts([]);
       }
     } catch (error) {
       console.error('Error loading accounts:', error);
+      setAccounts([]);
     } finally {
       setIsLoading(false);
     }
@@ -129,6 +139,9 @@ export default function AccountsPage() {
   };
 
   const getTotalBalance = () => {
+    if (!Array.isArray(accounts) || accounts.length === 0) {
+      return 0;
+    }
     return accounts.reduce((sum, acc) => {
       // Конвертация в основную валюту (упрощённо, без реальных курсов)
       return sum + Number(acc.balance);
@@ -138,7 +151,7 @@ export default function AccountsPage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400 text-xl">Загрузка...</div>
+        <div className="text-gray-600 dark:text-gray-400 text-xl">{t.loading}</div>
       </div>
     );
   }
@@ -154,10 +167,10 @@ export default function AccountsPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Счета
+              {t.accountsPage.title}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Управление финансовыми счетами
+              {t.accountsPage.subtitle}
             </p>
           </div>
           
@@ -165,20 +178,19 @@ export default function AccountsPage() {
             onClick={() => setShowCreateModal(true)}
             className="px-6 py-3 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
           >
-            <span>+</span>
-            <span>Добавить счёт</span>
+            {t.accountsPage.addButton}
           </button>
         </div>
 
         {/* Summary Card */}
         <div className="bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] rounded-2xl shadow-lg p-8 text-white mb-8">
-          <h2 className="text-lg opacity-90 mb-2">Общий баланс</h2>
+          <h2 className="text-lg opacity-90 mb-2">{t.accountsPage.totalBalance}</h2>
           <p className="text-4xl font-bold mb-4">
             {formatBalance(getTotalBalance(), 'RUB')}
           </p>
           <div className="flex gap-6 text-sm opacity-90">
             <div>
-              <span className="block">Счетов:</span>
+              <span className="block">{t.accountsPage.totalAccounts}:</span>
               <span className="text-2xl font-semibold">{accounts.length}</span>
             </div>
             <div>

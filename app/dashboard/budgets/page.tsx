@@ -13,6 +13,7 @@ import {
   Calendar,
   DollarSign,
 } from "lucide-react";
+import { useDashboardLocale } from "@/app/i18n/useDashboardLocale";
 
 interface Budget {
   id: string;
@@ -49,6 +50,7 @@ const PERIODS = {
 
 export default function BudgetsPage() {
   const { data: session, status } = useSession();
+  const { t } = useDashboardLocale();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,10 +81,15 @@ export default function BudgetsPage() {
       const res = await fetch("/api/budgets");
       if (res.ok) {
         const data = await res.json();
-        setBudgets(data);
+        // Ensure data is an array
+        setBudgets(Array.isArray(data) ? data : []);
+      } else {
+        console.error("Failed to fetch budgets:", res.statusText);
+        setBudgets([]);
       }
     } catch (error) {
       console.error("Error fetching budgets:", error);
+      setBudgets([]);
     } finally {
       setLoading(false);
     }
@@ -93,10 +100,15 @@ export default function BudgetsPage() {
       const res = await fetch("/api/categories");
       if (res.ok) {
         const data = await res.json();
-        setCategories(data.filter((c: Category) => c.type === "EXPENSE"));
+        // Ensure data is an array
+        setCategories(Array.isArray(data) ? data.filter((c: Category) => c.type === "EXPENSE") : []);
+      } else {
+        console.error("Failed to fetch categories:", res.statusText);
+        setCategories([]);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
+      setCategories([]);
     }
   };
 
@@ -196,13 +208,13 @@ export default function BudgetsPage() {
     return null;
   };
 
-  // Calculate stats
-  const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
-  const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
-  const budgetsWithAlerts = budgets.filter((b) => {
+  // Calculate stats - ensure budgets is an array
+  const totalBudget = Array.isArray(budgets) ? budgets.reduce((sum, b) => sum + b.amount, 0) : 0;
+  const totalSpent = Array.isArray(budgets) ? budgets.reduce((sum, b) => sum + b.spent, 0) : 0;
+  const budgetsWithAlerts = Array.isArray(budgets) ? budgets.filter((b) => {
     const percentage = (b.spent / b.amount) * 100;
     return percentage >= 50;
-  }).length;
+  }).length : 0;
 
   if (loading) {
     return (
@@ -218,15 +230,15 @@ export default function BudgetsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Бюджеты</h1>
-            <p className="text-gray-600 mt-1">Управляйте бюджетами семьи</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t.budgetsPage.title}</h1>
+            <p className="text-gray-600 mt-1">{t.budgetsPage.subtitle}</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
-            Создать бюджет
+            {t.budgetsPage.addButton.replace('+ ', '')}
           </button>
         </div>
 

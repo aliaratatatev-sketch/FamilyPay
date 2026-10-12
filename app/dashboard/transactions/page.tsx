@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import NotificationBell from '../../components/NotificationBell';
+import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
 
 interface Transaction {
   id: string;
@@ -60,6 +61,7 @@ interface Category {
 export default function TransactionsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useDashboardLocale();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [families, setFamilies] = useState<Family[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -95,11 +97,18 @@ export default function TransactionsPage() {
       const data = await response.json();
       
       if (response.ok && data.families && data.families.length > 0) {
-        setFamilies(data.families);
-        setSelectedFamilyId(data.families[0].id);
+        const familiesArray = Array.isArray(data.families) ? data.families : [];
+        setFamilies(familiesArray);
+        if (familiesArray.length > 0) {
+          setSelectedFamilyId(familiesArray[0].id);
+        }
+      } else {
+        console.error('Failed to fetch families:', response.statusText);
+        setFamilies([]);
       }
     } catch (error) {
       console.error('Error loading families:', error);
+      setFamilies([]);
     }
   };
 
@@ -109,10 +118,14 @@ export default function TransactionsPage() {
       const data = await response.json();
       
       if (response.ok) {
-        setAccounts(data.accounts || []);
+        setAccounts(Array.isArray(data.accounts) ? data.accounts : []);
+      } else {
+        console.error('Failed to fetch accounts:', response.statusText);
+        setAccounts([]);
       }
     } catch (error) {
       console.error('Error loading accounts:', error);
+      setAccounts([]);
     }
   };
 
@@ -122,10 +135,15 @@ export default function TransactionsPage() {
       const data = await response.json();
       
       if (response.ok) {
-        setCategories(data.categories || []);
+        // API теперь возвращает массив напрямую, а не объект с categories
+        setCategories(Array.isArray(data) ? data : (data.categories || []));
+      } else {
+        console.error('Failed to fetch categories:', response.statusText);
+        setCategories([]);
       }
     } catch (error) {
       console.error('Error loading categories:', error);
+      setCategories([]);
     }
   };
 
@@ -136,10 +154,14 @@ export default function TransactionsPage() {
       const data = await response.json();
       
       if (response.ok) {
-        setTransactions(data.transactions || []);
+        setTransactions(Array.isArray(data.transactions) ? data.transactions : []);
+      } else {
+        console.error('Failed to fetch transactions:', response.statusText);
+        setTransactions([]);
       }
     } catch (error) {
       console.error('Error loading transactions:', error);
+      setTransactions([]);
     } finally {
       setIsLoading(false);
     }
@@ -226,16 +248,16 @@ export default function TransactionsPage() {
 
   const getTransactionStats = () => {
     const filtered = getFilteredTransactions();
-    const income = filtered.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + Number(t.amount), 0);
-    const expense = filtered.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + Number(t.amount), 0);
+    const income = Array.isArray(filtered) ? filtered.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + Number(t.amount), 0) : 0;
+    const expense = Array.isArray(filtered) ? filtered.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + Number(t.amount), 0) : 0;
     
-    return { income, expense, total: income - expense, count: filtered.length };
+    return { income, expense, total: income - expense, count: Array.isArray(filtered) ? filtered.length : 0 };
   };
 
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400 text-xl">Загрузка...</div>
+        <div className="text-gray-600 dark:text-gray-400 text-xl">{t.loading}</div>
       </div>
     );
   }
@@ -248,14 +270,17 @@ export default function TransactionsPage() {
   const stats = getTransactionStats();
   const selectedFamily = families.find(f => f.id === selectedFamilyId);
 
-  return (\n    <>\n      {/* Main Content */}\n      <main className="container mx-auto px-6 py-8">
+  return (
+    <>
+      {/* Main Content */}
+      <main className="container mx-auto px-6 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              💰 Транзакции
+              💰 {t.transactionsPage.title}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              История всех операций
+              {t.transactionsPage.subtitle}
             </p>
           </div>
           
@@ -480,7 +505,7 @@ export default function TransactionsPage() {
           }}
         />
       )}
-    </div>
+    </>
   );
 }
 

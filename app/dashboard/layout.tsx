@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
+import Sidebar from "@/components/dashboard/Sidebar";
 import NotificationBell from "@/components/NotificationBell";
-import { Home, User, LogOut, Shield } from "lucide-react";
+import ThemeToggle from "@/app/components/ThemeToggle";
+import LanguageSwitcher from "@/app/components/dashboard/LanguageSwitcher";
+import { LogOut } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -15,103 +16,85 @@ export default function DashboardLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
     }
-    if (session?.user) {
-      checkAdminAccess();
-    }
-  }, [status, router, session]);
-
-  const checkAdminAccess = async () => {
-    try {
-      const response = await fetch('/api/admin/check-access');
-      const data = await response.json();
-      setIsAdmin(data.isAdmin || false);
-    } catch (error) {
-      console.error('Error checking admin access:', error);
-    }
-  };
+  }, [status, router]);
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500">Загрузка...</div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#0D6D6E] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Загрузка...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-40">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md">
-              <Image
-                src="/logo.png"
-                alt="FamilyPay"
-                width={40}
-                height={40}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
-              FamilyPay
-            </span>
-          </Link>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+      {/* Sidebar */}
+      <Sidebar />
 
-          <div className="flex items-center gap-4">
-            {/* Notification Bell */}
-            <NotificationBell />
-
-            {/* User Info */}
-            <div className="text-right hidden md:block">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Добро пожаловать,
-              </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                {session?.user?.name || session?.user?.email}
-              </p>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Top header bar */}
+        <header className="sticky top-0 z-30 bg-white/80 dark:bg-[#111d2b]/80 backdrop-blur-sm border-b border-gray-200 dark:border-white/5">
+          <div className="px-6 py-4 flex items-center justify-between">
+            {/* Page title placeholder - can be filled by individual pages */}
+            <div className="flex-1 ml-12 lg:ml-0">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {/* Dynamic title will be here */}
+              </h1>
             </div>
 
-            {/* User Menu */}
-            <Link
-              href="/dashboard/profile"
-              className="flex items-center gap-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              <User className="w-5 h-5" />
-              <span className="hidden sm:inline">Профиль</span>
-            </Link>
+            {/* Right actions */}
+            <div className="flex items-center gap-3">
+              {/* Notification Bell */}
+              <NotificationBell />
 
-            {/* Admin Panel Button */}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-lg hover:shadow-lg transition-all"
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
+              {/* User info */}
+              <div className="hidden md:flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-100 dark:bg-white/5">
+                <div className="text-right">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Добро пожаловать,
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {session?.user?.name || session?.user?.email}
+                  </p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white text-sm font-semibold">
+                  {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0) || '?'}
+                </div>
+              </div>
+
+              {/* Logout Button */}
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="flex items-center gap-2 px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                title="Выйти"
               >
-                <Shield className="w-5 h-5" />
-                <span className="hidden sm:inline">Админ</span>
-              </Link>
-            )}
-
-            {/* Logout Button */}
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="hidden sm:inline">Выйти</span>
-            </button>
+                <LogOut className="w-5 h-5" />
+                <span className="hidden lg:inline text-sm font-medium">Выйти</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      {children}
+        {/* Main content */}
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

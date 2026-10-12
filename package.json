@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "fix:escape": "node scripts/fix-escape-errors.js",
     "qr": "node scripts/show-qr.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",

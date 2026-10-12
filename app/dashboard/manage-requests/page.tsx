@@ -32,6 +32,8 @@ interface MoneyRequest {
     name: string;
     currency: string;
   };
+  aiRecommendation?: string | null;
+  aiLoading?: boolean;
 }
 
 interface Family {
@@ -123,18 +125,72 @@ export default function ManageRequestsPage() {
         params.append('status', 'PENDING');
       }
 
-      // НЕ добавляем requesterId - нужны ВСЕ запросы семьи для управления
-
       const response = await fetch(`/api/money-requests?${params}`);
       const data = await response.json();
       
       if (response.ok) {
-        setRequests(data.requests || []);
+        const requestsData = data.requests || [];
+        setRequests(requestsData);
+        
+        // Загружаем AI-рекомендации для pending запросов
+        if (requestsData.length > 0) {
+          loadAIRecommendations(requestsData);
+        }
       }
     } catch (error) {
       console.error('Error loading requests:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadAIRecommendations = async (requestsList: MoneyRequest[]) => {
+    const pendingRequests = requestsList.filter(r => r.status === 'PENDING');
+    
+    if (pendingRequests.length === 0) return;
+
+    // Получаем общий баланс семьи
+    const selectedFamilyData = families.find(f => f.id === selectedFamily);
+    const totalBalance = selectedFamilyData?.accounts?.reduce((sum, acc) => sum + acc.balance, 0) || 0;
+
+    // Загружаем рекомендации параллельно
+    for (const req of pendingRequests) {
+      // Помечаем как загружающиеся
+      setRequests(prev => prev.map(r => 
+        r.id === req.id ? { ...r, aiLoading: true } : r
+      ));
+
+      try {
+        const response = await fetch('/api/ai/analyze-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: req.title,
+            amount: req.amount,
+            currency: req.currency,
+            description: req.description,
+            familyBalance: totalBalance
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setRequests(prev => prev.map(r => 
+            r.id === req.id 
+              ? { ...r, aiRecommendation: data.recommendation, aiLoading: false }
+              : r
+          ));
+        } else {
+          setRequests(prev => prev.map(r => 
+            r.id === req.id ? { ...r, aiLoading: false } : r
+          ));
+        }
+      } catch (error) {
+        console.error('Error loading AI recommendation:', error);
+        setRequests(prev => prev.map(r => 
+          r.id === req.id ? { ...r, aiLoading: false } : r
+        ));
+      }
     }
   };
 
@@ -438,6 +494,35 @@ export default function ManageRequestsPage() {
                         <p className="text-xs text-red-800 dark:text-red-200">
                           <strong>Причина:</strong> {request.rejectionReason}
                         </p>
+                      </div>
+                    )}
+
+                    {/* AI Recommendation */}
+                    {isPending && (
+                      <div className="ml-14 mt-3">
+                        {request.aiLoading ? (
+                          <div className="bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800 rounded-lg p-3 flex items-start gap-2">
+                            <svg className="animate-spin h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            <span className="text-xs text-purple-700 dark:text-purple-300">AI анализирует запрос...</span>
+                          </div>
+                        ) : request.aiRecommendation ? (
+                          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
+                            <div className="flex items-start gap-2">
+                              <span className="text-lg flex-shrink-0">💡</span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold text-purple-900 dark:text-purple-200 mb-1">
+                                  AI-Совет родителю
+                                </p>
+                                <p className="text-xs text-purple-800 dark:text-purple-300 leading-relaxed">
+                                  {request.aiRecommendation}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                     )}
                   </div>

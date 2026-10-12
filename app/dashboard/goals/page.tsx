@@ -16,6 +16,7 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
+import { useDashboardLocale } from "@/app/i18n/useDashboardLocale";
 
 interface Goal {
   id: string;
@@ -59,6 +60,7 @@ const PRIORITIES = {
 
 export default function GoalsPage() {
   const { data: session, status } = useSession();
+  const { t } = useDashboardLocale();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -101,10 +103,14 @@ export default function GoalsPage() {
       const res = await fetch("/api/goals");
       if (res.ok) {
         const data = await res.json();
-        setGoals(data);
+        setGoals(Array.isArray(data) ? data : []);
+      } else {
+        console.error("Failed to fetch goals:", res.statusText);
+        setGoals([]);
       }
     } catch (error) {
       console.error("Error fetching goals:", error);
+      setGoals([]);
     } finally {
       setLoading(false);
     }
@@ -115,10 +121,14 @@ export default function GoalsPage() {
       const res = await fetch("/api/categories");
       if (res.ok) {
         const data = await res.json();
-        setCategories(data);
+        setCategories(Array.isArray(data) ? data : []);
+      } else {
+        console.error("Failed to fetch categories:", res.statusText);
+        setCategories([]);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
+      setCategories([]);
     }
   };
 
@@ -127,10 +137,15 @@ export default function GoalsPage() {
       const res = await fetch("/api/accounts");
       if (res.ok) {
         const data = await res.json();
-        setAccounts(data.filter((a: Account) => a.balance > 0));
+        const accountsArray = Array.isArray(data) ? data : [];
+        setAccounts(accountsArray.filter((a: Account) => a.balance > 0));
+      } else {
+        console.error("Failed to fetch accounts:", res.statusText);
+        setAccounts([]);
       }
     } catch (error) {
       console.error("Error fetching accounts:", error);
+      setAccounts([]);
     }
   };
 
@@ -283,10 +298,10 @@ export default function GoalsPage() {
   });
 
   // Calculate stats
-  const activeGoals = goals.filter((g) => g.status === "ACTIVE").length;
-  const completedGoals = goals.filter((g) => g.status === "COMPLETED").length;
-  const totalSaved = goals.reduce((sum, g) => sum + g.currentAmount, 0);
-  const totalTarget = goals.filter((g) => g.status === "ACTIVE").reduce((sum, g) => sum + g.targetAmount, 0);
+  const activeGoals = Array.isArray(goals) ? goals.filter((g) => g.status === "ACTIVE").length : 0;
+  const completedGoals = Array.isArray(goals) ? goals.filter((g) => g.status === "COMPLETED").length : 0;
+  const totalSaved = Array.isArray(goals) ? goals.reduce((sum, g) => sum + g.currentAmount, 0) : 0;
+  const totalTarget = Array.isArray(goals) ? goals.filter((g) => g.status === "ACTIVE").reduce((sum, g) => sum + g.targetAmount, 0) : 0;
 
   if (loading) {
     return (
@@ -302,15 +317,15 @@ export default function GoalsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Финансовые цели</h1>
-            <p className="text-gray-600 mt-1">Планируйте и достигайте своих целей</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t.goalsPage.title}</h1>
+            <p className="text-gray-600 mt-1">{t.goalsPage.subtitle}</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
-            Создать цель
+            {t.goalsPage.addButton.replace('+ ', '')}
           </button>
         </div>
 
