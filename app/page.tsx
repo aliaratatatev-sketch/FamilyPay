@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/Header";
 import AuthAwareLink from "./components/AuthAwareLink";
+import FinikPaymentButton from "./components/FinikPaymentButton";
 import { useLocale } from "./i18n/LocaleContext";
 import RequestApprovalCard from "./components/RequestApprovalCard";
 import VideoModal from "./components/VideoModal";
-import { Target, Mail, Phone, MapPin, Handshake, Lock, Lightbulb, TrendingUp, User, CreditCard, Users, BarChart3, Rocket, RefreshCw, Sparkles } from "lucide-react";
+import { Target, Mail, Phone, MapPin, Handshake, Lock, Lightbulb, TrendingUp, User, CreditCard, Users, BarChart3, Rocket, RefreshCw, Sparkles, CheckCircle, XCircle } from "lucide-react";
 
 // Маппинг имён иконок на компоненты
 const iconComponents: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -28,9 +29,80 @@ const iconComponents: Record<string, React.ComponentType<{ className?: string }>
 export default function Home() {
   const { t } = useLocale();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+  const [showPaymentFailed, setShowPaymentFailed] = useState(false);
+
+  // Проверяем параметры URL для отображения уведомления об оплате
+  useEffect(() => {
+    // Проверяем URL параметры на клиенте
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const payment = urlParams.get('payment');
+      
+      if (payment === 'success') {
+        setShowPaymentSuccess(true);
+        // Автоматически скрыть через 8 секунд
+        setTimeout(() => setShowPaymentSuccess(false), 8000);
+        // Очистить параметр из URL
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (payment === 'failed') {
+        setShowPaymentFailed(true);
+        setTimeout(() => setShowPaymentFailed(false), 8000);
+        // Очистить параметр из URL
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#0f1923] transition-colors duration-300">
       <Header />
+
+      {/* ─── PAYMENT SUCCESS NOTIFICATION ─────────────────────────────── */}
+      {showPaymentSuccess && (
+        <div className="fixed top-20 right-4 z-50 max-w-md animate-slide-in-right">
+          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 sm:p-5 rounded-xl shadow-2xl border border-green-400/20">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-bold text-base sm:text-lg mb-1">Оплата успешна!</h3>
+                <p className="text-sm text-green-50">Платеж на сумму <strong>5 сом</strong> успешно проведен через Finik Pay.</p>
+              </div>
+              <button 
+                onClick={() => setShowPaymentSuccess(false)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── PAYMENT FAILED NOTIFICATION ─────────────────────────────── */}
+      {showPaymentFailed && (
+        <div className="fixed top-20 right-4 z-50 max-w-md animate-slide-in-right">
+          <div className="bg-gradient-to-r from-red-500 to-rose-600 text-white p-4 sm:p-5 rounded-xl shadow-2xl border border-red-400/20">
+            <div className="flex items-start gap-3">
+              <XCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-bold text-base sm:text-lg mb-1">Оплата не прошла</h3>
+                <p className="text-sm text-red-50">К сожалению, платеж не был завершен. Попробуйте еще раз.</p>
+              </div>
+              <button 
+                onClick={() => setShowPaymentFailed(false)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[80vh] md:min-h-screen flex items-center pt-20 pb-8">
@@ -437,6 +509,8 @@ function PricingCard({ name, price, period, features, cta, href, popular, badge 
   name: string; price: string; period?: string;
   features: string[]; cta: string; href: string; popular: boolean; badge?: string;
 }) {
+  const isEnterprise = href === "/contact";
+  
   return (
     <div className={`relative rounded-xl sm:rounded-2xl md:rounded-3xl p-5 sm:p-6 md:p-8 flex flex-col transition-all duration-300 ${
       popular
@@ -465,13 +539,29 @@ function PricingCard({ name, price, period, features, cta, href, popular, badge 
           </li>
         ))}
       </ul>
-      <Link href={href} className={`block w-full min-h-[44px] py-3 sm:py-3.5 text-center rounded-lg sm:rounded-xl md:rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center ${
-        popular
-          ? "bg-white text-[#0D6D6E] hover:bg-teal-50 hover:shadow-lg active:scale-95"
-          : "border-2 border-[#0D6D6E]/30 dark:border-[#4FD1C5]/30 text-[#0D6D6E] dark:text-[#4FD1C5] hover:border-[#0D6D6E] dark:hover:border-[#4FD1C5] hover:bg-[#0D6D6E]/5 dark:hover:bg-[#4FD1C5]/5 active:scale-95"
-      }`}>
-        {cta}
-      </Link>
+      
+      {/* Используем Finik кнопку для всех планов кроме Enterprise */}
+      {isEnterprise ? (
+        <Link href={href} className={`block w-full min-h-[44px] py-3 sm:py-3.5 text-center rounded-lg sm:rounded-xl md:rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center ${
+          popular
+            ? "bg-white text-[#0D6D6E] hover:bg-teal-50 hover:shadow-lg active:scale-95"
+            : "border-2 border-[#0D6D6E]/30 dark:border-[#4FD1C5]/30 text-[#0D6D6E] dark:text-[#4FD1C5] hover:border-[#0D6D6E] dark:hover:border-[#4FD1C5] hover:bg-[#0D6D6E]/5 dark:hover:bg-[#4FD1C5]/5 active:scale-95"
+        }`}>
+          {cta}
+        </Link>
+      ) : (
+        <FinikPaymentButton
+          planName={name}
+          workId={`subscription-${name.toLowerCase()}`}
+          className={`block w-full min-h-[44px] py-3 sm:py-3.5 text-center rounded-lg sm:rounded-xl md:rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center ${
+            popular
+              ? "bg-white text-[#0D6D6E] hover:bg-teal-50 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              : "border-2 border-[#0D6D6E]/30 dark:border-[#4FD1C5]/30 text-[#0D6D6E] dark:text-[#4FD1C5] hover:border-[#0D6D6E] dark:hover:border-[#4FD1C5] hover:bg-[#0D6D6E]/5 dark:hover:bg-[#4FD1C5]/5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          }`}
+        >
+          {cta}
+        </FinikPaymentButton>
+      )}
     </div>
   );
 }

@@ -8,6 +8,161 @@ import AdminAccessModal from '@/app/components/AdminAccessModal';
 import CreateFamilyModal from '@/app/components/CreateFamilyModal';
 import NotificationBell from '@/components/NotificationBell';
 import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+
+interface Family {
+  id: string;
+  name: string;
+  currency: string;
+  members: any[];
+  accounts: any[];
+  _count: {
+    transactions: number;
+    budgets: number;
+    goals: number;
+  };
+}
+
+// Компонент круговой диаграммы категорий
+const CategoryPieChart = ({ 
+  categories, 
+  currency, 
+  formatAmount,
+  t 
+}: { 
+  categories: any[]; 
+  currency: string;
+  formatAmount: (amount: number, currency: string) => string;
+  t: any;
+}) => {
+  // Цвета для диаграммы
+  const COLORS = [
+    '#10b981', // emerald-500
+    '#6366f1', // indigo-500
+    '#f59e0b', // amber-500
+    '#0ea5e9', // sky-500
+    '#ec4899', // pink-500
+    '#8b5cf6', // violet-500
+    '#14b8a6', // teal-500
+    '#f97316', // orange-500
+  ];
+
+  // Демо-данные для примера (без эмодзи)
+  const demoData = [
+    { name: 'Еда', value: 45000, category: 'Еда' },
+    { name: 'Развлечения', value: 28000, category: 'Развлечения' },
+    { name: 'Техника', value: 35000, category: 'Техника' },
+    { name: 'Транспорт', value: 22000, category: 'Транспорт' },
+    { name: 'Дом', value: 18000, category: 'Дом' },
+  ];
+
+  // Используем реальные данные или демо-данные
+  const hasRealData = categories && categories.length > 0;
+  const chartData = hasRealData 
+    ? categories.slice(0, 8).map((cat: any) => ({
+        name: cat.category || 'Без категории',
+        value: Number(cat.total),
+        category: cat.category || 'Без категории'
+      }))
+    : demoData;
+
+  // Кастомная метка для легенды (компактная сетка в 2 колонки)
+  const renderLegend = (props: any) => {
+    const { payload } = props;
+    return (
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-2">
+        {payload.map((entry: any, index: number) => (
+          <div key={`legend-${index}`} className="flex items-center gap-1.5 text-xs">
+            <div 
+              className="w-2.5 h-2.5 rounded-full flex-shrink-0" 
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-gray-700 dark:text-gray-300 truncate">
+              {entry.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Кастомный тултип
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3">
+          <p className="font-semibold text-gray-900 dark:text-white mb-1">
+            {payload[0].name}
+          </p>
+          <p className="text-lg font-bold text-[#0D6D6E] dark:text-[#4FD1C5]">
+            {formatAmount(payload[0].value, currency)}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {((payload[0].value / chartData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1)}% от общих расходов
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          {t.sections.topCategories}
+        </h2>
+        <Link 
+          href="/dashboard/transactions"
+          className="text-sm text-[#0D6D6E] dark:text-[#4FD1C5] hover:underline"
+        >
+          {t.sections.details}
+        </Link>
+      </div>
+
+      <div style={{ width: '100%', height: '360px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="38%"
+              labelLine={false}
+              outerRadius={75}
+              innerRadius={48}
+              fill="#8884d8"
+              dataKey="value"
+              animationBegin={0}
+              animationDuration={800}
+            >
+              {chartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]}
+                  className="hover:opacity-80 transition-opacity cursor-pointer"
+                />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              content={renderLegend}
+              verticalAlign="bottom"
+              align="center"
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {!hasRealData && (
+        <div className="mt-3 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            ℹ️ Демо-данные для примера
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface Family {
   id: string;
@@ -608,73 +763,13 @@ export default function DashboardPage() {
           </div>
 
           {/* Top Expenses Widget */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {t.sections.topCategories}
-              </h2>
-              <Link 
-                href="/dashboard/transactions"
-                className="text-sm text-[#0D6D6E] dark:text-[#4FD1C5] hover:underline"
-              >
-                {t.sections.details}
-              </Link>
-            </div>
-            {stats && stats.topExpenseCategories && stats.topExpenseCategories.length > 0 ? (
-              <div className="space-y-3">
-                {stats.topExpenseCategories.slice(0, 5).map((cat: any, index: number) => {
-                  const maxAmount = Number(stats.topExpenseCategories[0].total);
-                  const percentage = (Number(cat.total) / maxAmount) * 100;
-                  return (
-                    <div key={cat.category || index}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {cat.icon} {cat.category || 'Без категории'}
-                        </span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {formatAmount(Number(cat.total), selectedFamily?.currency)}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full transition-all"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-2">📊</div>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {t.categories.noData}
-                </p>
-              </div>
-            )}
-          </div>
+          <CategoryPieChart 
+            categories={stats?.topExpenseCategories || []}
+            currency={selectedFamily?.currency || 'KGS'}
+            formatAmount={formatAmount}
+            t={t}
+          />
         </div>
-
-        {/* Debug Info - только для администраторов */}
-        {isAdmin && (
-          <details className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg overflow-hidden">
-            <summary className="px-4 py-3 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition select-none">
-              <span className="text-sm text-blue-800 dark:text-blue-200 font-semibold">
-                🔍 Показать отладочную информацию (только для администраторов)
-              </span>
-            </summary>
-            <div className="px-4 pb-4 pt-2">
-              <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1 font-mono">
-                <p>Email: {session?.user?.email || 'Нет email'}</p>
-                <p>Имя: {session?.user?.name || 'Нет имени'}</p>
-                <p>Роль в БД: {session?.user?.role || 'Нет роли'}</p>
-                <p>isAdmin (состояние): {isAdmin ? '✅ Да' : '❌ Нет'}</p>
-                <p>hasAdminAccess (состояние): {hasAdminAccess ? '✅ Да' : '❌ Нет'}</p>
-              </div>
-            </div>
-          </details>
-        )}
       </main>
       
       {/* Admin Access Modal */}
