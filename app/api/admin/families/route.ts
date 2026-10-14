@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     const family = await prisma.family.create({
       data: {
         name,
-        currency: currency || 'RUB',
+        currency: currency || 'KGS',
         createdById,
         members: {
           create: {

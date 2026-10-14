@@ -140,7 +140,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t.dashboard.recentTransactions.amount}: <span className="font-semibold text-green-600">{parseFloat(stats.recentTransactions.INCOME?.total || '0').toLocaleString()} ₽</span>
+              {t.dashboard.recentTransactions.amount}: <span className="font-semibold text-green-600">{parseFloat(stats.recentTransactions.INCOME?.total || '0').toLocaleString()} сом</span>
             </p>
           </div>
 
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t.dashboard.recentTransactions.amount}: <span className="font-semibold text-red-600">{parseFloat(stats.recentTransactions.EXPENSE?.total || '0').toLocaleString()} ₽</span>
+              {t.dashboard.recentTransactions.amount}: <span className="font-semibold text-red-600">{parseFloat(stats.recentTransactions.EXPENSE?.total || '0').toLocaleString()} сом</span>
             </p>
           </div>
 
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t.dashboard.recentTransactions.amount}: <span className="font-semibold text-blue-600">{parseFloat(stats.recentTransactions.TRANSFER?.total || '0').toLocaleString()} ₽</span>
+              {t.dashboard.recentTransactions.amount}: <span className="font-semibold text-blue-600">{parseFloat(stats.recentTransactions.TRANSFER?.total || '0').toLocaleString()} сом</span>
             </p>
           </div>
         </div>

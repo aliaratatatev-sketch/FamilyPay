@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         userId,
         name,
         amount,
-        currency: currency || 'RUB',
+        currency: currency || 'KGS',
         period,
         startDate: new Date(startDate),
         endDate: new Date(endDate),

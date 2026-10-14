@@ -11,12 +11,12 @@ interface CreateFamilyModalProps {
 
 export default function CreateFamilyModal({ isOpen, onClose, onSuccess }: CreateFamilyModalProps) {
   const [name, setName] = useState('');
-  const [currency, setCurrency] = useState('RUB');
+  const [currency, setCurrency] = useState('KGS');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const currencies = [
-    { code: 'RUB', name: 'Российский рубль', symbol: '₽' },
+    { code: 'KGS', name: 'Кыргызский сом', symbol: 'сом' },
     { code: 'USD', name: 'Доллар США', symbol: '$' },
     { code: 'EUR', name: 'Евро', symbol: '€' },
     { code: 'KGS', name: 'Киргизский сом', symbol: 'сом' },
@@ -58,7 +58,7 @@ export default function CreateFamilyModal({ isOpen, onClose, onSuccess }: Create
 
       // Успешно создано!
       setName('');
-      setCurrency('RUB');
+      setCurrency('KGS');
       onClose();
       
       if (onSuccess) {
@@ -74,7 +74,7 @@ export default function CreateFamilyModal({ isOpen, onClose, onSuccess }: Create
   const handleClose = () => {
     if (!isLoading) {
       setName('');
-      setCurrency('RUB');
+      setCurrency('KGS');
       setError('');
       onClose();
     }

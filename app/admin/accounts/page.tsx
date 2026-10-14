@@ -41,7 +41,7 @@ export default function AccountsPage() {
     name: '',
     type: 'CASH',
     balance: '0',
-    currency: 'RUB',
+    currency: 'KGS',
     description: '',
     color: '#4FD1C5',
     iconType: 'CASH',
@@ -105,7 +105,7 @@ export default function AccountsPage() {
       name: '',
       type: 'CASH',
       balance: '0',
-      currency: 'RUB',
+      currency: 'KGS',
       description: '',
       color: '#4FD1C5',
       iconType: 'CASH',
@@ -209,7 +209,7 @@ export default function AccountsPage() {
               <div className="mb-4 p-4 rounded-xl bg-gradient-to-br from-[#0D6D6E]/10 to-[#4FD1C5]/10">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Баланс</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {parseFloat(account.balance).toLocaleString()} {account.currency === 'RUB' ? '₽' : account.currency}
+                  {parseFloat(account.balance).toLocaleString()} {account.currency === 'KGS' ? 'сом' : account.currency}
                 </p>
               </div>
 
@@ -296,7 +296,7 @@ export default function AccountsPage() {
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                     className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f1923] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#4FD1C5]"
                   >
-                    <option value="RUB">RUB (₽)</option>
+                    <option value="KGS">KGS (сом)</option>
                     <option value="USD">USD ($)</option>
                     <option value="EUR">EUR (€)</option>
                     <option value="KGS">KGS (с)</option>

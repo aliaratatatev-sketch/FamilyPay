@@ -41,6 +41,12 @@ interface Category {
   color: string;
 }
 
+interface Family {
+  id: string;
+  name: string;
+  currency: string;
+}
+
 const PERIODS = {
   DAILY: "День",
   WEEKLY: "Неделя",
@@ -53,6 +59,8 @@ export default function BudgetsPage() {
   const { t } = useDashboardLocale();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [families, setFamilies] = useState<Family[]>([]);
+  const [selectedFamilyId, setSelectedFamilyId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
@@ -71,10 +79,32 @@ export default function BudgetsPage() {
       redirect("/auth/signin");
     }
     if (session?.user) {
+      fetchFamilies();
       fetchBudgets();
       fetchCategories();
     }
   }, [session, status]);
+
+  const fetchFamilies = async () => {
+    try {
+      const response = await fetch('/api/families');
+      const data = await response.json();
+      if (response.ok) {
+        const familyList = Array.isArray(data.families) ? data.families : [];
+        setFamilies(familyList);
+        // Set first family as default
+        if (familyList.length > 0 && !selectedFamilyId) {
+          setSelectedFamilyId(familyList[0].id);
+        }
+      } else {
+        console.error('Failed to fetch families:', response.statusText);
+        setFamilies([]);
+      }
+    } catch (error) {
+      console.error('Error fetching families:', error);
+      setFamilies([]);
+    }
+  };
 
   const fetchBudgets = async () => {
     try {
@@ -115,11 +145,51 @@ export default function BudgetsPage() {
   const handleCreateOrUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate required fields
+    if (!selectedFamilyId) {
+      alert("Пожалуйста, выберите семью");
+      return;
+    }
+
+    if (!categoryId) {
+      alert("Пожалуйста, выберите категорию");
+      return;
+    }
+
+    // Calculate start and end dates based on period
+    const now = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
+
+    switch (period) {
+      case "DAILY":
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        break;
+      case "WEEKLY":
+        const dayOfWeek = now.getDay();
+        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Start from Monday
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+        endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "MONTHLY":
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+        break;
+      case "YEARLY":
+        startDate = new Date(now.getFullYear(), 0, 1);
+        endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+        break;
+    }
+
     const budgetData = {
       name,
       amount: parseFloat(amount),
       period,
-      categoryId: categoryId || null,
+      categoryId,
+      familyId: selectedFamilyId,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
       alertAt50,
       alertAt80,
       alertAt100,
@@ -252,7 +322,7 @@ export default function BudgetsPage() {
               <div>
                 <p className="text-gray-600 text-sm">Общий бюджет</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalBudget.toLocaleString("ru-RU")} ₽
+                  {totalBudget.toLocaleString("ru-RU")} сом
                 </p>
               </div>
             </div>
@@ -266,7 +336,7 @@ export default function BudgetsPage() {
               <div>
                 <p className="text-gray-600 text-sm">Потрачено</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalSpent.toLocaleString("ru-RU")} ₽
+                  {totalSpent.toLocaleString("ru-RU")} сом
                 </p>
               </div>
             </div>
@@ -359,10 +429,10 @@ export default function BudgetsPage() {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-2xl font-bold text-gray-900">
-                        {budget.spent.toLocaleString("ru-RU")} ₽
+                        {budget.spent.toLocaleString("ru-RU")} сом
                       </span>
                       <span className="text-sm text-gray-600">
-                        из {budget.amount.toLocaleString("ru-RU")} ₽
+                        из {budget.amount.toLocaleString("ru-RU")} сом
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
@@ -374,7 +444,7 @@ export default function BudgetsPage() {
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm font-medium text-gray-700">{percentage.toFixed(1)}%</span>
                       <span className="text-sm text-gray-600">
-                        Осталось: {(budget.amount - budget.spent).toLocaleString("ru-RU")} ₽
+                        Осталось: {(budget.amount - budget.spent).toLocaleString("ru-RU")} сом
                       </span>
                     </div>
                   </div>
@@ -419,7 +489,7 @@ export default function BudgetsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Сумма (₽) *
+                    Сумма (сом) *
                   </label>
                   <input
                     type="number"
@@ -451,14 +521,15 @@ export default function BudgetsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Категория (опционально)
+                    Категория *
                   </label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
                   >
-                    <option value="">Все категории</option>
+                    <option value="">Выберите категорию</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}

@@ -342,9 +342,9 @@ export default function DashboardPage() {
     loadFamilies();
   };
 
-  const formatAmount = (amount: number, currency: string = 'RUB') => {
+  const formatAmount = (amount: number, currency: string = 'KGS') => {
     const symbols: Record<string, string> = {
-      RUB: '₽',
+      KGS: ' сом',
       USD: '$',
       EUR: '€',
       KGS: 'сом',
@@ -430,7 +430,7 @@ export default function DashboardPage() {
               ) : stats ? (
                 formatAmount(stats.totalBalance, selectedFamily?.currency)
               ) : (
-                '0 ₽'
+                '0 сом'
               )}
             </p>
           </div>
@@ -459,7 +459,7 @@ export default function DashboardPage() {
               ) : stats ? (
                 formatAmount(stats.expense, selectedFamily?.currency)
               ) : (
-                '0 ₽'
+                '0 сом'
               )}
             </p>
           </div>

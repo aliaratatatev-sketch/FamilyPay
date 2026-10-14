@@ -215,7 +215,7 @@ export default function TransactionsPage() {
 
   const formatAmount = (amount: number, currency: string) => {
     const symbols: Record<string, string> = {
-      RUB: '₽',
+      KGS: ' сом',
       USD: '$',
       EUR: '€',
       KGS: 'сом',
@@ -304,13 +304,13 @@ export default function TransactionsPage() {
           <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow p-6">
             <div className="text-sm text-green-800 dark:text-green-400 mb-1">Доходы</div>
             <div className="text-2xl font-bold text-green-900 dark:text-green-300">
-              +{formatAmount(stats.income, selectedFamily?.currency || 'RUB')}
+              +{formatAmount(stats.income, selectedFamily?.currency || 'KGS')}
             </div>
           </div>
           <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow p-6">
             <div className="text-sm text-red-800 dark:text-red-400 mb-1">Расходы</div>
             <div className="text-2xl font-bold text-red-900 dark:text-red-300">
-              -{formatAmount(stats.expense, selectedFamily?.currency || 'RUB')}
+              -{formatAmount(stats.expense, selectedFamily?.currency || 'KGS')}
             </div>
           </div>
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl shadow p-6">
@@ -320,7 +320,7 @@ export default function TransactionsPage() {
                 ? 'text-green-900 dark:text-green-300' 
                 : 'text-red-900 dark:text-red-300'
             }`}>
-              {stats.total >= 0 ? '+' : ''}{formatAmount(stats.total, selectedFamily?.currency || 'RUB')}
+              {stats.total >= 0 ? '+' : ''}{formatAmount(stats.total, selectedFamily?.currency || 'KGS')}
             </div>
           </div>
         </div>

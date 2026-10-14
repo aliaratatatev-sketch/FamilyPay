@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         type,
         balance: accountBalance,
-        currency: currency || family?.currency || 'RUB',
+        currency: currency || family?.currency || 'KGS',
         description: description?.trim() || null,
         color: color || null,
         icon: icon || null,

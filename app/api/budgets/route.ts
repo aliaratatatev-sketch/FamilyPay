@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
         userId,
         name,
         amount,
-        currency: family?.currency || 'RUB',
+        currency: family?.currency || 'KGS',
         period,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
         userId,
         type: 'SYSTEM',
         title: 'Бюджет создан',
-        message: `Создан бюджет "${name}" на ${amount} ${family?.currency || 'RUB'}`,
+        message: `Создан бюджет "${name}" на ${amount} ${family?.currency || 'KGS'}`,
         data: JSON.parse(JSON.stringify({
           budgetId: budget.id,
           familyId,

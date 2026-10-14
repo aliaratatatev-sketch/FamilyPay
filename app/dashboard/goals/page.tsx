@@ -52,6 +52,12 @@ interface Account {
   currency: string;
 }
 
+interface Family {
+  id: string;
+  name: string;
+  currency: string;
+}
+
 const PRIORITIES = {
   LOW: { text: "Низкий", color: "text-gray-600 bg-gray-100" },
   MEDIUM: { text: "Средний", color: "text-blue-600 bg-blue-100" },
@@ -64,6 +70,8 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [families, setFamilies] = useState<Family[]>([]);
+  const [selectedFamilyId, setSelectedFamilyId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
@@ -92,11 +100,33 @@ export default function GoalsPage() {
       redirect("/auth/signin");
     }
     if (session?.user) {
+      fetchFamilies();
       fetchGoals();
       fetchCategories();
       fetchAccounts();
     }
   }, [session, status]);
+
+  const fetchFamilies = async () => {
+    try {
+      const response = await fetch('/api/families');
+      const data = await response.json();
+      if (response.ok) {
+        const familyList = Array.isArray(data.families) ? data.families : [];
+        setFamilies(familyList);
+        // Set first family as default
+        if (familyList.length > 0 && !selectedFamilyId) {
+          setSelectedFamilyId(familyList[0].id);
+        }
+      } else {
+        console.error('Failed to fetch families:', response.statusText);
+        setFamilies([]);
+      }
+    } catch (error) {
+      console.error('Error fetching families:', error);
+      setFamilies([]);
+    }
+  };
 
   const fetchGoals = async () => {
     try {
@@ -152,6 +182,17 @@ export default function GoalsPage() {
   const handleCreateOrUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate required fields
+    if (!selectedFamilyId) {
+      alert("Пожалуйста, выберите семью");
+      return;
+    }
+
+    if (!name || !targetAmount) {
+      alert("Пожалуйста, заполните обязательные поля");
+      return;
+    }
+
     const goalData = {
       name,
       description: description || null,
@@ -160,7 +201,7 @@ export default function GoalsPage() {
       deadline: deadline || null,
       categoryId: categoryId || null,
       priority,
-      familyId: session?.user?.familyId || undefined,
+      familyId: selectedFamilyId,
     };
 
     try {
@@ -363,7 +404,7 @@ export default function GoalsPage() {
               <div>
                 <p className="text-gray-600 text-sm">Накоплено</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalSaved.toLocaleString("ru-RU")} ₽
+                  {totalSaved.toLocaleString("ru-RU")} сом
                 </p>
               </div>
             </div>
@@ -377,7 +418,7 @@ export default function GoalsPage() {
               <div>
                 <p className="text-gray-600 text-sm">Общая цель</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalTarget.toLocaleString("ru-RU")} ₽
+                  {totalTarget.toLocaleString("ru-RU")} сом
                 </p>
               </div>
             </div>
@@ -513,10 +554,10 @@ export default function GoalsPage() {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-2xl font-bold text-gray-900">
-                        {goal.currentAmount.toLocaleString("ru-RU")} ₽
+                        {goal.currentAmount.toLocaleString("ru-RU")} сом
                       </span>
                       <span className="text-sm text-gray-600">
-                        из {goal.targetAmount.toLocaleString("ru-RU")} ₽
+                        из {goal.targetAmount.toLocaleString("ru-RU")} сом
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
@@ -531,7 +572,7 @@ export default function GoalsPage() {
                       </span>
                       {!isCompleted && (
                         <span className="text-sm text-gray-600">
-                          Осталось: {(goal.targetAmount - goal.currentAmount).toLocaleString("ru-RU")} ₽
+                          Осталось: {(goal.targetAmount - goal.currentAmount).toLocaleString("ru-RU")} сом
                         </span>
                       )}
                     </div>
@@ -616,7 +657,7 @@ export default function GoalsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Целевая сумма (₽) *
+                    Целевая сумма (сом) *
                   </label>
                   <input
                     type="number"
@@ -632,7 +673,7 @@ export default function GoalsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Текущая сумма (₽)
+                    Текущая сумма (сом)
                   </label>
                   <input
                     type="number"
@@ -723,7 +764,7 @@ export default function GoalsPage() {
               <form onSubmit={handleContribute} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Сумма вклада (₽) *
+                    Сумма вклада (сом) *
                   </label>
                   <input
                     type="number"

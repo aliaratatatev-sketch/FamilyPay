@@ -35,7 +35,7 @@ export default function FamiliesPage() {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingFamily, setEditingFamily] = useState<Family | null>(null);
-  const [formData, setFormData] = useState({ name: '', currency: 'RUB', createdById: '' });
+  const [formData, setFormData] = useState({ name: '', currency: 'KGS', createdById: '' });
 
   const loadFamilies = async () => {
     setLoading(true);
@@ -71,7 +71,7 @@ export default function FamiliesPage() {
       }
       setShowModal(false);
       setEditingFamily(null);
-      setFormData({ name: '', currency: 'RUB', createdById: '' });
+      setFormData({ name: '', currency: 'KGS', createdById: '' });
       loadFamilies();
     } catch (error) {
       console.error('Error saving family:', error);
@@ -232,7 +232,7 @@ export default function FamiliesPage() {
                   onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                   className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f1923] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#4FD1C5]"
                 >
-                  <option value="RUB">RUB (₽)</option>
+                  <option value="KGS">KGS (сом)</option>
                   <option value="USD">USD ($)</option>
                   <option value="EUR">EUR (€)</option>
                   <option value="KGS">KGS (с)</option>

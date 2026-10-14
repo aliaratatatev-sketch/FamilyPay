@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         name,
         type,
         balance: balance || 0,
-        currency: currency || 'RUB',
+        currency: currency || 'KGS',
         description,
         color,
         icon,

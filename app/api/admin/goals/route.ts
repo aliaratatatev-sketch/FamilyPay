@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         description,
         targetAmount,
         currentAmount: currentAmount || 0,
-        currency: currency || 'RUB',
+        currency: currency || 'KGS',
         targetDate: targetDate ? new Date(targetDate) : null,
         status: status || 'ACTIVE',
         color,

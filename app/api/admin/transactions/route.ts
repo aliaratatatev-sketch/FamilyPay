@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         userId,
         type,
         amount,
-        currency: currency || 'RUB',
+        currency: currency || 'KGS',
         description,
         date: date ? new Date(date) : new Date(),
         location,
