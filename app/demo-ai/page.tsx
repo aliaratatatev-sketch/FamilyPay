@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import AIRecommendationCard from '@/components/ai/AIRecommendationCard';
+import { ChevronDown } from 'lucide-react';
 
 export default function DemoAIPage() {
   const [amount, setAmount] = useState(500);
@@ -121,17 +122,20 @@ export default function DemoAIPage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Категория
             </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-3 text-lg border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#4FD1C5] focus:border-transparent dark:bg-gray-900 dark:text-white"
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-3 pr-10 text-lg border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-[#4FD1C5] focus:border-transparent dark:bg-gray-900 dark:text-white appearance-none cursor-pointer"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+            </div>
           </div>
 
           {/* Комментарий */}

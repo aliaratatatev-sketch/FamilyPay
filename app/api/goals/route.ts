@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       where,
       include: {
         family: { select: { name: true } },
-        category: { select: { name: true, color: true } },
+        user: { select: { name: true, email: true } },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -71,10 +71,22 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, description, targetAmount, currentAmount, deadline, familyId, categoryId, priority } = body;
+    console.log('Received goal data:', body); // Debug log
+    
+    const { 
+      name, 
+      description, 
+      targetAmount, 
+      currentAmount, 
+      deadline, // Will map to targetDate
+      familyId, 
+      categoryId, // Not in schema, will ignore
+      priority // Not in schema, will ignore
+    } = body;
 
     // Validate required fields
     if (!name || !targetAmount || !familyId) {
+      console.error('Validation failed:', { name, targetAmount, familyId }); // Debug log
       return NextResponse.json(
         { error: "Name, target amount, and family are required" },
         { status: 400 }
@@ -99,21 +111,26 @@ export async function POST(request: Request) {
       );
     }
 
+    // Get family currency
+    const family = await prisma.family.findUnique({
+      where: { id: familyId },
+      select: { currency: true },
+    });
+
     const goal = await prisma.goal.create({
       data: {
         name,
         description,
         targetAmount: parseFloat(targetAmount),
         currentAmount: currentAmount ? parseFloat(currentAmount) : 0,
-        deadline: deadline ? new Date(deadline) : null,
+        targetDate: deadline ? new Date(deadline) : null,
         familyId,
-        categoryId: categoryId || null,
-        priority: priority || "MEDIUM",
+        userId: user.id,
+        currency: family?.currency || "KGS",
         status: "ACTIVE",
       },
       include: {
         family: { select: { name: true } },
-        category: { select: { name: true, color: true } },
       },
     });
 
@@ -142,8 +159,18 @@ export async function POST(request: Request) {
     return NextResponse.json(goal, { status: 201 });
   } catch (error) {
     console.error("Error creating goal:", error);
+    
+    // Detailed error logging
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+    
     return NextResponse.json(
-      { error: "Failed to create goal" },
+      { 
+        error: "Failed to create goal",
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }

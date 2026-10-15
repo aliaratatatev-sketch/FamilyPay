@@ -6,9 +6,10 @@ import { prisma } from "@/lib/prisma";
 // GET /api/goals/[id] - Get a specific goal
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -24,10 +25,10 @@ export async function GET(
     }
 
     const goal = await prisma.goal.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         family: { select: { name: true } },
-        category: { select: { name: true, color: true } },
+        user: { select: { name: true, email: true } },
       },
     });
 
@@ -54,9 +55,10 @@ export async function GET(
 // PUT /api/goals/[id] - Update a goal
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -72,7 +74,7 @@ export async function PUT(
     }
 
     const goal = await prisma.goal.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!goal) {
@@ -94,23 +96,30 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, description, targetAmount, currentAmount, deadline, categoryId, priority, status } = body;
+    const { 
+      name, 
+      description, 
+      targetAmount, 
+      currentAmount, 
+      deadline, // Maps to targetDate
+      categoryId, // Not in schema
+      priority, // Not in schema
+      status 
+    } = body;
 
     const updatedGoal = await prisma.goal.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name !== undefined && { name }),
         ...(description !== undefined && { description }),
         ...(targetAmount !== undefined && { targetAmount: parseFloat(targetAmount) }),
         ...(currentAmount !== undefined && { currentAmount: parseFloat(currentAmount) }),
-        ...(deadline !== undefined && { deadline: deadline ? new Date(deadline) : null }),
-        ...(categoryId !== undefined && { categoryId }),
-        ...(priority !== undefined && { priority }),
+        ...(deadline !== undefined && { targetDate: deadline ? new Date(deadline) : null }),
         ...(status !== undefined && { status }),
       },
       include: {
         family: { select: { name: true } },
-        category: { select: { name: true, color: true } },
+        user: { select: { name: true, email: true } },
       },
     });
 
@@ -127,9 +136,10 @@ export async function PUT(
 // DELETE /api/goals/[id] - Delete a goal
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -145,7 +155,7 @@ export async function DELETE(
     }
 
     const goal = await prisma.goal.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!goal) {
@@ -167,7 +177,7 @@ export async function DELETE(
     }
 
     await prisma.goal.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Goal deleted successfully" });

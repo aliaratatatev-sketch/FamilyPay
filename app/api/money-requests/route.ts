@@ -86,6 +86,14 @@ export async function GET(request: NextRequest) {
             currency: true,
           },
         },
+        account: {
+          select: {
+            id: true,
+            name: true,
+            balance: true,
+            currency: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Info, Users } from 'lucide-react';
+import { Info, Users, ChevronDown } from 'lucide-react';
 
 interface CreateFamilyModalProps {
   isOpen: boolean;
@@ -139,19 +139,22 @@ export default function CreateFamilyModal({ isOpen, onClose, onSuccess }: Create
             >
               Валюта
             </label>
-            <select
-              id="currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              disabled={isLoading}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50"
-            >
-              {currencies.map((curr) => (
-                <option key={curr.code} value={curr.code}>
-                  {curr.name} ({curr.symbol})
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                disabled={isLoading}
+                className="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 appearance-none cursor-pointer"
+              >
+                {currencies.map((curr) => (
+                  <option key={curr.code} value={curr.code}>
+                    {curr.name} ({curr.symbol})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+            </div>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Вы сможете использовать другие валюты для отдельных счетов
             </p>

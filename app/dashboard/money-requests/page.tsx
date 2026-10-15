@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 
 interface MoneyRequest {
   id: string;
@@ -180,17 +181,20 @@ export default function MoneyRequestsPage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Выберите семью
             </label>
-            <select
-              value={selectedFamily}
-              onChange={(e) => setSelectedFamily(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-            >
-              {families.map((family) => (
-                <option key={family.id} value={family.id}>
-                  {family.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={selectedFamily}
+                onChange={(e) => setSelectedFamily(e.target.value)}
+                className="appearance-none w-full px-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-[#0D6D6E] dark:focus:border-[#4FD1C5] focus:ring-2 focus:ring-[#0D6D6E]/20 dark:focus:ring-[#4FD1C5]/20 transition-all cursor-pointer"
+              >
+                {families.map((family) => (
+                  <option key={family.id} value={family.id}>
+                    {family.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+            </div>
           </div>
         )}
 

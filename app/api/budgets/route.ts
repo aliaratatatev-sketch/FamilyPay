@@ -101,16 +101,30 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/budgets - Создать новый бюджет
- * Body: { familyId, categoryId, name, amount, period, startDate, endDate }
+ * Body: { familyId, categoryId, name, amount, period, startDate, endDate, alertAt50?, alertAt80?, alertAt100? }
  */
 export async function POST(request: NextRequest) {
   try {
     const userId = await getCurrentUserId();
     const body = await request.json();
-    const { familyId, categoryId, name, amount, period, startDate, endDate } = body;
+    const { 
+      familyId, 
+      categoryId, 
+      name, 
+      amount, 
+      period, 
+      startDate, 
+      endDate,
+      alertAt50 = true,
+      alertAt80 = true,
+      alertAt100 = true
+    } = body;
+
+    console.log('Received budget data:', body); // Debug log
 
     // Валидация
     if (!familyId || !categoryId || !name || !amount || !period || !startDate || !endDate) {
+      console.error('Validation failed:', { familyId, categoryId, name, amount, period, startDate, endDate });
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
@@ -169,9 +183,9 @@ export async function POST(request: NextRequest) {
         endDate: new Date(endDate),
         spent: 0,
         isActive: true,
-        alertAt50: true,
-        alertAt80: true,
-        alertAt100: true,
+        alertAt50: alertAt50 ?? true,
+        alertAt80: alertAt80 ?? true,
+        alertAt100: alertAt100 ?? true,
       },
       include: {
         category: {

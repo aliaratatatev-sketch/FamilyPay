@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
+import { ChevronDown } from 'lucide-react';
 
 interface Account {
   id: string;
@@ -126,7 +127,7 @@ export default function AccountsPage() {
 
   const formatBalance = (balance: number, currency: string) => {
     const symbols: Record<string, string> = {
-      RUB: '₽',
+      RUB: 'сом',
       USD: '$',
       EUR: '€',
       KGS: 'сом',
@@ -206,18 +207,21 @@ export default function AccountsPage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Фильтр по семье
             </label>
-            <select
-              value={selectedFamilyId}
-              onChange={(e) => handleFamilyChange(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-            >
-              <option value="all">Все семьи</option>
-              {families.map((family) => (
-                <option key={family.id} value={family.id}>
-                  {family.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={selectedFamilyId}
+                onChange={(e) => handleFamilyChange(e.target.value)}
+                className="appearance-none w-full px-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-[#0D6D6E] dark:focus:border-[#4FD1C5] focus:ring-2 focus:ring-[#0D6D6E]/20 dark:focus:ring-[#4FD1C5]/20 transition-all cursor-pointer"
+              >
+                <option value="all">Все семьи</option>
+                {families.map((family) => (
+                  <option key={family.id} value={family.id}>
+                    {family.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+            </div>
           </div>
         )}
 
@@ -312,7 +316,7 @@ function CreateAccountModal({
     name: '',
     type: 'CASH',
     balance: '0',
-    currency: 'RUB',
+    currency: 'KGS',
     description: '',
     color: '#10B981',
     icon: '',
@@ -330,10 +334,7 @@ function CreateAccountModal({
   ];
 
   const currencies = [
-    { code: 'RUB', name: 'Российский рубль', symbol: '₽' },
-    { code: 'USD', name: 'Доллар США', symbol: '$' },
-    { code: 'EUR', name: 'Евро', symbol: '€' },
-    { code: 'KGS', name: 'Киргизский сом', symbol: 'сом' },
+    { code: 'KGS', name: 'Кыргызский сом', symbol: 'сом' },
   ];
 
   const colors = [
@@ -413,18 +414,21 @@ function CreateAccountModal({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Семья
               </label>
-              <select
-                value={formData.familyId}
-                onChange={(e) => setFormData({ ...formData, familyId: e.target.value })}
-                disabled={isLoading}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                {families.map((family) => (
-                  <option key={family.id} value={family.id}>
-                    {family.name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={formData.familyId}
+                  onChange={(e) => setFormData({ ...formData, familyId: e.target.value })}
+                  disabled={isLoading}
+                  className="appearance-none w-full px-4 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-[#0D6D6E] dark:focus:border-[#4FD1C5] focus:ring-2 focus:ring-[#0D6D6E]/20 dark:focus:ring-[#4FD1C5]/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {families.map((family) => (
+                    <option key={family.id} value={family.id}>
+                      {family.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+              </div>
             </div>
           )}
 
@@ -480,6 +484,7 @@ function CreateAccountModal({
                 value={formData.balance}
                 onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
                 disabled={isLoading}
+                placeholder="0.00 сом"
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -488,18 +493,21 @@ function CreateAccountModal({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Валюта
               </label>
-              <select
-                value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                disabled={isLoading}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                {currencies.map((curr) => (
-                  <option key={curr.code} value={curr.code}>
-                    {curr.name} ({curr.symbol})
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  disabled={isLoading}
+                  className="appearance-none w-full px-4 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-[#0D6D6E] dark:focus:border-[#4FD1C5] focus:ring-2 focus:ring-[#0D6D6E]/20 dark:focus:ring-[#4FD1C5]/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {currencies.map((curr) => (
+                    <option key={curr.code} value={curr.code}>
+                      {curr.name} ({curr.symbol})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+              </div>
             </div>
           </div>
 

@@ -8,6 +8,7 @@ import {
   Wallet,
   TrendingUp,
   AlertTriangle,
+  ChevronDown,
   Edit,
   Trash2,
   Calendar,
@@ -74,16 +75,25 @@ export default function BudgetsPage() {
   const [alertAt80, setAlertAt80] = useState(true);
   const [alertAt100, setAlertAt100] = useState(true);
 
+  // Custom dropdown states
+  const [isFamilyOpen, setIsFamilyOpen] = useState(false);
+  const [isPeriodOpen, setIsPeriodOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       redirect("/auth/signin");
     }
     if (session?.user) {
-      fetchFamilies();
-      fetchBudgets();
-      fetchCategories();
+      fetchInitialData();
     }
   }, [session, status]);
+
+  const fetchInitialData = async () => {
+    await fetchFamilies();
+    await fetchCategories();
+    await fetchBudgets();
+  };
 
   const fetchFamilies = async () => {
     try {
@@ -92,7 +102,7 @@ export default function BudgetsPage() {
       if (response.ok) {
         const familyList = Array.isArray(data.families) ? data.families : [];
         setFamilies(familyList);
-        // Set first family as default
+        // Set first family as default if not already set
         if (familyList.length > 0 && !selectedFamilyId) {
           setSelectedFamilyId(familyList[0].id);
         }
@@ -111,8 +121,8 @@ export default function BudgetsPage() {
       const res = await fetch("/api/budgets");
       if (res.ok) {
         const data = await res.json();
-        // Ensure data is an array
-        setBudgets(Array.isArray(data) ? data : []);
+        // API returns { budgets: [...] }
+        setBudgets(Array.isArray(data.budgets) ? data.budgets : []);
       } else {
         console.error("Failed to fetch budgets:", res.statusText);
         setBudgets([]);
@@ -145,14 +155,27 @@ export default function BudgetsPage() {
   const handleCreateOrUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Use first family if none selected
+    const targetFamilyId = selectedFamilyId || (families.length > 0 ? families[0].id : '');
+
     // Validate required fields
-    if (!selectedFamilyId) {
-      alert("Пожалуйста, выберите семью");
+    if (!targetFamilyId) {
+      alert("Пожалуйста, создайте семью сначала");
       return;
     }
 
     if (!categoryId) {
       alert("Пожалуйста, выберите категорию");
+      return;
+    }
+
+    if (!name.trim()) {
+      alert("Пожалуйста, введите название бюджета");
+      return;
+    }
+
+    if (!amount || parseFloat(amount) <= 0) {
+      alert("Пожалуйста, введите корректную сумму");
       return;
     }
 
@@ -187,13 +210,15 @@ export default function BudgetsPage() {
       amount: parseFloat(amount),
       period,
       categoryId,
-      familyId: selectedFamilyId,
+      familyId: targetFamilyId,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       alertAt50,
       alertAt80,
       alertAt100,
     };
+
+    console.log('Sending budget data:', budgetData); // Debug log
 
     try {
       const url = editingBudget ? `/api/budgets/${editingBudget.id}` : "/api/budgets";
@@ -208,13 +233,15 @@ export default function BudgetsPage() {
       if (res.ok) {
         fetchBudgets();
         handleCloseModal();
+        alert("Бюджет успешно сохранен!");
       } else {
         const error = await res.json();
+        console.error('API Error:', error);
         alert(error.error || "Ошибка при сохранении бюджета");
       }
     } catch (error) {
       console.error("Error saving budget:", error);
-      alert("Ошибка при сохранении бюджета");
+      alert("Ошибка при сохранении бюджета. Проверьте консоль для деталей.");
     }
   };
 
@@ -304,7 +331,13 @@ export default function BudgetsPage() {
             <p className="text-gray-600 mt-1">{t.budgetsPage.subtitle}</p>
           </div>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              // Set family if not already set
+              if (!selectedFamilyId && families.length > 0) {
+                setSelectedFamilyId(families[0].id);
+              }
+              setShowCreateModal(true);
+            }}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -362,7 +395,13 @@ export default function BudgetsPage() {
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Нет бюджетов</h3>
             <p className="text-gray-600 mb-6">Создайте первый бюджет для отслеживания расходов</p>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => {
+                // Set family if not already set
+                if (!selectedFamilyId && families.length > 0) {
+                  setSelectedFamilyId(families[0].id);
+                }
+                setShowCreateModal(true);
+              }}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Создать бюджет
@@ -473,6 +512,50 @@ export default function BudgetsPage() {
               </h2>
 
               <form onSubmit={handleCreateOrUpdate} className="space-y-4">
+                {/* Family Selector */}
+                {families.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Семья *
+                    </label>
+                    <div className="relative">
+                      <div
+                        className="w-full border-2 border-gray-200 text-sm rounded-lg p-2.5 flex justify-between items-center cursor-pointer bg-white hover:border-[#0D6D6E] transition-colors"
+                        onClick={() => setIsFamilyOpen(!isFamilyOpen)}
+                      >
+                        <span className="text-slate-900">
+                          {selectedFamilyId 
+                            ? families.find(f => f.id === selectedFamilyId)?.name || "Выберите семью"
+                            : "Выберите семью"}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isFamilyOpen ? 'rotate-180' : ''}`} />
+                      </div>
+                      {isFamilyOpen && (
+                        <>
+                          <div 
+                            className="fixed inset-0 z-10" 
+                            onClick={() => setIsFamilyOpen(false)}
+                          />
+                          <div className="absolute z-20 w-full mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+                            {families.map((family) => (
+                              <div
+                                key={family.id}
+                                className="p-2.5 text-sm hover:bg-[#0D6D6E]/10 hover:text-[#0D6D6E] cursor-pointer text-slate-700 transition-colors"
+                                onClick={() => {
+                                  setSelectedFamilyId(family.id);
+                                  setIsFamilyOpen(false);
+                                }}
+                              >
+                                {family.name}
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Название *
@@ -507,35 +590,78 @@ export default function BudgetsPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Период *
                   </label>
-                  <select
-                    value={period}
-                    onChange={(e) => setPeriod(e.target.value as any)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="DAILY">День</option>
-                    <option value="WEEKLY">Неделя</option>
-                    <option value="MONTHLY">Месяц</option>
-                    <option value="YEARLY">Год</option>
-                  </select>
+                  <div className="relative">
+                    <div
+                      className="w-full border-2 border-gray-200 text-sm rounded-lg p-2.5 flex justify-between items-center cursor-pointer bg-white hover:border-[#0D6D6E] transition-colors"
+                      onClick={() => setIsPeriodOpen(!isPeriodOpen)}
+                    >
+                      <span className="text-slate-900">{PERIODS[period]}</span>
+                      <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isPeriodOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                    {isPeriodOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-10" 
+                          onClick={() => setIsPeriodOpen(false)}
+                        />
+                        <div className="absolute z-20 w-full mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                          {(Object.entries(PERIODS) as [keyof typeof PERIODS, string][]).map(([key, label]) => (
+                            <div
+                              key={key}
+                              className="p-2.5 text-sm hover:bg-[#0D6D6E]/10 hover:text-[#0D6D6E] cursor-pointer text-slate-700 transition-colors"
+                              onClick={() => {
+                                setPeriod(key);
+                                setIsPeriodOpen(false);
+                              }}
+                            >
+                              {label}
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Категория *
                   </label>
-                  <select
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  >
-                    <option value="">Выберите категорию</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <div
+                      className="w-full border-2 border-gray-200 text-sm rounded-lg p-2.5 flex justify-between items-center cursor-pointer bg-white hover:border-[#0D6D6E] transition-colors"
+                      onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                    >
+                      <span className="text-slate-900">
+                        {categoryId 
+                          ? categories.find(c => c.id === categoryId)?.name || "Выберите категорию"
+                          : "Выберите категорию"}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                    {isCategoryOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-10" 
+                          onClick={() => setIsCategoryOpen(false)}
+                        />
+                        <div className="absolute z-20 w-full mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+                          {categories.map((cat) => (
+                            <div
+                              key={cat.id}
+                              className="p-2.5 text-sm hover:bg-[#0D6D6E]/10 hover:text-[#0D6D6E] cursor-pointer text-slate-700 transition-colors"
+                              onClick={() => {
+                                setCategoryId(cat.id);
+                                setIsCategoryOpen(false);
+                              }}
+                            >
+                              {cat.name}
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* Alerts */}

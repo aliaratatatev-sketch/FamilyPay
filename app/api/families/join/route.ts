@@ -3,6 +3,66 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUserId } from '@/lib/session';
 
 /**
+ * GET /api/families/join/info - Получить информацию о приглашении
+ * Query: ?token=xxx
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get('token');
+
+    if (!token || typeof token !== 'string') {
+      return NextResponse.json(
+        { error: 'Valid token is required' },
+        { status: 400 }
+      );
+    }
+
+    // Ищем приглашение по токену
+    const invitation = await prisma.familyInvitation.findUnique({
+      where: { token },
+      include: {
+        family: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!invitation) {
+      return NextResponse.json(
+        { error: 'Invitation not found' },
+        { status: 404 }
+      );
+    }
+
+    // Проверяем, не истекло ли приглашение
+    if (invitation.expires < new Date()) {
+      return NextResponse.json(
+        { error: 'Invitation has expired' },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      familyName: invitation.family.name,
+      role: invitation.role,
+      email: invitation.email,
+      expires: invitation.expires,
+    });
+  } catch (error) {
+    console.error('Error fetching invitation info:', error);
+    
+    return NextResponse.json(
+      { error: 'Failed to fetch invitation info' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * POST /api/families/join - Принять приглашение в семью
  * Body: { token: string }
  */

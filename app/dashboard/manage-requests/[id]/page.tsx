@@ -488,7 +488,7 @@ export default function RequestDetailPage() {
   );
 }
 
-// Компонент одобрения запроса с выбором банка
+// Компонент одобрения запроса с выбором счета
 function ApproveModal({
   request,
   family,
@@ -500,34 +500,30 @@ function ApproveModal({
   onClose: () => void;
   onSuccess: () => void;
 }) {
-  const [step, setStep] = useState<'bank' | 'confirm'>('bank');
-  const [selectedBank, setSelectedBank] = useState<string>('');
+  const [step, setStep] = useState<'account' | 'confirm'>('account');
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const banks = [
-    { id: 'sber', name: 'Сбер', icon: '🟢', color: 'from-green-500 to-green-600' },
-    { id: 'odengi', name: 'О!Деньги', icon: '🟠', color: 'from-orange-500 to-orange-600' },
-    { id: 'mbank', name: 'MBANK', icon: '🔵', color: 'from-blue-500 to-blue-600' },
-    { id: 'cash', name: 'Наличные', icon: '💵', color: 'from-emerald-500 to-emerald-600' },
-  ];
-
-  const handleBankSelect = (bankId: string) => {
-    setSelectedBank(bankId);
+  const handleAccountSelect = (accountId: string) => {
+    setSelectedAccountId(accountId);
     setStep('confirm');
   };
 
   const handleApprove = async () => {
+    if (!selectedAccountId) {
+      setError('Выберите счет для списания');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
       const response = await fetch(`/api/money-requests/${request.id}/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentMethod: selectedBank }),
+        body: JSON.stringify({ accountId: selectedAccountId }),
       });
 
       const data = await response.json();
@@ -544,11 +540,12 @@ function ApproveModal({
     }
   };
 
-  const selectedBankData = banks.find(b => b.id === selectedBank);
+  const selectedAccount = family.accounts.find(a => a.id === selectedAccountId);
+  const totalBalance = family.accounts.reduce((sum, acc) => sum + Number(acc.balance || 0), 0);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative">
         <button
           onClick={onClose}
           disabled={isLoading}
@@ -557,14 +554,14 @@ function ApproveModal({
           ×
         </button>
 
-        {step === 'bank' ? (
+        {step === 'account' ? (
           <>
             <div className="text-center mb-6">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">💳</span>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Выберите банк оплаты
+                Выберите счет для списания
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 {request.requester.name || request.requester.email} • {request.amount} {request.currency}
@@ -582,32 +579,87 @@ function ApproveModal({
               )}
             </div>
 
-            <div className="space-y-3 mb-6">
-              {banks.map((bank) => (
-                <button
-                  key={bank.id}
-                  onClick={() => handleBankSelect(bank.id)}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-[#0D6D6E] dark:hover:border-[#4FD1C5] transition-all hover:shadow-lg group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${bank.color} flex items-center justify-center text-2xl`}>
-                      {bank.icon}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-semibold text-gray-900 dark:text-white group-hover:text-[#0D6D6E] dark:group-hover:text-[#4FD1C5] transition">
-                        {bank.name}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {bank.id === 'cash' ? 'Наличный расчет' : 'Онлайн перевод'}
-                      </p>
-                    </div>
-                    <svg className="w-6 h-6 text-gray-400 group-hover:text-[#0D6D6E] dark:group-hover:text-[#4FD1C5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </button>
-              ))}
+            {/* Общий баланс семьи */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-4 mb-6 border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-purple-700 dark:text-purple-300 mb-1">
+                    Общий баланс семьи
+                  </p>
+                  <p className="text-2xl font-bold text-purple-900 dark:text-purple-200">
+                    {Number(totalBalance).toFixed(2)} {request.currency}
+                  </p>
+                </div>
+                <div className="text-4xl">💰</div>
+              </div>
             </div>
+
+            {family.accounts.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  У семьи нет счетов для списания
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3 mb-6">
+                {family.accounts.map((account) => {
+                  const hasEnoughBalance = Number(account.balance) >= Number(request.amount);
+                  return (
+                    <button
+                      key={account.id}
+                      onClick={() => hasEnoughBalance ? handleAccountSelect(account.id) : null}
+                      disabled={!hasEnoughBalance}
+                      className={`w-full p-4 border-2 rounded-xl transition-all ${
+                        hasEnoughBalance
+                          ? 'border-gray-200 dark:border-gray-600 hover:border-[#0D6D6E] dark:hover:border-[#4FD1C5] hover:shadow-lg cursor-pointer'
+                          : 'border-red-200 dark:border-red-900/50 opacity-60 cursor-not-allowed'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                          hasEnoughBalance 
+                            ? 'bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5]' 
+                            : 'bg-gray-300 dark:bg-gray-700'
+                        }`}>
+                          {account.name.includes('Сбер') ? '🟢' :
+                           account.name.includes('Деньги') ? '🟠' :
+                           account.name.includes('MBANK') ? '🔵' :
+                           account.name.includes('Наличные') ? '💵' : '💳'}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className={`font-semibold mb-1 ${
+                            hasEnoughBalance 
+                              ? 'text-gray-900 dark:text-white' 
+                              : 'text-gray-500 dark:text-gray-500'
+                          }`}>
+                            {account.name}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <p className={`text-sm font-medium ${
+                              hasEnoughBalance 
+                                ? 'text-[#0D6D6E] dark:text-[#4FD1C5]' 
+                                : 'text-red-600 dark:text-red-400'
+                            }`}>
+                              {Number(account.balance).toFixed(2)} {account.currency}
+                            </p>
+                            {!hasEnoughBalance && (
+                              <span className="text-xs text-red-600 dark:text-red-400">
+                                (Недостаточно средств)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {hasEnoughBalance && (
+                          <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             <button
               type="button"
@@ -620,33 +672,57 @@ function ApproveModal({
         ) : (
           <>
             <div className="text-center mb-6">
-              <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${selectedBankData?.color} flex items-center justify-center mx-auto mb-4`}>
-                <span className="text-3xl">{selectedBankData?.icon}</span>
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">✓</span>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Подтвердите платеж
+                Подтвердите одобрение
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Через {selectedBankData?.name}
+                Деньги будут списаны со счета
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
+            {/* Выбранный счет */}
+            {selectedAccount && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 mb-4 border border-blue-200 dark:border-blue-800">
+                <p className="text-xs text-blue-700 dark:text-blue-300 mb-2">Счет для списания</p>
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-blue-900 dark:text-blue-200">
+                    {selectedAccount.name}
+                  </p>
+                  <p className="text-lg font-bold text-blue-900 dark:text-blue-200">
+                    {Number(selectedAccount.balance).toFixed(2)} {selectedAccount.currency}
+                  </p>
+                </div>
+                <div className="mt-2 pt-2 border-t border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-blue-700 dark:text-blue-300">Остаток после списания:</span>
+                    <span className="font-bold text-blue-900 dark:text-blue-200">
+                      {(Number(selectedAccount.balance) - request.amount).toFixed(2)} {selectedAccount.currency}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Детали платежа */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Получатель</span>
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
                   {request.requester.name || request.requester.email}
                 </span>
               </div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Назначение</span>
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
                   {request.title}
                 </span>
               </div>
-              <div className="border-t border-gray-300 dark:border-gray-600 pt-4 mt-4">
+              <div className="border-t border-gray-300 dark:border-gray-600 pt-3 mt-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold text-gray-900 dark:text-white">Сумма</span>
+                  <span className="text-lg font-semibold text-gray-900 dark:text-white">Сумма к списанию</span>
                   <span className="text-2xl font-bold text-[#0D6D6E] dark:text-[#4FD1C5]">
                     {request.amount} {request.currency}
                   </span>
@@ -663,7 +739,7 @@ function ApproveModal({
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep('bank')}
+                onClick={() => setStep('account')}
                 disabled={isLoading}
                 className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
               >
@@ -684,7 +760,7 @@ function ApproveModal({
                     Обработка...
                   </>
                 ) : (
-                  'Одобрить'
+                  '✓ Одобрить и списать'
                 )}
               </button>
             </div>

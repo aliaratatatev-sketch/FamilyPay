@@ -50,6 +50,14 @@ export async function GET(
             currency: true,
           },
         },
+        account: {
+          select: {
+            id: true,
+            name: true,
+            balance: true,
+            currency: true,
+          },
+        },
       },
     });
 
@@ -82,6 +90,77 @@ export async function GET(
 
   } catch (error) {
     console.error('Error fetching money request:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * API: Отмена запроса на деньги
+ * DELETE /api/money-requests/[id]
+ */
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { id: requestId } = await context.params;
+
+    // Получаем запрос
+    const moneyRequest = await prisma.moneyRequest.findUnique({
+      where: { id: requestId },
+    });
+
+    if (!moneyRequest) {
+      return NextResponse.json(
+        { error: 'Request not found' },
+        { status: 404 }
+      );
+    }
+
+    // Проверяем, что пользователь - автор запроса
+    if (moneyRequest.requesterId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Вы можете отменить только свой запрос' },
+        { status: 403 }
+      );
+    }
+
+    // Проверяем статус - можно отменить только PENDING запросы
+    if (moneyRequest.status !== 'PENDING') {
+      return NextResponse.json(
+        { error: 'Можно отменить только ожидающие запросы' },
+        { status: 400 }
+      );
+    }
+
+    // Отменяем запрос
+    await prisma.moneyRequest.update({
+      where: { id: requestId },
+      data: {
+        status: 'CANCELLED',
+        processedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Запрос успешно отменен',
+    });
+
+  } catch (error) {
+    console.error('Error cancelling money request:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

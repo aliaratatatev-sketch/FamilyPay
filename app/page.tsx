@@ -498,7 +498,7 @@ export default function Home() {
       <VideoModal 
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        videoUrl="/1012 (1).mp4"
+        videoUrl="/1013.mp4"
       />
     </div>
   );

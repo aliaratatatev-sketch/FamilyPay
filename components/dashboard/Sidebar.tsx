@@ -302,8 +302,28 @@ export default function Sidebar() {
             </div>
           </nav>
 
-          {/* Footer - User info */}
+          {/* Footer - Legal Links & User info */}
           <div className="border-t border-gray-200 dark:border-white/5 p-4">
+            {/* Legal Links */}
+            {!isCollapsed && (
+              <div className="mb-3 flex flex-wrap gap-2 text-xs">
+                <Link 
+                  href="/privacy" 
+                  className="text-gray-500 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition-colors"
+                >
+                  Конфиденциальность
+                </Link>
+                <span className="text-gray-300 dark:text-gray-600">•</span>
+                <Link 
+                  href="/terms" 
+                  className="text-gray-500 dark:text-gray-400 hover:text-[#0D6D6E] dark:hover:text-[#4FD1C5] transition-colors"
+                >
+                  Условия
+                </Link>
+              </div>
+            )}
+            
+            {/* User Info */}
             {!isCollapsed ? (
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-semibold">

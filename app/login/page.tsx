@@ -40,9 +40,12 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
+      // Получаем параметр redirect из URL
+      const redirectUrl = searchParams.get('redirect') || '/dashboard';
+      
       // Используем redirect: false для обработки ошибок
       const result = await signIn('google', {
-        callbackUrl: '/dashboard',
+        callbackUrl: redirectUrl,
         redirect: false,
       });
       
@@ -51,7 +54,7 @@ export default function LoginPage() {
         setLoading(false);
       } else if (result?.ok) {
         // Успешный вход, перенаправляем вручную
-        router.push('/dashboard');
+        router.push(redirectUrl);
       }
     } catch (err) {
       setError('Ошибка соединения с сервером');
@@ -66,6 +69,9 @@ export default function LoginPage() {
 
     try {
       if (mode === 'login') {
+        // Получаем параметр redirect из URL
+        const redirectUrl = searchParams.get('redirect') || '/dashboard';
+        
         // Вход
         const result = await signIn('credentials', {
           username: email,
@@ -76,8 +82,8 @@ export default function LoginPage() {
         if (result?.error) {
           setError('Неверные учетные данные');
         } else {
-          // Перенаправление на dashboard
-          router.push('/dashboard');
+          // Перенаправление
+          router.push(redirectUrl);
         }
       } else if (mode === 'register') {
         // Регистрация - отправляем код
@@ -111,6 +117,9 @@ export default function LoginPage() {
         const data = await response.json();
 
         if (response.ok) {
+          // Получаем параметр redirect из URL
+          const redirectUrl = searchParams.get('redirect') || '/dashboard';
+          
           // После успешной верификации, автоматически входим
           const result = await signIn('credentials', {
             username: email,
@@ -119,7 +128,7 @@ export default function LoginPage() {
           });
 
           if (!result?.error) {
-            router.push('/dashboard');
+            router.push(redirectUrl);
           }
         } else {
           setError(data.error || 'Ошибка верификации');
