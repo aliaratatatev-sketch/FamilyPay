@@ -165,12 +165,12 @@ export default function MoneyRequestsPage() {
   return (
     <>
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             💸 Запросы на деньги
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Отправляйте запросы родителям на карманные расходы
           </p>
         </div>
@@ -199,41 +199,41 @@ export default function MoneyRequestsPage() {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Всего запросов</div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">{requests.length}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Всего запросов</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{requests.length}</div>
           </div>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-yellow-800 dark:text-yellow-400 mb-1">Ожидают</div>
-            <div className="text-2xl font-bold text-yellow-900 dark:text-yellow-300">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-400 mb-1">Ожидают</div>
+            <div className="text-xl sm:text-2xl font-bold text-yellow-900 dark:text-yellow-300">
               {requests.filter(r => r.status === 'PENDING').length}
             </div>
           </div>
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-green-800 dark:text-green-400 mb-1">Одобрено</div>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-300">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-green-800 dark:text-green-400 mb-1">Одобрено</div>
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-300">
               {requests.filter(r => r.status === 'APPROVED' || r.status === 'COMPLETED').length}
             </div>
           </div>
-          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-red-800 dark:text-red-400 mb-1">Отклонено</div>
-            <div className="text-2xl font-bold text-red-900 dark:text-red-300">
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-red-800 dark:text-red-400 mb-1">Отклонено</div>
+            <div className="text-xl sm:text-2xl font-bold text-red-900 dark:text-red-300">
               {requests.filter(r => r.status === 'REJECTED').length}
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               Мои запросы
             </h2>
             {requests.length > 0 && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
+                className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center justify-center gap-2"
               >
                 <span>+</span>
                 <span>Новый запрос</span>
@@ -248,7 +248,7 @@ export default function MoneyRequestsPage() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
                     filter === f
                       ? 'bg-[#0D6D6E] text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -286,25 +286,25 @@ export default function MoneyRequestsPage() {
                     key={request.id}
                     className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 break-words">
                           {request.title}
                         </h3>
                         {request.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 break-words">
                             {request.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                           <span>📅 {new Date(request.createdAt).toLocaleDateString('ru-RU')}</span>
                           {request.processedAt && (
                             <span>✓ {new Date(request.processedAt).toLocaleDateString('ru-RU')}</span>
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                      <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2">
+                        <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
                           {request.amount} {request.currency}
                         </div>
                         <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${badge.color}`}>
@@ -315,9 +315,9 @@ export default function MoneyRequestsPage() {
                     </div>
 
                     {request.approver && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">
                         <span>👤</span>
-                        <span>
+                        <span className="break-words">
                           {request.status === 'REJECTED' ? 'Отклонил' : 'Одобрил'}: {request.approver.name || request.approver.email}
                         </span>
                       </div>
@@ -325,7 +325,7 @@ export default function MoneyRequestsPage() {
 
                     {request.status === 'REJECTED' && request.rejectionReason && (
                       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-3">
-                        <p className="text-sm text-red-800 dark:text-red-200">
+                        <p className="text-xs sm:text-sm text-red-800 dark:text-red-200 break-words">
                           <strong>Причина отклонения:</strong> {request.rejectionReason}
                         </p>
                       </div>
@@ -335,7 +335,7 @@ export default function MoneyRequestsPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleCancelRequest(request.id)}
-                          className="px-4 py-2 text-sm bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition"
+                          className="w-full sm:w-auto px-4 py-2 text-sm bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition"
                         >
                           Отменить запрос
                         </button>

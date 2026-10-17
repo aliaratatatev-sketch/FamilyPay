@@ -27,7 +27,7 @@ const iconComponents: Record<string, React.ComponentType<{ className?: string }>
 };
 
 export default function Home() {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [showPaymentFailed, setShowPaymentFailed] = useState(false);
@@ -162,7 +162,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-6 pt-2">
                 <div className="flex -space-x-2">
                   {["#0D6D6E","#4FD1C5","#10B981"].map((c,i)=>(
-                    <div key={i} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white dark:border-[#0f1923] flex items-center justify-center text-white text-xs font-bold" style={{background:c}} title={t.hero.social_proof.roles[i]}>
+                    <div key={`${locale}-role-${i}`} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white dark:border-[#0f1923] flex items-center justify-center text-white text-xs font-bold" style={{background:c}} title={t.hero.social_proof.roles[i]}>
                       {t.hero.social_proof.roles[i].charAt(0)}
                     </div>
                   ))}
@@ -216,7 +216,7 @@ export default function Home() {
               const IconComponent = iconComponents[value.icon] || Lightbulb;
               return (
                 <div
-                  key={i}
+                  key={`${locale}-feature-${i}`}
                   className="group relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-xl hover:shadow-teal-500/10 transition-all duration-300"
                 >
                   <div className="w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mb-3 sm:mb-4 md:mb-5 shadow-lg shadow-teal-500/30">
@@ -258,15 +258,15 @@ export default function Home() {
               {/* Connecting line */}
               <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-[#0D6D6E] via-[#4FD1C5] to-[#0D6D6E] -translate-y-1/2 opacity-20" />
               
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                 {t.howItWorks.steps.map((step: any, i: number) => {
                   const IconComponent = iconComponents[step.icon] || User;
                   return (
-                    <div key={i} className="relative">
-                      <div className="relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-300 group">
+                    <div key={`${locale}-step-${i}`} className="relative">
+                      <div className="relative overflow-hidden p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl bg-white dark:bg-[#111d2b] border border-gray-100 dark:border-white/5 hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-300 group">
                         {/* Step number */}
-                        <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center shadow-lg shadow-teal-500/30">
-                          <span className="text-white font-black text-base sm:text-lg">{step.number}</span>
+                        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg sm:rounded-xl md:rounded-2xl bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center shadow-lg shadow-teal-500/30">
+                          <span className="text-white font-black text-sm sm:text-base md:text-lg">{step.number}</span>
                         </div>
                         
                         {/* Icon */}
@@ -314,12 +314,12 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
             {t.features.items.map((f: any, i: number) => {
               const IconComponent = iconComponents[f.icon] || Lightbulb;
               return (
                 <div
-                  key={i}
+                  key={`${locale}-benefit-${i}`}
                   className="group relative p-5 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#0f1923] hover:border-[#4FD1C5]/40 hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/0 to-[#0D6D6E]/0 hover:from-[#4FD1C5]/5 hover:to-[#0D6D6E]/5 transition-all duration-500 rounded-3xl" />
@@ -346,7 +346,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
             {t.stats.items.map((stat, i) => (
-              <div key={i} className="text-center">
+              <div key={`${locale}-stat-${i}`} className="text-center">
                 <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-2 sm:mb-3 md:mb-4">
                   {stat.value}
                 </div>
@@ -377,7 +377,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto items-start">
             {t.pricing.plans.map((plan, idx) => (
               <PricingCard
-                key={idx}
+                key={`${locale}-${idx}`}
                 name={plan.name}
                 price={plan.price}
                 period={plan.period}
@@ -426,7 +426,7 @@ export default function Home() {
         />
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 pb-8 sm:pb-10 md:pb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 pb-8 sm:pb-10 md:pb-12">
             {/* brand */}
             <div className="col-span-1 sm:col-span-2 lg:col-span-1">
               <Link href="/" className="flex items-center gap-2 sm:gap-2.5 mb-3 sm:mb-4">
@@ -458,7 +458,7 @@ export default function Home() {
               <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">{t.footer.sections.product.title}</h4>
               <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm">
                 {t.footer.sections.product.links.map((link, i) => (
-                  <li key={i}><Link href={link.href} className="hover:text-[#0D6D6E] transition-colors inline-block min-h-[44px] flex items-center">{link.label}</Link></li>
+                  <li key={`${locale}-product-link-${i}`}><Link href={link.href} className="hover:text-[#0D6D6E] transition-colors inline-block min-h-[44px] flex items-center">{link.label}</Link></li>
                 ))}
               </ul>
             </div>
@@ -468,7 +468,7 @@ export default function Home() {
               <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">{t.footer.sections.company.title}</h4>
               <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm">
                 {t.footer.sections.company.links.map((link, i) => (
-                  <li key={i}><Link href={link.href} className="hover:text-[#0D6D6E] transition-colors inline-block min-h-[44px] flex items-center">{link.label}</Link></li>
+                  <li key={`${locale}-company-link-${i}`}><Link href={link.href} className="hover:text-[#0D6D6E] transition-colors inline-block min-h-[44px] flex items-center">{link.label}</Link></li>
                 ))}
               </ul>
             </div>
@@ -531,7 +531,7 @@ function PricingCard({ name, price, period, features, cta, href, popular, badge 
       </div>
       <ul className="space-y-2 sm:space-y-2.5 md:space-y-3 mb-5 sm:mb-6 md:mb-8 flex-1">
         {features.map((f, i) => (
-          <li key={i} className="flex items-start gap-2 sm:gap-2.5 md:gap-3">
+          <li key={`feature-${i}-${f.substring(0, 10)}`} className="flex items-start gap-2 sm:gap-2.5 md:gap-3">
             <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5 text-[#4FD1C5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>

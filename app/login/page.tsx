@@ -142,12 +142,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] p-4 sm:p-6">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8">
           {/* Logo */}
-          <Link href="/" className="flex justify-center mb-6">
-            <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-md">
+          <Link href="/" className="flex justify-center mb-4 sm:mb-6">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl overflow-hidden shadow-md">
               <Image
                 src="/logo.png"
                 alt="FamilyPay"
@@ -160,13 +160,13 @@ export default function LoginPage() {
 
           {/* Tab Switcher */}
           {mode !== 'verify' && (
-            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mb-6">
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mb-4 sm:mb-6">
               <button
                 onClick={() => {
                   setMode('login');
                   window.history.pushState({}, '', '/login?mode=login');
                 }}
-                className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all duration-200 text-center ${
+                className={`flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-md text-sm font-semibold transition-all duration-200 text-center ${
                   mode === 'login'
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -179,7 +179,7 @@ export default function LoginPage() {
                   setMode('register');
                   window.history.pushState({}, '', '/login?mode=register');
                 }}
-                className={`flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition-all duration-200 text-center ${
+                className={`flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-md text-sm font-semibold transition-all duration-200 text-center ${
                   mode === 'register'
                     ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -190,10 +190,10 @@ export default function LoginPage() {
             </div>
           )}
 
-          <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
             {mode === 'login' ? 'Добро пожаловать!' : mode === 'register' ? 'Создать аккаунт' : 'Подтверждение Email'}
           </h1>
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-center text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
             {mode === 'login'
               ? 'Войдите для управления финансами'
               : mode === 'register'
@@ -202,14 +202,14 @@ export default function LoginPage() {
           </p>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400 text-center">
+            <div className="mb-4 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 text-center">
                 {error}
               </p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {mode === 'verify' ? (
               // Режим верификации - только поле кода
               <div>
@@ -221,14 +221,14 @@ export default function LoginPage() {
                   type="text"
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition text-center text-2xl tracking-widest"
+                  className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition text-center text-xl sm:text-2xl tracking-widest"
                   placeholder="000000"
                   required
                   maxLength={6}
                   autoComplete="off"
                   autoFocus
                 />
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                <p className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center">
                   Проверьте ваш почтовый ящик
                 </p>
               </div>
@@ -244,7 +244,7 @@ export default function LoginPage() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition text-sm sm:text-base"
                       placeholder="Ваше имя"
                       required
                       autoComplete="name"
@@ -261,7 +261,7 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition"
+                    className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition text-sm sm:text-base"
                     placeholder="you@example.com"
                     required
                     autoComplete="email"
@@ -277,7 +277,7 @@ export default function LoginPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition"
+                    className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent outline-none transition text-sm sm:text-base"
                     placeholder="••••••••"
                     required
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -290,7 +290,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-teal-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full min-h-[44px] py-2.5 sm:py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-teal-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               {loading ? 'Загрузка...' : mode === 'login' ? 'Войти' : mode === 'register' ? 'Зарегистрироваться' : 'Подтвердить'}
             </button>
@@ -299,7 +299,7 @@ export default function LoginPage() {
           {/* Divider - только для режимов login и register */}
           {mode !== 'verify' && (
             <>
-              <div className="relative my-6">
+              <div className="relative my-4 sm:my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                 </div>
@@ -315,9 +315,9 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 sm:gap-3 min-h-[44px] py-2.5 sm:py-3 px-4 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -342,10 +342,10 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-6 text-center">
+        <div className="mt-4 sm:mt-6 text-center">
           <Link
             href="/"
-            className="text-sm text-white/80 hover:text-white transition-colors duration-200"
+            className="inline-flex items-center min-h-[44px] text-sm text-white/80 hover:text-white transition-colors duration-200"
           >
             ← Вернуться на главную
           </Link>

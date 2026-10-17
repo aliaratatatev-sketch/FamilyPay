@@ -80,12 +80,12 @@ export default function JoinFamilyPage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
           <div className="mb-6">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
               <svg
-                className="w-8 h-8 text-red-600"
+                className="w-7 h-7 sm:w-8 sm:h-8 text-red-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -98,16 +98,16 @@ export default function JoinFamilyPage() {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               Ошибка
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               Токен приглашения не найден или недействителен
             </p>
           </div>
           <button
             onClick={() => router.push("/")}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+            className="w-full min-h-[44px] bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm sm:text-base"
           >
             На главную
           </button>
@@ -118,23 +118,23 @@ export default function JoinFamilyPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Загрузка...</p>
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-indigo-600 mx-auto mb-3 sm:mb-4"></div>
+          <p className="text-sm sm:text-base text-gray-600">Загрузка...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-6 sm:p-8 max-w-md w-full">
         {/* Иконка */}
-        <div className="mb-6 text-center">
-          <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="mb-4 sm:mb-6 text-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
             <svg
-              className="w-10 h-10 text-indigo-600"
+              className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -149,24 +149,24 @@ export default function JoinFamilyPage() {
           </div>
 
           {/* Заголовок */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             Приглашение в семью
           </h1>
 
           {familyName && (
-            <p className="text-lg text-gray-700 mb-4">
+            <p className="text-base sm:text-lg text-gray-700 mb-3 sm:mb-4">
               Семья: <span className="font-semibold">{familyName}</span>
             </p>
           )}
 
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Нажмите кнопку ниже, чтобы присоединиться к семье и начать управлять финансами вместе
           </p>
         </div>
 
         {/* Ошибка */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-start">
               <svg
                 className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0"
@@ -179,7 +179,7 @@ export default function JoinFamilyPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-xs sm:text-sm text-red-800">{error}</p>
             </div>
           </div>
         )}
@@ -188,7 +188,7 @@ export default function JoinFamilyPage() {
         <button
           onClick={handleAcceptInvitation}
           disabled={loading || status !== "authenticated"}
-          className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all ${
+          className={`w-full min-h-[44px] py-2.5 sm:py-3 px-4 rounded-lg font-medium text-white transition-all text-sm sm:text-base ${
             loading || status !== "authenticated"
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg"
@@ -225,7 +225,7 @@ export default function JoinFamilyPage() {
         </button>
 
         {status !== "authenticated" && (
-          <p className="mt-4 text-center text-sm text-gray-600">
+          <p className="mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-600">
             У вас еще нет аккаунта?{" "}
             <a
               href={`/login?callbackUrl=/join?token=${token}`}

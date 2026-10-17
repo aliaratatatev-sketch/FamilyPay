@@ -296,63 +296,63 @@ export default function FamilyPage() {
   return (
     <>
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {selectedFamily.name}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Управление семьёй и участниками
           </p>
         </div>
 
         {/* Family Info - Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Участники */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 p-3 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                <Users className="w-6 h-6" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 p-2 sm:p-3 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
             </div>
-            <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Участники</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily.members.length}</p>
+            <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Участники</h3>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily.members.length}</p>
           </div>
 
           {/* Счета */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/20 p-3 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                <CreditCard className="w-6 h-6" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-50 dark:bg-purple-900/20 p-2 sm:p-3 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                <CreditCard className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
             </div>
-            <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Счета</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily.accounts.length}</p>
+            <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Счета</h3>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily.accounts.length}</p>
           </div>
 
           {/* Транзакции */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-900/20 p-3 flex items-center justify-center text-green-600 dark:text-green-400">
-                <DollarSign className="w-6 h-6" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-50 dark:bg-green-900/20 p-2 sm:p-3 flex items-center justify-center text-green-600 dark:text-green-400">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
             </div>
-            <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">Транзакции</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily._count.transactions}</p>
+            <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Транзакции</h3>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{selectedFamily._count.transactions}</p>
           </div>
         </div>
 
         {/* Members Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               Участники семьи
             </h2>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               {(userRole === 'ADMIN' || userRole === 'PARENT') && (
                 <button
                   onClick={() => setShowInviteModal(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center justify-center gap-2"
                 >
                   <span>+</span>
                   <span>Пригласить</span>
@@ -361,7 +361,7 @@ export default function FamilyPage() {
               {isCreator && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition flex items-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition flex items-center justify-center gap-2"
                   title="Только создатель может удалить семью"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -375,37 +375,39 @@ export default function FamilyPage() {
             {selectedFamily.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
               >
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                  {member.user.name?.charAt(0) || member.user.email?.charAt(0) || '?'}
+                <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-bold text-base sm:text-lg shrink-0">
+                    {member.user.name?.charAt(0) || member.user.email?.charAt(0) || '?'}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white break-words">
+                      {member.user.name || 'Без имени'}
+                      {selectedFamily.createdBy?.id === member.user.id && (
+                        <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full inline-flex items-center gap-1">
+                          <Crown className="w-3 h-3" />
+                          Создатель
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-words">
+                      {member.user.email}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      В семье с {new Date(member.joinedAt).toLocaleDateString('ru-RU')}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 dark:text-white">
-                    {member.user.name || 'Без имени'}
-                    {selectedFamily.createdBy?.id === member.user.id && (
-                      <span className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full inline-flex items-center gap-1">
-                        <Crown className="w-3 h-3" />
-                        Создатель
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {member.user.email}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    В семье с {new Date(member.joinedAt).toLocaleDateString('ru-RU')}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getRoleBadgeColor(member.role)}`}>
+                <div className="flex items-center justify-between sm:justify-end gap-2 flex-wrap">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 ${getRoleBadgeColor(member.role)}`}>
                     {getRoleName(member.role)}
                   </span>
 
                   {canManageMember(member) && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => {
                           setSelectedMember(member);
@@ -439,7 +441,7 @@ export default function FamilyPage() {
                         setSelectedMember(member);
                         setShowRemoveMemberModal(true);
                       }}
-                      className="px-3 py-1.5 text-sm border border-orange-300 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition font-medium"
+                      className="w-full sm:w-auto px-3 py-1.5 text-sm border border-orange-300 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition font-medium shrink-0"
                     >
                       Покинуть
                     </button>
@@ -452,8 +454,8 @@ export default function FamilyPage() {
 
         {/* Pending Invitations */}
         {invitations.length > 0 && (userRole === 'ADMIN' || userRole === 'PARENT') && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-6">
               Активные приглашения
             </h2>
 
@@ -461,17 +463,17 @@ export default function FamilyPage() {
               {invitations.map((invitation) => (
                 <div
                   key={invitation.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl flex-shrink-0">
+                  <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xl sm:text-2xl shrink-0">
                       📧
                     </div>
-                    <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">
+                    <div className="min-w-0">
+                      <p className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white break-words">
                         {invitation.email}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         Роль: {getRoleName(invitation.role)}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
@@ -479,7 +481,7 @@ export default function FamilyPage() {
                       </p>
                     </div>
                   </div>
-                  <span className="px-3 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full text-xs font-medium">
+                  <span className="px-3 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full text-xs font-medium w-fit shrink-0">
                     Ожидается
                   </span>
                 </div>

@@ -268,12 +268,12 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Уведомления</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Уведомления</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             {unreadCount > 0
               ? `У вас ${unreadCount} непрочитанных уведомлений`
               : "Все уведомления прочитаны"}
@@ -282,8 +282,8 @@ export default function NotificationsPage() {
 
         {/* Actions Bar */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="flex flex-wrap items-center gap-2">
               {selectedIds.length > 0 && (
                 <>
                   <span className="text-sm text-gray-600">
@@ -312,11 +312,11 @@ export default function NotificationsPage() {
                 </>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors whitespace-nowrap"
                 >
                   <CheckCheck className="w-4 h-4" />
                   Прочитать все
@@ -324,10 +324,11 @@ export default function NotificationsPage() {
               )}
               <button
                 onClick={deleteAllRead}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors whitespace-nowrap"
               >
                 <Trash2 className="w-4 h-4" />
-                Очистить прочитанные
+                <span className="hidden sm:inline">Очистить прочитанные</span>
+                <span className="sm:hidden">Очистить</span>
               </button>
             </div>
           </div>
@@ -335,7 +336,7 @@ export default function NotificationsPage() {
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
@@ -345,35 +346,36 @@ export default function NotificationsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Поиск уведомлений..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 />
               </div>
             </div>
 
-            {/* Read Filter */}
-            <select
-              value={filterRead}
-              onChange={(e) => setFilterRead(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="ALL">Все</option>
-              <option value="UNREAD">Непрочитанные</option>
-              <option value="READ">Прочитанные</option>
-            </select>
+            {/* Read Filter & Type Filter */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select
+                value={filterRead}
+                onChange={(e) => setFilterRead(e.target.value as any)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="ALL">Все</option>
+                <option value="UNREAD">Непрочитанные</option>
+                <option value="READ">Прочитанные</option>
+              </select>
 
-            {/* Type Filter */}
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="ALL">Все типы</option>
-              {Object.entries(NOTIFICATION_TYPES).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.icon} {value.label}
-                </option>
-              ))}
-            </select>
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="ALL">Все типы</option>
+                {Object.entries(NOTIFICATION_TYPES).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value.icon} {value.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -426,23 +428,23 @@ export default function NotificationsPage() {
                       : ""
                   }`}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     {/* Checkbox */}
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(notification.id)}
                       onChange={() => toggleSelect(notification.id)}
-                      className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                      className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 shrink-0"
                     />
 
                     {/* Icon */}
-                    <div className="flex-shrink-0">{typeInfo.iconComponent}</div>
+                    <div className="shrink-0">{typeInfo.iconComponent}</div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <div>
-                          <h3 className="font-semibold text-gray-900">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-sm sm:text-base text-gray-900 break-words">
                             {notification.title}
                           </h3>
                           <span
@@ -452,19 +454,19 @@ export default function NotificationsPage() {
                           </span>
                         </div>
                         {!notification.isRead && (
-                          <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
+                          <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 shrink-0"></span>
                         )}
                       </div>
-                      <p className="text-gray-600 mb-3">{notification.message}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500">
+                      <p className="text-sm sm:text-base text-gray-600 mb-3 break-words">{notification.message}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <span className="text-xs sm:text-sm text-gray-500">
                           {getRelativeTime(notification.createdAt)}
                         </span>
                         <div className="flex items-center gap-2">
                           {!notification.isRead && (
                             <button
                               onClick={() => markAsRead([notification.id])}
-                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                              className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-100 rounded-lg transition-colors whitespace-nowrap"
                             >
                               <Check className="w-4 h-4" />
                               Прочитано
@@ -472,7 +474,7 @@ export default function NotificationsPage() {
                           )}
                           <button
                             onClick={() => deleteNotifications([notification.id])}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

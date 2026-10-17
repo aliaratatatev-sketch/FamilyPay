@@ -3,9 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocale } from '../i18n/LocaleContext';
 import { Locale, localeNames } from '../i18n';
 import ThemeToggle from './ThemeToggle';
+import { Menu, X } from 'lucide-react';
 
 const languages: Locale[] = ['ru', 'kg', 'en'];
 
@@ -50,7 +52,14 @@ export default function Header() {
   const { locale, setLocale, t } = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Отслеживаем монтирование компонента
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Отслеживаем изменения темы
   useEffect(() => {
@@ -75,6 +84,29 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
+  // Закрываем мобильное меню при изменении размера экрана на desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Блокируем скролл при открытом мобильном меню
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -87,11 +119,11 @@ export default function Header() {
           : 'bg-transparent'
       }`}
     >
-      <div className="container mx-auto px-6 py-4">
-        <nav className="flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <nav className="flex items-center justify-between gap-2">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-md group-hover:shadow-[#0D6D6E]/40 transition-shadow duration-300">
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl overflow-hidden shadow-md group-hover:shadow-[#0D6D6E]/40 transition-shadow duration-300">
               <Image
                 src="/logo.png"
                 alt="FamilyPay"
@@ -100,12 +132,12 @@ export default function Header() {
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
+            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] bg-clip-text text-transparent">
               {t.header.brand}
             </span>
           </Link>
 
-          {/* Nav links */}
+          {/* Desktop Nav links */}
           <div className="hidden md:flex items-center gap-8">
             {[
               { label: t.header.nav.about, href: '#about' },
@@ -127,21 +159,21 @@ export default function Header() {
           </div>
 
           {/* Right controls */}
-          <div className="flex items-center gap-3">
-            {/* Language switcher */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Language switcher - всегда видимый */}
             <div className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${
                   isDark
                     ? 'bg-white/10 text-gray-200 hover:bg-white/20'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 <FlagIcon code={locale} />
-                <span>{locale.toUpperCase()}</span>
+                <span className="hidden xs:inline">{locale.toUpperCase()}</span>
                 <svg 
-                  className={`w-4 h-4 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`}
+                  className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`}
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -156,7 +188,7 @@ export default function Header() {
                     onClick={() => setLangOpen(false)}
                   />
                   <div
-                    className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl border overflow-hidden z-50 ${
+                    className={`absolute right-0 mt-2 w-48 sm:w-56 rounded-xl shadow-xl border overflow-hidden z-50 ${
                       isDark ? 'bg-[#1a2535] border-white/10' : 'bg-white border-gray-100'
                     }`}
                   >
@@ -164,7 +196,7 @@ export default function Header() {
                       <button
                         key={l}
                         onClick={() => { setLocale(l); setLangOpen(false); }}
-                        className={`w-full px-4 py-3 text-left transition-all duration-150 flex items-center gap-3 ${
+                        className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left transition-all duration-150 flex items-center gap-2.5 sm:gap-3 ${
                           locale === l
                             ? 'text-[#0D6D6E] dark:text-[#4FD1C5] bg-[#0D6D6E]/10 dark:bg-[#4FD1C5]/10 font-semibold'
                             : isDark
@@ -189,7 +221,7 @@ export default function Header() {
                         </div>
                         {locale === l && (
                           <svg 
-                            className="w-5 h-5 ml-auto text-[#0D6D6E] dark:text-[#4FD1C5]" 
+                            className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-[#0D6D6E] dark:text-[#4FD1C5]" 
                             fill="none" 
                             stroke="currentColor" 
                             viewBox="0 0 24 24"
@@ -207,10 +239,10 @@ export default function Header() {
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            {/* Auth buttons */}
+            {/* Auth buttons - desktop */}
             <Link
               href="/login?mode=login"
-              className={`hidden sm:block px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 ${
+              className={`hidden md:block px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 ${
                 isDark
                   ? 'text-gray-200 hover:text-[#4FD1C5] hover:bg-white/10'
                   : 'text-gray-700 hover:text-[#0D6D6E] hover:bg-gray-100'
@@ -220,13 +252,117 @@ export default function Header() {
             </Link>
             <Link
               href="/login?mode=register"
-              className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl hover:shadow-lg hover:shadow-[#0D6D6E]/30 hover:-translate-y-0.5 transition-all duration-200"
+              className="hidden md:block px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl hover:shadow-lg hover:shadow-[#0D6D6E]/30 hover:-translate-y-0.5 transition-all duration-200"
             >
               {t.header.auth.register}
             </Link>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`md:hidden min-w-[44px] min-h-[44px] w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 ${
+                isDark
+                  ? 'text-gray-200 hover:bg-white/10'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
           </div>
         </nav>
       </div>
+
+      {/* Mobile Menu Drawer - вынесено через Portal */}
+      {mounted && mobileMenuOpen && createPortal(
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          
+          {/* Drawer */}
+          <div
+            className={`fixed top-0 right-0 bottom-0 z-[101] w-[85vw] max-w-sm transform transition-transform duration-300 md:hidden ${
+              isDark ? 'bg-[#0f1923]' : 'bg-white'
+            } shadow-2xl overflow-y-auto`}
+          >
+              {/* Header with close button */}
+              <div className={`flex items-center justify-between p-4 border-b ${
+                isDark ? 'border-white/10' : 'border-gray-200'
+              }`}>
+                <span className={`text-lg font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {t.header.mobileMenu}
+                </span>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`min-w-[44px] min-h-[44px] w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+                    isDark ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+            {/* Navigation Links */}
+            <div className="p-4 space-y-2">
+              {[
+                { label: t.header.nav.about, href: '#about' },
+                { label: t.header.nav.features, href: '#features' },
+                { label: t.header.nav.howItWorks, href: '#how-it-works' },
+                { label: t.header.nav.pricing, href: '#pricing' },
+                { label: t.header.nav.contact, href: '#contact' }
+              ].map((item, i) => (
+                <Link
+                  key={i}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block min-h-[44px] px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                    isDark
+                      ? 'text-gray-300 hover:bg-white/10 hover:text-[#4FD1C5]'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-[#0D6D6E]'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Divider */}
+            <div className={`mx-4 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`} />
+
+            {/* Auth Buttons */}
+            <div className="p-4 space-y-2">
+              <Link
+                href="/login?mode=login"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block w-full min-h-[44px] px-6 py-3 text-center text-sm font-semibold rounded-xl transition-all duration-200 ${
+                  isDark
+                    ? 'text-gray-200 border-2 border-white/20 hover:bg-white/10'
+                    : 'text-gray-700 border-2 border-gray-300 hover:bg-gray-100'
+                }`}
+              >
+                {t.header.auth.login}
+              </Link>
+              <Link
+                href="/login?mode=register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full min-h-[44px] px-6 py-3 text-center text-sm font-semibold bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl hover:shadow-lg hover:shadow-[#0D6D6E]/30 transition-all duration-200"
+              >
+                {t.header.auth.register}
+              </Link>
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
     </header>
   );
 }

@@ -20,7 +20,8 @@
       "ru": "рџ‡·рџ‡є RU",
       "kg": "рџ‡°рџ‡¬ KR",
       "en": "рџ‡¬рџ‡§ EN"
-    }
+    },
+    "mobileMenu": "Menu"
   },
   "auth": {
     "login": {
@@ -282,6 +283,16 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
     }
+  },
+  "requestCard": {
+    "sender": "Son",
+    "status": "Awaiting decision",
+    "category": "Entertainment",
+    "comment": "Movies with friends",
+    "budgetLabel": "Available this month:",
+    "approve": "Approve",
+    "postpone": "Postpone",
+    "reject": "Reject"
   }
 }
 

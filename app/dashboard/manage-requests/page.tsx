@@ -220,12 +220,12 @@ export default function ManageRequestsPage() {
 
   return (
     <>
-      <main className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             👨‍💼 Управление запросами
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Рассматривайте запросы на деньги от членов семьи
           </p>
         </div>
@@ -239,7 +239,7 @@ export default function ManageRequestsPage() {
             <select
               value={selectedFamily}
               onChange={(e) => setSelectedFamily(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
               {families.map((family) => (
                 <option key={family.id} value={family.id}>
@@ -252,14 +252,14 @@ export default function ManageRequestsPage() {
 
         {/* Alert for pending requests */}
         {pendingCount > 0 && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mb-8">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">⚠️</span>
-              <div>
-                <p className="font-semibold text-yellow-900 dark:text-yellow-200">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mb-6 sm:mb-8">
+            <div className="flex items-start gap-3">
+              <span className="text-xl sm:text-2xl shrink-0">⚠️</span>
+              <div className="min-w-0">
+                <p className="font-semibold text-sm sm:text-base text-yellow-900 dark:text-yellow-200 break-words">
                   {pendingCount} {getRequestWord(pendingCount)} {getWaitVerb(pendingCount)} вашего решения
                 </p>
-                <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-300">
                   Рассмотрите запросы как можно скорее
                 </p>
               </div>
@@ -268,40 +268,40 @@ export default function ManageRequestsPage() {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Всего запросов</div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">{requests.length}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Всего запросов</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{requests.length}</div>
           </div>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-yellow-800 dark:text-yellow-400 mb-1">Ожидают</div>
-            <div className="text-2xl font-bold text-yellow-900 dark:text-yellow-300">{pendingCount}</div>
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-400 mb-1">Ожидают</div>
+            <div className="text-xl sm:text-2xl font-bold text-yellow-900 dark:text-yellow-300">{pendingCount}</div>
           </div>
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-green-800 dark:text-green-400 mb-1">Одобрено</div>
-            <div className="text-2xl font-bold text-green-900 dark:text-green-300">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-green-800 dark:text-green-400 mb-1">Одобрено</div>
+            <div className="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-300">
               {requests.filter(r => r.status === 'APPROVED' || r.status === 'COMPLETED').length}
             </div>
           </div>
-          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-red-800 dark:text-red-400 mb-1">Отклонено</div>
-            <div className="text-2xl font-bold text-red-900 dark:text-red-300">
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm text-red-800 dark:text-red-400 mb-1">Отклонено</div>
+            <div className="text-xl sm:text-2xl font-bold text-red-900 dark:text-red-300">
               {requests.filter(r => r.status === 'REJECTED').length}
             </div>
           </div>
         </div>
 
         {/* Requests List */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               Запросы
             </h2>
             {/* Filters */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
               <button
                 onClick={() => setFilter('pending')}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${
                   filter === 'pending'
                     ? 'bg-[#0D6D6E] text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -311,7 +311,7 @@ export default function ManageRequestsPage() {
               </button>
               <button
                 onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${
                   filter === 'all'
                     ? 'bg-[#0D6D6E] text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -342,76 +342,81 @@ export default function ManageRequestsPage() {
                   <div
                     id={`request-${request.id}`}
                     key={request.id}
-                    className={`py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition ${
+                    className={`py-4 px-3 sm:px-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition ${
                       isPending ? 'bg-yellow-50/30 dark:bg-yellow-900/5' : ''
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      {/* Avatar */}
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-semibold flex-shrink-0">
-                        {request.requester.name?.charAt(0) || request.requester.email?.charAt(0) || '?'}
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-                            {request.title}
-                          </h3>
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${badge.color}`}>
-                            {badge.text}
-                          </span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                      {/* Avatar & Info */}
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center text-white font-semibold shrink-0">
+                          {request.requester.name?.charAt(0) || request.requester.email?.charAt(0) || '?'}
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {request.requester.name || request.requester.email}
-                          {request.description && (
-                            <span className="ml-2 text-gray-500 dark:text-gray-500">
-                              • {request.description.length > 50 ? request.description.slice(0, 50) + '...' : request.description}
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                            <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white break-words">
+                              {request.title}
+                            </h3>
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${badge.color} w-fit`}>
+                              {badge.text}
                             </span>
-                          )}
-                        </p>
-                      </div>
-
-                      {/* Amount */}
-                      <div className="text-right flex-shrink-0 min-w-[100px]">
-                        <div className="text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">
-                          {request.amount} {request.currency}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(request.createdAt).toLocaleDateString('ru-RU', { 
-                            day: 'numeric',
-                            month: 'short'
-                          })}
+                          </div>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-words">
+                            {request.requester.name || request.requester.email}
+                            {request.description && (
+                              <span className="ml-2 text-gray-500 dark:text-gray-500">
+                                • {request.description.length > 50 ? request.description.slice(0, 50) + '...' : request.description}
+                              </span>
+                            )}
+                          </p>
                         </div>
                       </div>
 
-                      {/* Actions */}
-                      {isPending ? (
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <Link
-                            href={`/dashboard/manage-requests/${request.id}`}
-                            className="px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white text-sm font-semibold rounded-lg hover:shadow-lg transition"
-                          >
-                            Рассмотреть
-                          </Link>
+                      {/* Amount & Actions */}
+                      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 flex-shrink-0">
+                        {/* Amount */}
+                        <div className="text-left sm:text-right">
+                          <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                            {request.amount} {request.currency}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(request.createdAt).toLocaleDateString('ru-RU', { 
+                              day: 'numeric',
+                              month: 'short'
+                            })}
+                          </div>
                         </div>
-                      ) : (
-                        <div className="flex-shrink-0 min-w-[140px] text-right">
-                          {request.approver && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {request.status === 'REJECTED' ? 'Отклонил' : 'Одобрил'}:
-                              <br />
-                              {request.approver.name || request.approver.email}
-                            </p>
-                          )}
-                        </div>
-                      )}
+
+                        {/* Actions */}
+                        {isPending ? (
+                          <div className="shrink-0">
+                            <Link
+                              href={`/dashboard/manage-requests/${request.id}`}
+                              className="px-3 sm:px-4 py-2 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white text-sm font-semibold rounded-lg hover:shadow-lg transition whitespace-nowrap"
+                            >
+                              Рассмотреть
+                            </Link>
+                          </div>
+                        ) : (
+                          <div className="shrink-0 text-right">
+                            {request.approver && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 break-words">
+                                {request.status === 'REJECTED' ? 'Отклонил' : 'Одобрил'}:
+                                <br />
+                                {request.approver.name || request.approver.email}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Rejection Reason */}
                     {request.status === 'REJECTED' && request.rejectionReason && (
-                      <div className="ml-14 mt-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2">
-                        <p className="text-xs text-red-800 dark:text-red-200">
+                      <div className="mt-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-2">
+                        <p className="text-xs text-red-800 dark:text-red-200 break-words">
                           <strong>Причина:</strong> {request.rejectionReason}
                         </p>
                       </div>
