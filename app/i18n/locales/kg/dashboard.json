@@ -129,12 +129,13 @@
     "noBudgets": "Бюджеттер жок",
     "noBudgetsDescription": "Сизде али бюджеттер жок",
     "selectFamily": "Үй-бүлө тандаңыз:",
-    "totalBudget": "Жалпы бюджет",
-    "spent": "Коротулду",
+    "spent": "Колдонулду",
     "remaining": "Калды",
     "exceeded": "Ашты",
+    "totalBudget": "Жалпы бюджет",
     "warnings": "Эскертүүлөр",
     "period": {
+      "DAILY": "Күн",
       "MONTHLY": "Ай",
       "WEEKLY": "Жума",
       "YEARLY": "Жыл"

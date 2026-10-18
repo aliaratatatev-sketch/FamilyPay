@@ -53,6 +53,7 @@ export default function BudgetsPage() {
   const { t } = useDashboardLocale();
   
   const PERIODS = {
+    DAILY: t.budgetsPage.period.DAILY,
     MONTHLY: t.budgetsPage.period.MONTHLY,
     WEEKLY: t.budgetsPage.period.WEEKLY,
     YEARLY: t.budgetsPage.period.YEARLY,

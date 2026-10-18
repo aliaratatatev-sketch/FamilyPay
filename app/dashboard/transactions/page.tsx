@@ -218,7 +218,6 @@ export default function TransactionsPage() {
       KGS: ' сом',
       USD: '$',
       EUR: '€',
-      KGS: 'сом',
     };
     
     const symbol = symbols[currency] || currency;

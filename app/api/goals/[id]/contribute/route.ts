@@ -6,9 +6,10 @@ import { prisma } from "@/lib/prisma";
 // POST /api/goals/[id]/contribute - Add money to a goal
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -24,7 +25,7 @@ export async function POST(
     }
 
     const goal = await prisma.goal.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!goal) {
@@ -53,7 +54,7 @@ export async function POST(
     const result = await prisma.$transaction(async (tx) => {
       // Update goal current amount
       const updatedGoal = await tx.goal.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           currentAmount: {
             increment: contributionAmount,
@@ -61,14 +62,13 @@ export async function POST(
         },
         include: {
           family: { select: { name: true } },
-          category: { select: { name: true, color: true } },
         },
       });
 
       // Check if goal is completed
       if (updatedGoal.currentAmount >= updatedGoal.targetAmount && updatedGoal.status === "ACTIVE") {
         await tx.goal.update({
-          where: { id: params.id },
+          where: { id },
           data: { status: "COMPLETED" },
         });
         updatedGoal.status = "COMPLETED";
@@ -77,15 +77,15 @@ export async function POST(
       // Create transaction if accountId is provided
       let transaction = null;
       if (createTransaction && accountId) {
-        const account = await tx.account.findUnique({
+        const financialAccount = await tx.financialAccount.findUnique({
           where: { id: accountId },
         });
 
-        if (!account) {
+        if (!financialAccount) {
           throw new Error("Account not found");
         }
 
-        if (account.balance < contributionAmount) {
+        if (Number(financialAccount.balance) < contributionAmount) {
           throw new Error("Insufficient balance");
         }
 
@@ -94,17 +94,16 @@ export async function POST(
           data: {
             type: "EXPENSE",
             amount: contributionAmount,
-            currency: account.currency,
+            currency: financialAccount.currency,
             description: `Вклад в цель: ${goal.name}`,
             accountId,
             familyId: goal.familyId,
             userId: user.id,
-            categoryId: goal.categoryId,
           },
         });
 
         // Update account balance
-        await tx.account.update({
+        await tx.financialAccount.update({
           where: { id: accountId },
           data: {
             balance: {

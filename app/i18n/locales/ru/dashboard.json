@@ -60,6 +60,11 @@
     "title": "Транзакции",
     "subtitle": "История всех операций",
     "addButton": "+ Добавить транзакцию",
+    "addTransaction": "Добавить транзакцию",
+    "addFirstTransaction": "Создайте первую транзакцию",
+    "noTransactions": "Нет транзакций",
+    "noTransactionsDescription": "История транзакций пуста",
+    "tryChangeFilters": "Попробуйте изменить фильтры",
     "filters": {
       "family": "Семья:",
       "account": "Счёт:",
@@ -67,13 +72,24 @@
       "type": "Тип:",
       "allAccounts": "Все счета",
       "allCategories": "Все категории",
-      "allTypes": "Все типы"
+      "allTypes": "Все типы",
+      "typeLabel": "Тип операции",
+      "periodLabel": "Период",
+      "all": "Все",
+      "allTime": "За всё время",
+      "today": "Сегодня",
+      "week": "Неделя",
+      "month": "Месяц",
+      "search": "Поиск",
+      "searchPlaceholder": "Искать по описанию, категории или счёту..."
     },
     "stats": {
       "totalIncome": "Общий доход",
       "totalExpense": "Общий расход",
       "netAmount": "Разница",
-      "transactionsCount": "Транзакций"
+      "transactionsCount": "Транзакций",
+      "totalOperations": "Всего операций",
+      "balance": "Баланс"
     },
     "table": {
       "date": "Дата",
@@ -83,12 +99,27 @@
       "amount": "Сумма",
       "actions": "Действия"
     },
-    "noTransactions": "Нет транзакций",
-    "noTransactionsDescription": "История транзакций пуста",
     "types": {
       "INCOME": "Доход",
       "EXPENSE": "Расход",
       "TRANSFER": "Перевод"
+    },
+    "modal": {
+      "title": "Добавить транзакцию",
+      "subtitle": "Заполните данные транзакции",
+      "typeLabel": "Тип",
+      "accountLabel": "Счёт",
+      "categoryLabel": "Категория",
+      "noCategory": "Без категории",
+      "noAccounts": "Нет доступных счетов",
+      "amountLabel": "Сумма",
+      "amountPlaceholder": "0.00",
+      "dateLabel": "Дата",
+      "descriptionLabel": "Описание",
+      "descriptionPlaceholder": "Описание транзакции...",
+      "submit": "Создать",
+      "submitting": "Создание...",
+      "cancel": "Отмена"
     }
   },
   "budgetsPage": {
@@ -101,7 +132,9 @@
     "spent": "Потрачено",
     "remaining": "Осталось",
     "exceeded": "Превышено",
+    "totalBudget": "Общий бюджет",
     "period": {
+      "DAILY": "День",
       "MONTHLY": "Месяц",
       "WEEKLY": "Неделя",
       "YEARLY": "Год"

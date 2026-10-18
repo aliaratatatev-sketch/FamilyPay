@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-export default function JoinFamilyPage() {
+function JoinFamilyPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -237,5 +237,18 @@ export default function JoinFamilyPage() {
         )}
       </div>
     </div>
+  );
+}
+
+
+export default function JoinFamilyPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-600 text-xl">Загрузка...</div>
+      </div>
+    }>
+      <JoinFamilyPageContent />
+    </Suspense>
   );
 }

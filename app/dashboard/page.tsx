@@ -347,7 +347,6 @@ export default function DashboardPage() {
       KGS: ' сом',
       USD: '$',
       EUR: '€',
-      KGS: 'сом',
     };
     
     const symbol = symbols[currency] || currency;

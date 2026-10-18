@@ -206,7 +206,7 @@ export default function ProfilePage() {
             <div className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700">
               <span className="text-gray-600 dark:text-gray-400">Роль</span>
               <span className="text-gray-900 dark:text-white font-medium">
-                {session?.user?.role === 'SUPER_ADMIN' ? 'Супер-администратор' : 'Пользователь'}
+                {session?.user?.role === 'ADMIN' ? 'Администратор' : 'Пользователь'}
               </span>
             </div>
             <div className="flex justify-between py-2">

@@ -60,6 +60,11 @@
     "title": "Transactions",
     "subtitle": "History of all operations",
     "addButton": "+ Add Transaction",
+    "addTransaction": "Add Transaction",
+    "addFirstTransaction": "Create first transaction",
+    "noTransactions": "No transactions",
+    "noTransactionsDescription": "Transaction history is empty",
+    "tryChangeFilters": "Try changing filters",
     "filters": {
       "family": "Family:",
       "account": "Account:",
@@ -67,13 +72,24 @@
       "type": "Type:",
       "allAccounts": "All accounts",
       "allCategories": "All categories",
-      "allTypes": "All types"
+      "allTypes": "All types",
+      "typeLabel": "Transaction Type",
+      "periodLabel": "Period",
+      "all": "All",
+      "allTime": "All Time",
+      "today": "Today",
+      "week": "Week",
+      "month": "Month",
+      "search": "Search",
+      "searchPlaceholder": "Search by description, category or account..."
     },
     "stats": {
       "totalIncome": "Total Income",
       "totalExpense": "Total Expense",
       "netAmount": "Net Amount",
-      "transactionsCount": "Transactions"
+      "transactionsCount": "Transactions",
+      "totalOperations": "Total Operations",
+      "balance": "Balance"
     },
     "table": {
       "date": "Date",
@@ -83,12 +99,27 @@
       "amount": "Amount",
       "actions": "Actions"
     },
-    "noTransactions": "No transactions",
-    "noTransactionsDescription": "Transaction history is empty",
     "types": {
       "INCOME": "Income",
       "EXPENSE": "Expense",
       "TRANSFER": "Transfer"
+    },
+    "modal": {
+      "title": "Add Transaction",
+      "subtitle": "Fill in transaction details",
+      "typeLabel": "Type",
+      "accountLabel": "Account",
+      "categoryLabel": "Category",
+      "noCategory": "No category",
+      "noAccounts": "No accounts available",
+      "amountLabel": "Amount",
+      "amountPlaceholder": "0.00",
+      "dateLabel": "Date",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Transaction description...",
+      "submit": "Create",
+      "submitting": "Creating...",
+      "cancel": "Cancel"
     }
   },
   "budgetsPage": {
@@ -101,7 +132,9 @@
     "spent": "Spent",
     "remaining": "Remaining",
     "exceeded": "Exceeded",
+    "totalBudget": "Total Budget",
     "period": {
+      "DAILY": "Day",
       "MONTHLY": "Month",
       "WEEKLY": "Week",
       "YEARLY": "Year"
