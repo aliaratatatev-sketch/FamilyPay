@@ -185,7 +185,7 @@ export default function NotificationBell() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-[600px] flex flex-col">
+        <div className="fixed inset-x-4 top-16 w-auto sm:absolute sm:right-0 sm:left-auto sm:top-auto sm:inset-x-auto sm:mt-2 sm:w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-[600px] flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h3 className="text-lg font-bold text-gray-900">Уведомления</h3>
@@ -242,14 +242,14 @@ export default function NotificationBell() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-semibold text-gray-900 text-sm">
+                        <h4 className="font-semibold text-gray-900 text-sm break-words">
                           {notification.title}
                         </h4>
                         {!notification.isRead && (
                           <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2 break-words">
                         {notification.message}
                       </p>
                       <div className="flex items-center justify-between mt-2">

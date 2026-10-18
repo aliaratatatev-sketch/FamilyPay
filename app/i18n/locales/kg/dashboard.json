@@ -59,20 +59,31 @@
   "transactionsPage": {
     "title": "Транзакциялар",
     "subtitle": "Бардык операциялардын тарыхы",
-    "addButton": "+ Транзакция кошуу",
+    "addButton": "Кошуу",
+    "addTransaction": "Транзакция кошуу",
     "filters": {
-      "family": "Үй-бүлө:",
+      "family": "Үй-бүлө",
       "account": "Эсеп:",
       "category": "Категория:",
       "type": "Түрү:",
+      "search": "Издөө",
+      "searchPlaceholder": "Сүрөттөмө, категория боюнча издөө...",
+      "typeLabel": "Операциянын түрү",
+      "periodLabel": "Мезгил",
       "allAccounts": "Бардык эсептер",
       "allCategories": "Бардык категориялар",
-      "allTypes": "Бардык түрлөр"
+      "allTypes": "Бардык түрлөр",
+      "all": "Баары",
+      "today": "Бүгүн",
+      "week": "Жума",
+      "month": "Ай",
+      "allTime": "Бардык убакыт"
     },
     "stats": {
-      "totalIncome": "Жалпы киреше",
-      "totalExpense": "Жалпы чыгым",
-      "netAmount": "Айырма",
+      "totalOperations": "Бардык операциялар",
+      "totalIncome": "Кирешелер",
+      "totalExpense": "Чыгымдар",
+      "balance": "Баланс",
       "transactionsCount": "Транзакциялар"
     },
     "table": {
@@ -85,29 +96,54 @@
     },
     "noTransactions": "Транзакциялар жок",
     "noTransactionsDescription": "Транзакциялардын тарыхы бош",
+    "tryChangeFilters": "Фильтрлерди өзгөртүп көрүңүз",
+    "addFirstTransaction": "Биринчи транзакцияны кошуңуз",
     "types": {
       "INCOME": "Киреше",
       "EXPENSE": "Чыгым",
       "TRANSFER": "Которуу"
+    },
+    "modal": {
+      "title": "Транзакция кошуу",
+      "subtitle": "Кирешени же чыгымды жазуу",
+      "typeLabel": "Операциянын түрү",
+      "accountLabel": "Эсеп",
+      "accountPlaceholder": "Эсепти тандаңыз",
+      "noAccounts": "Жеткиликтүү эсептер жок",
+      "categoryLabel": "Категория",
+      "noCategory": "Категориясыз",
+      "amountLabel": "Сумма",
+      "amountPlaceholder": "0.00",
+      "dateLabel": "Дата",
+      "descriptionLabel": "Сүрөттөмө",
+      "descriptionPlaceholder": "Мисалы: Азык-түлүк сатып алуу",
+      "cancel": "Жокко чыгаруу",
+      "submit": "Кошуу",
+      "submitting": "Кошулууда..."
     }
   },
   "budgetsPage": {
     "title": "Бюджеттер",
     "subtitle": "Үй-бүлө бюджеттерин башкаруу",
-    "addButton": "+ Бюджет түзүү",
+    "addButton": "Бюджет түзүү",
     "noBudgets": "Бюджеттер жок",
     "noBudgetsDescription": "Сизде али бюджеттер жок",
     "selectFamily": "Үй-бүлө тандаңыз:",
+    "totalBudget": "Жалпы бюджет",
     "spent": "Коротулду",
     "remaining": "Калды",
     "exceeded": "Ашты",
+    "warnings": "Эскертүүлөр",
     "period": {
       "MONTHLY": "Ай",
       "WEEKLY": "Жума",
       "YEARLY": "Жыл"
     },
     "limit": "Лимит",
-    "category": "Категория"
+    "category": "Категория",
+    "monthly": "Ай сайын",
+    "from": "башынан",
+    "to": "чейин"
   },
   "goalsPage": {
     "title": "Каржылык максаттар",

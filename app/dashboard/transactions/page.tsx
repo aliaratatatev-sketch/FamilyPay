@@ -291,30 +291,30 @@ export default function TransactionsPage() {
             className="px-6 py-3 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2"
           >
             <span>+</span>
-            <span>Добавить</span>
+            <span>{t.transactionsPage.addButton}</span>
           </button>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Всего операций</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t.transactionsPage.stats.totalOperations}</div>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.count}</div>
           </div>
           <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-green-800 dark:text-green-400 mb-1">Доходы</div>
+            <div className="text-sm text-green-800 dark:text-green-400 mb-1">{t.transactionsPage.stats.totalIncome}</div>
             <div className="text-2xl font-bold text-green-900 dark:text-green-300">
               +{formatAmount(stats.income, selectedFamily?.currency || 'KGS')}
             </div>
           </div>
           <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-red-800 dark:text-red-400 mb-1">Расходы</div>
+            <div className="text-sm text-red-800 dark:text-red-400 mb-1">{t.transactionsPage.stats.totalExpense}</div>
             <div className="text-2xl font-bold text-red-900 dark:text-red-300">
               -{formatAmount(stats.expense, selectedFamily?.currency || 'KGS')}
             </div>
           </div>
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl shadow p-6">
-            <div className="text-sm text-blue-800 dark:text-blue-400 mb-1">Баланс</div>
+            <div className="text-sm text-blue-800 dark:text-blue-400 mb-1">{t.transactionsPage.stats.balance}</div>
             <div className={`text-2xl font-bold ${
               stats.total >= 0 
                 ? 'text-green-900 dark:text-green-300' 
@@ -332,7 +332,7 @@ export default function TransactionsPage() {
             {families.length > 1 && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Семья
+                  {t.transactionsPage.filters.family}
                 </label>
                 <div className="relative">
                   <select
@@ -354,13 +354,13 @@ export default function TransactionsPage() {
             {/* Search */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Поиск
+                {t.transactionsPage.filters.search}
               </label>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Поиск по описанию, категории..."
+                placeholder={t.transactionsPage.filters.searchPlaceholder}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
@@ -368,7 +368,7 @@ export default function TransactionsPage() {
             {/* Type Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Тип операции
+                {t.transactionsPage.filters.typeLabel}
               </label>
               <div className="flex gap-2 flex-wrap">
                 {(['all', 'INCOME', 'EXPENSE', 'TRANSFER'] as const).map((type) => (
@@ -381,7 +381,7 @@ export default function TransactionsPage() {
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
-                    {type === 'all' ? 'Все' : type === 'INCOME' ? 'Доходы' : type === 'EXPENSE' ? 'Расходы' : 'Переводы'}
+                    {type === 'all' ? t.transactionsPage.filters.all : t.transactionsPage.types[type]}
                   </button>
                 ))}
               </div>
@@ -390,7 +390,7 @@ export default function TransactionsPage() {
             {/* Date Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Период
+                {t.transactionsPage.filters.periodLabel}
               </label>
               <div className="flex gap-2 flex-wrap">
                 {(['all', 'today', 'week', 'month'] as const).map((period) => (
@@ -403,7 +403,10 @@ export default function TransactionsPage() {
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                   >
-                    {period === 'all' ? 'Все время' : period === 'today' ? 'Сегодня' : period === 'week' ? 'Неделя' : 'Месяц'}
+                    {period === 'all' ? t.transactionsPage.filters.allTime : 
+                     period === 'today' ? t.transactionsPage.filters.today : 
+                     period === 'week' ? t.transactionsPage.filters.week : 
+                     t.transactionsPage.filters.month}
                   </button>
                 ))}
               </div>
@@ -414,7 +417,7 @@ export default function TransactionsPage() {
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#0D6D6E] mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">Загрузка транзакций...</p>
+              <p className="text-gray-600 dark:text-gray-400">{t.loading}</p>
             </div>
           ) : filteredTransactions.length === 0 ? (
             <div className="text-center py-12">
@@ -422,12 +425,12 @@ export default function TransactionsPage() {
                 <Wallet className="w-16 h-16 text-gray-300 dark:text-gray-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Нет транзакций
+                {t.transactionsPage.noTransactions}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {searchQuery || typeFilter !== 'all' || dateFilter !== 'all' 
-                  ? 'Попробуйте изменить фильтры'
-                  : 'Добавьте первую транзакцию'
+                  ? t.transactionsPage.tryChangeFilters
+                  : t.transactionsPage.addFirstTransaction
                 }
               </p>
               {!searchQuery && typeFilter === 'all' && dateFilter === 'all' && (
@@ -435,7 +438,7 @@ export default function TransactionsPage() {
                   onClick={() => setShowAddModal(true)}
                   className="px-6 py-3 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition"
                 >
-                  Добавить транзакцию
+                  {t.transactionsPage.addTransaction}
                 </button>
               )}
             </div>
@@ -469,7 +472,7 @@ export default function TransactionsPage() {
                           ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
                           : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
                       }`}>
-                        {transaction.type === 'INCOME' ? 'Доход' : transaction.type === 'EXPENSE' ? 'Расход' : 'Перевод'}
+                        {t.transactionsPage.types[transaction.type]}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
@@ -532,6 +535,7 @@ function AddTransactionModal({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const { t } = useDashboardLocale();
   const [formData, setFormData] = useState({
     type: 'EXPENSE' as 'INCOME' | 'EXPENSE' | 'TRANSFER',
     accountId: accounts[0]?.id || '',
@@ -547,13 +551,13 @@ function AddTransactionModal({
     e.preventDefault();
     
     if (!formData.accountId || !formData.amount) {
-      setError('Заполните обязательные поля');
+      setError(t.transactionsPage.modal.accountLabel + ' ' + t.transactionsPage.modal.amountLabel);
       return;
     }
 
     const amountNum = parseFloat(formData.amount);
     if (isNaN(amountNum) || amountNum <= 0) {
-      setError('Введите корректную сумму');
+      setError(t.transactionsPage.modal.amountLabel);
       return;
     }
 
@@ -581,12 +585,12 @@ function AddTransactionModal({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Ошибка при создании транзакции');
+        throw new Error(data.error || t.transactionsPage.modal.title);
       }
 
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка при создании транзакции');
+      setError(err instanceof Error ? err.message : t.transactionsPage.modal.title);
     } finally {
       setIsLoading(false);
     }
@@ -612,10 +616,10 @@ function AddTransactionModal({
             <DollarSign className="w-8 h-8 text-teal-600 dark:text-teal-400" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Добавить транзакцию
+            {t.transactionsPage.modal.title}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Записать доход или расход
+            {t.transactionsPage.modal.subtitle}
           </p>
         </div>
 
@@ -623,7 +627,7 @@ function AddTransactionModal({
           {/* Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Тип операции *
+              {t.transactionsPage.modal.typeLabel} *
             </label>
             <div className="grid grid-cols-3 gap-2">
               {(['INCOME', 'EXPENSE', 'TRANSFER'] as const).map((type) => (
@@ -642,7 +646,7 @@ function AddTransactionModal({
                     {type === 'INCOME' ? <TrendingUp className="w-6 h-6" /> : type === 'EXPENSE' ? <TrendingDown className="w-6 h-6" /> : <ArrowRightLeft className="w-6 h-6" />}
                   </div>
                   <div className="text-xs font-medium text-gray-900 dark:text-white">
-                    {type === 'INCOME' ? 'Доход' : type === 'EXPENSE' ? 'Расход' : 'Перевод'}
+                    {t.transactionsPage.types[type]}
                   </div>
                 </button>
               ))}
@@ -652,23 +656,31 @@ function AddTransactionModal({
           {/* Account */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Счёт *
+              {t.transactionsPage.modal.accountLabel} *
             </label>
-            <div className="relative">
-              <select
-                value={formData.accountId}
-                onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
-                disabled={isLoading}
-                className="appearance-none w-full px-4 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-[#0D6D6E] dark:focus:border-[#4FD1C5] focus:ring-2 focus:ring-[#0D6D6E]/20 dark:focus:ring-[#4FD1C5]/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <option value="">Выберите счёт</option>
-                {accounts.map((account) => (
-                  <option key={account.id} value={account.id}>
-                    {account.name} - {account.balance} {account.currency}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {accounts.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-2">{t.transactionsPage.modal.noAccounts}</p>
+              ) : (
+                accounts.map((account) => (
+                  <button
+                    key={account.id}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, accountId: account.id })}
+                    disabled={isLoading}
+                    className={`w-full p-3 border-2 rounded-lg text-left transition ${
+                      formData.accountId === account.id
+                        ? 'border-[#0D6D6E] bg-[#0D6D6E]/10 dark:bg-[#0D6D6E]/20'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
+                    }`}
+                  >
+                    <div className="font-medium text-gray-900 dark:text-white">{account.name}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {account.balance} {account.currency}
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
           </div>
 
@@ -676,23 +688,39 @@ function AddTransactionModal({
           {filteredCategories.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Категория
+                {t.transactionsPage.modal.categoryLabel}
               </label>
-              <div className="relative">
-                <select
-                  value={formData.categoryId}
-                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, categoryId: '' })}
                   disabled={isLoading}
-                  className="appearance-none w-full px-4 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-[#0D6D6E] dark:focus:border-[#4FD1C5] focus:ring-2 focus:ring-[#0D6D6E]/20 dark:focus:ring-[#4FD1C5]/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full p-3 border-2 rounded-lg text-left transition ${
+                    formData.categoryId === ''
+                      ? 'border-[#0D6D6E] bg-[#0D6D6E]/10 dark:bg-[#0D6D6E]/20'
+                      : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
+                  }`}
                 >
-                  <option value="">Без категории</option>
-                  {filteredCategories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.icon} {category.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                  <div className="font-medium text-gray-900 dark:text-white">{t.transactionsPage.modal.noCategory}</div>
+                </button>
+                {filteredCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, categoryId: category.id })}
+                    disabled={isLoading}
+                    className={`w-full p-3 border-2 rounded-lg text-left transition flex items-center gap-3 ${
+                      formData.categoryId === category.id
+                        ? 'border-[#0D6D6E] bg-[#0D6D6E]/10 dark:bg-[#0D6D6E]/20'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
+                    }`}
+                  >
+                    {category.icon && (
+                      <span className="text-xl">{category.icon}</span>
+                    )}
+                    <div className="font-medium text-gray-900 dark:text-white">{category.name}</div>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -701,14 +729,14 @@ function AddTransactionModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Сумма ({currency}) *
+                {t.transactionsPage.modal.amountLabel} ({currency}) *
               </label>
               <input
                 type="number"
                 step="0.01"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                placeholder="0.00"
+                placeholder={t.transactionsPage.modal.amountPlaceholder}
                 disabled={isLoading}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
@@ -716,7 +744,7 @@ function AddTransactionModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Дата
+                {t.transactionsPage.modal.dateLabel}
               </label>
               <input
                 type="date"
@@ -732,13 +760,13 @@ function AddTransactionModal({
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Описание
+              {t.transactionsPage.modal.descriptionLabel}
             </label>
             <input
               type="text"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Например: Покупка продуктов"
+              placeholder={t.transactionsPage.modal.descriptionPlaceholder}
               disabled={isLoading}
               maxLength={200}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#0D6D6E] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -758,14 +786,14 @@ function AddTransactionModal({
               disabled={isLoading}
               className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
             >
-              Отмена
+              {t.transactionsPage.modal.cancel}
             </button>
             <button
               type="submit"
               disabled={isLoading || !formData.accountId || !formData.amount}
               className="flex-1 py-3 px-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50"
             >
-              {isLoading ? 'Сохранение...' : 'Добавить'}
+              {isLoading ? t.transactionsPage.modal.submitting : t.transactionsPage.modal.submit}
             </button>
           </div>
         </form>

@@ -1,5 +1,5 @@
 /**
- * API: AI Chat с интеграцией Ollama Mistral
+ * API: AI Chat с интеграцией Groq
  * POST /api/ai/chat
  */
 
@@ -7,8 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-const OLLAMA_API_URL = 'http://localhost:11434/api/chat';
-const OLLAMA_MODEL = 'mistral:latest';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'qwen/qwen3.8-27b'; // Qwen 2.5 - поддерживает русский язык
 
 interface ChatRequest {
   message: string;
@@ -19,7 +19,7 @@ interface ChatRequest {
   }>;
 }
 
-interface OllamaMessage {
+interface GroqMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }
@@ -54,58 +54,61 @@ export async function POST(request: NextRequest) {
     // Построение сообщений с системным промптом и историей
     const messages = buildChatMessages(message, userRole, conversationHistory);
 
-    console.log('📤 Sending to Ollama:', {
-      model: OLLAMA_MODEL,
+    console.log('📤 Sending to Groq:', {
+      model: GROQ_MODEL,
       messagesCount: messages.length,
       systemPromptLength: messages[0]?.content?.length,
       hasSystemRole: messages[0]?.role === 'system'
     });
 
-    // Вызов Ollama с chat API
+    // Вызов Groq API
     try {
-      const ollamaResponse = await fetch(OLLAMA_API_URL, {
+      const apiKey = process.env.GROQ_API_KEY;
+      
+      if (!apiKey) {
+        throw new Error('GROQ_API_KEY not configured');
+      }
+
+      const groqResponse = await fetch(GROQ_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: OLLAMA_MODEL,
+          model: GROQ_MODEL,
           messages: messages,
-          stream: false,
-          options: {
-            temperature: 0.7,
-            top_p: 0.9,
-            num_predict: 300, // Короткие ответы (2-4 предложения)
-          }
+          temperature: 0.7,
+          max_tokens: 500,
         }),
       });
 
-      if (!ollamaResponse.ok) {
-        throw new Error(`Ollama API error: ${ollamaResponse.status}`);
+      if (!groqResponse.ok) {
+        throw new Error(`Groq API error: ${groqResponse.status}`);
       }
 
-      const data = await ollamaResponse.json();
-      const aiReply = data.message?.content?.trim() || 'Извините, не смог сформировать ответ.';
+      const data = await groqResponse.json();
+      const aiReply = data.choices?.[0]?.message?.content?.trim() || 'Извините, не смог сформировать ответ.';
 
       console.log('✅ AI response generated');
 
       return NextResponse.json({
         success: true,
         reply: aiReply,
-        model: OLLAMA_MODEL,
+        model: GROQ_MODEL,
       });
 
-    } catch (ollamaError) {
-      console.error('❌ Ollama error:', ollamaError);
+    } catch (groqError) {
+      console.error('❌ Groq error:', groqError);
       
-      // Fallback к симуляции при недоступности Ollama
+      // Fallback к симуляции при недоступности Groq
       const fallbackReply = getFallbackResponse(message, userRole);
       
       return NextResponse.json({
         success: true,
         reply: fallbackReply,
         model: 'fallback',
-        warning: 'Ollama временно недоступен. Используется базовая логика.'
+        warning: 'AI временно недоступен. Используется базовая логика.'
       });
     }
 
@@ -122,14 +125,14 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Построение массива сообщений для Ollama Chat API
+ * Построение массива сообщений для Groq Chat API
  */
 function buildChatMessages(
   message: string,
   userRole: string,
   conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }>
-): OllamaMessage[] {
-  const messages: OllamaMessage[] = [];
+): GroqMessage[] {
+  const messages: GroqMessage[] = [];
 
   // Системный промпт
   const systemPrompt = getSystemPrompt(userRole);
@@ -185,7 +188,7 @@ function getSystemPrompt(userRole: string): string {
 }
 
 /**
- * Fallback ответы при недоступности Ollama
+ * Fallback ответы при недоступности AI
  */
 function getFallbackResponse(message: string, userRole: string): string {
   const lowerMessage = message.toLowerCase();

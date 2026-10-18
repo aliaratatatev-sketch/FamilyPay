@@ -1,6 +1,6 @@
 /**
- * Ollama AI Integration (Локальный AI)
- * Работает без API ключей, полностью на вашем компьютере
+ * Groq AI Integration
+ * Fast AI inference using Groq Cloud API
  */
 
 export interface ExpenseAnalysisRequest {
@@ -40,54 +40,69 @@ export interface AIRecommendation {
   };
 }
 
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'qwen/qwen3.8-27b'; // Qwen 2.5 - мощная модель с поддержкой русского языка
+
 /**
- * Анализ запроса на расход с помощью Ollama Mistral
+ * Анализ запроса на расход с помощью Groq AI
  */
 export async function analyzeExpenseRequest(
   request: ExpenseAnalysisRequest
 ): Promise<AIRecommendation> {
-  console.log('🤖 Ollama: Starting analysis...');
+  console.log('🤖 Groq: Starting analysis...');
 
   try {
-    const prompt = buildAnalysisPrompt(request);
+    const apiKey = process.env.GROQ_API_KEY;
     
-    console.log('🚀 Calling Ollama Mistral...');
+    if (!apiKey) {
+      console.warn('⚠️ GROQ_API_KEY not found, using fallback');
+      return getFallbackRecommendation(request);
+    }
+
+    const messages = buildChatMessages(request);
     
-    // Вызов Ollama через HTTP API (localhost:11434)
-    const response = await fetch('http://localhost:11434/api/generate', {
+    console.log('🚀 Calling Groq API...');
+    
+    const response = await fetch(GROQ_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
       body: JSON.stringify({
-        model: 'mistral',
-        prompt: prompt,
-        stream: false,
-        options: {
-          temperature: 0.7,
-          top_p: 0.9,
-        }
+        model: GROQ_MODEL,
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1000,
+        response_format: { type: 'json_object' },
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`Groq API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    const text = data.response;
+    const text = data.choices?.[0]?.message?.content;
 
-    console.log('✅ Got response from Ollama');
+    if (!text) {
+      throw new Error('No response from Groq');
+    }
+
+    console.log('✅ Got response from Groq');
     return parseAIResponse(text);
     
   } catch (error) {
-    console.error('❌ Ошибка Ollama:', error);
+    console.error('❌ Ошибка Groq:', error);
     return getFallbackRecommendation(request);
   }
 }
 
 /**
- * Построение промпта для Mistral
+ * Построение сообщений для Groq Chat API
  */
-function buildAnalysisPrompt(request: ExpenseAnalysisRequest): string {
+function buildChatMessages(request: ExpenseAnalysisRequest) {
   const {
     amount,
     category,
@@ -99,13 +114,7 @@ function buildAnalysisPrompt(request: ExpenseAnalysisRequest): string {
     goals
   } = request;
 
-  let prompt = `Ты — AI-помощник для семейных финансов FamilyPay. Проанализируй запрос на расход и дай рекомендацию.
-
-ВАЖНО:
-- Отвечай ТОЛЬКО на русском языке
-- Будь тактичным, но честным
-- Используй только предоставленные данные
-- Твоя рекомендация — это совет, решение принимает человек
+  let userContent = `Проанализируй запрос на расход:
 
 ЗАПРОС:
 Сумма: ${amount} сом
@@ -118,7 +127,7 @@ ${comment ? `Комментарий: "${comment}"` : ''}
 `;
 
   if (currentBudget) {
-    prompt += `
+    userContent += `
 Бюджет "${currentBudget.category}":
 - Лимит: ${currentBudget.limit} сом/месяц
 - Потрачено: ${currentBudget.spent} сом
@@ -127,21 +136,30 @@ ${comment ? `Комментарий: "${comment}"` : ''}
   }
 
   if (recentExpenses.length > 0) {
-    prompt += `\nПоследние расходы в "${category}":\n`;
+    userContent += `\nПоследние расходы в "${category}":\n`;
     recentExpenses.slice(0, 5).forEach((e, i) => {
-      prompt += `${i + 1}. ${e.amount} сом (${new Date(e.date).toLocaleDateString('ru-RU')})\n`;
+      userContent += `${i + 1}. ${e.amount} сом (${new Date(e.date).toLocaleDateString('ru-RU')})\n`;
     });
   }
 
   if (goals && goals.length > 0) {
-    prompt += '\nФинансовые цели:\n';
+    userContent += '\nФинансовые цели:\n';
     goals.forEach((goal, i) => {
       const progress = Math.round((goal.current / goal.target) * 100);
-      prompt += `${i + 1}. ${goal.name}: ${goal.current}/${goal.target} сом (${progress}%)\n`;
+      userContent += `${i + 1}. ${goal.name}: ${goal.current}/${goal.target} сом (${progress}%)\n`;
     });
   }
 
-  prompt += `
+  return [
+    {
+      role: 'system',
+      content: `Ты — AI-помощник для семейных финансов FamilyPay. Проанализируй запрос на расход и дай рекомендацию.
+
+ВАЖНО:
+- Отвечай ТОЛЬКО на русском языке
+- Будь тактичным, но честным
+- Используй только предоставленные данные
+- Твоя рекомендация — это совет, решение принимает человек
 
 ФОРМАТ ОТВЕТА (строго JSON):
 {
@@ -163,23 +181,21 @@ ${comment ? `Комментарий: "${comment}"` : ''}
 - "defer": лучше отложить
 - "reject": рекомендуется отклонить
 
-Ответь ТОЛЬКО JSON без дополнительного текста:`;
-
-  return prompt;
+Ответь ТОЛЬКО валидным JSON без дополнительного текста.`
+    },
+    {
+      role: 'user',
+      content: userContent
+    }
+  ];
 }
 
 /**
- * Парсинг ответа от Mistral
+ * Парсинг ответа от Groq
  */
 function parseAIResponse(text: string): AIRecommendation {
   try {
-    // Извлекаем JSON из ответа
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('JSON не найден в ответе');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(text);
 
     return {
       decision: parsed.decision || 'consider',
@@ -200,7 +216,7 @@ function parseAIResponse(text: string): AIRecommendation {
 }
 
 /**
- * Fallback если Ollama недоступен
+ * Fallback если Groq недоступен
  */
 function getFallbackRecommendation(
   request: ExpenseAnalysisRequest
@@ -232,7 +248,7 @@ function getFallbackRecommendation(
   return {
     decision,
     confidence: 60,
-    reasoning: 'Ollama временно недоступен. Используется базовая проверка.',
+    reasoning: 'AI временно недоступен. Используется базовая проверка.',
     warnings,
     suggestions,
     impact: {

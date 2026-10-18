@@ -48,16 +48,16 @@ interface Family {
   currency: string;
 }
 
-const PERIODS = {
-  DAILY: "День",
-  WEEKLY: "Неделя",
-  MONTHLY: "Месяц",
-  YEARLY: "Год",
-};
-
 export default function BudgetsPage() {
   const { data: session, status } = useSession();
   const { t } = useDashboardLocale();
+  
+  const PERIODS = {
+    MONTHLY: t.budgetsPage.period.MONTHLY,
+    WEEKLY: t.budgetsPage.period.WEEKLY,
+    YEARLY: t.budgetsPage.period.YEARLY,
+  };
+  
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [families, setFamilies] = useState<Family[]>([]);
@@ -353,7 +353,7 @@ export default function BudgetsPage() {
                 <Wallet className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Общий бюджет</p>
+                <p className="text-gray-600 text-sm">{t.budgetsPage.totalBudget}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {totalBudget.toLocaleString("ru-RU")} сом
                 </p>
@@ -367,7 +367,7 @@ export default function BudgetsPage() {
                 <TrendingUp className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Потрачено</p>
+                <p className="text-gray-600 text-sm">{t.budgetsPage.spent}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {totalSpent.toLocaleString("ru-RU")} сом
                 </p>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useDashboardLocale } from '@/app/i18n/useDashboardLocale';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Wallet, Building2, CreditCard, PiggyBank, TrendingUp, HandCoins } from 'lucide-react';
 
 interface Account {
   id: string;
@@ -325,16 +325,12 @@ function CreateAccountModal({
   const [error, setError] = useState('');
 
   const accountTypes = [
-    { value: 'CASH', label: 'Наличные', icon: '💵' },
-    { value: 'BANK_ACCOUNT', label: 'Банковский счёт', icon: '🏦' },
-    { value: 'CARD', label: 'Карта', icon: '💳' },
-    { value: 'SAVINGS', label: 'Накопления', icon: '🏦' },
-    { value: 'INVESTMENT', label: 'Инвестиции', icon: '📈' },
-    { value: 'DEBT', label: 'Долг', icon: '💳' },
-  ];
-
-  const currencies = [
-    { code: 'KGS', name: 'Кыргызский сом', symbol: 'сом' },
+    { value: 'CASH', label: 'Наличные', Icon: Wallet },
+    { value: 'BANK_ACCOUNT', label: 'Банковский счёт', Icon: Building2 },
+    { value: 'CARD', label: 'Карта', Icon: CreditCard },
+    { value: 'SAVINGS', label: 'Накопления', Icon: PiggyBank },
+    { value: 'INVESTMENT', label: 'Инвестиции', Icon: TrendingUp },
+    { value: 'DEBT', label: 'Долг', Icon: HandCoins },
   ];
 
   const colors = [
@@ -367,7 +363,6 @@ function CreateAccountModal({
         body: JSON.stringify({
           ...formData,
           balance: parseFloat(formData.balance) || 0,
-          icon: formData.icon || accountTypes.find(t => t.value === formData.type)?.icon,
         }),
       });
 
@@ -398,7 +393,7 @@ function CreateAccountModal({
 
         <div className="text-center mb-6">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0D6D6E] to-[#4FD1C5] flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">💳</span>
+            <CreditCard className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Добавить счёт
@@ -452,24 +447,27 @@ function CreateAccountModal({
               Тип счёта *
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {accountTypes.map((type) => (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, type: type.value })}
-                  disabled={isLoading}
-                  className={`p-3 border-2 rounded-lg text-center transition ${
-                    formData.type === type.value
-                      ? 'border-[#0D6D6E] bg-[#0D6D6E]/10 dark:bg-[#0D6D6E]/20'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{type.icon}</div>
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">
-                    {type.label}
-                  </div>
-                </button>
-              ))}
+              {accountTypes.map((type) => {
+                const IconComponent = type.Icon;
+                return (
+                  <button
+                    key={type.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, type: type.value })}
+                    disabled={isLoading}
+                    className={`p-3 border-2 rounded-lg text-center transition ${
+                      formData.type === type.value
+                        ? 'border-[#0D6D6E] bg-[#0D6D6E]/10 dark:bg-[#0D6D6E]/20'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-[#0D6D6E]/50'
+                    }`}
+                  >
+                    <IconComponent className="w-6 h-6 mx-auto mb-1 text-[#0D6D6E] dark:text-[#4FD1C5]" />
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      {type.label}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -493,20 +491,8 @@ function CreateAccountModal({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Валюта
               </label>
-              <div className="relative">
-                <select
-                  value={formData.currency}
-                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                  disabled={isLoading}
-                  className="appearance-none w-full px-4 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-[#0D6D6E] dark:focus:border-[#4FD1C5] focus:ring-2 focus:ring-[#0D6D6E]/20 dark:focus:ring-[#4FD1C5]/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {currencies.map((curr) => (
-                    <option key={curr.code} value={curr.code}>
-                      {curr.name} ({curr.symbol})
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
+                <p className="text-gray-900 dark:text-white font-medium">Кыргызский сом (сом)</p>
               </div>
             </div>
           </div>

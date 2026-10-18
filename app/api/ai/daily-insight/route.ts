@@ -5,8 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const OLLAMA_API_URL = 'http://localhost:11434/api/chat';
-const OLLAMA_MODEL = 'mistral:latest';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'qwen/qwen3.8-27b';
 
 interface InsightRequest {
   totalBalance: number;
@@ -59,26 +59,32 @@ ${topCategory ? `- Топ категория: ${topCategory}` : ''}
     ];
 
     try {
-      const ollamaResponse = await fetch(OLLAMA_API_URL, {
+      const apiKey = process.env.GROQ_API_KEY;
+      
+      if (!apiKey) {
+        throw new Error('GROQ_API_KEY not configured');
+      }
+
+      const groqResponse = await fetch(GROQ_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
         body: JSON.stringify({
-          model: OLLAMA_MODEL,
+          model: GROQ_MODEL,
           messages: messages,
-          stream: false,
-          options: {
-            temperature: 0.7,
-            num_predict: 100,
-          }
+          temperature: 0.7,
+          max_tokens: 150,
         }),
       });
 
-      if (!ollamaResponse.ok) {
-        throw new Error(`Ollama API error: ${ollamaResponse.status}`);
+      if (!groqResponse.ok) {
+        throw new Error(`Groq API error: ${groqResponse.status}`);
       }
 
-      const data = await ollamaResponse.json();
-      const insight = data.message?.content?.trim();
+      const data = await groqResponse.json();
+      const insight = data.choices?.[0]?.message?.content?.trim();
 
       if (insight) {
         return NextResponse.json({
@@ -89,8 +95,8 @@ ${topCategory ? `- Топ категория: ${topCategory}` : ''}
 
       throw new Error('No response from AI');
 
-    } catch (ollamaError) {
-      console.error('❌ Ollama error:', ollamaError);
+    } catch (groqError) {
+      console.error('❌ Groq error:', groqError);
       
       // Fallback инсайты
       let insight = '';

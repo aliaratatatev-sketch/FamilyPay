@@ -42,7 +42,7 @@ export default function DemoAIPage() {
             🤖 AI-помощник FamilyPay
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            Умный анализ финансовых запросов с помощью Ollama Mistral (локальный AI)
+            Умный анализ финансовых запросов с помощью Groq AI (Qwen 2.5 27B)
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-medium">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
@@ -170,7 +170,7 @@ export default function DemoAIPage() {
           <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-400">
             <li className="flex items-start gap-2">
               <span className="text-blue-500 mt-0.5">•</span>
-              <span>Работает полностью локально на вашем компьютере (Ollama Mistral 7B)</span>
+              <span>Работает через облачный Groq API (быстрые ответы на базе Qwen 2.5 27B)</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-500 mt-0.5">•</span>
@@ -198,7 +198,7 @@ export default function DemoAIPage() {
         {/* Футер */}
         <div className="text-center text-sm text-gray-500 dark:text-gray-400 space-y-2">
           <p>
-            Powered by <strong>Ollama Mistral 7B</strong> (локальный AI)
+            Powered by <strong>Groq AI</strong> (Qwen 2.5 27B)
           </p>
           <p>
             Это демо-страница. В реальном приложении AI интегрирован в модерацию запросов.

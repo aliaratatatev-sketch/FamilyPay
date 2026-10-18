@@ -146,7 +146,7 @@ export default function AIAssistantPage() {
 
   const getAIResponse = async (message: string, role: string): Promise<string> => {
     try {
-      // Вызов API с интеграцией Ollama
+      // Вызов API с интеграцией Groq
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: {
@@ -247,17 +247,17 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <main className="container mx-auto px-4 sm:px-6 py-6 max-w-5xl">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full max-w-full overflow-x-hidden">
+      <main className="container mx-auto p-4 sm:px-6 sm:py-6 max-w-5xl w-full">
         {/* Hero Section */}
         <div className="mb-4 sm:mb-6 text-center">
           <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-3 shadow-lg">
             <span className="text-2xl sm:text-3xl">🤖</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 break-words px-2">
             ИИ Финансовый Ассистент
           </h1>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4 break-words">
             {userRole === 'TEEN' || userRole === 'VIEWER' 
               ? 'Твой личный помощник, который научит копить и разумно тратить! 🎯'
               : 'Персональный помощник для анализа расходов и оптимизации семейного бюджета'}
@@ -265,16 +265,16 @@ export default function AIAssistantPage() {
         </div>
 
         {/* Chat Container */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 240px)', minHeight: '400px' }}>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col w-full max-w-full" style={{ height: 'calc(100vh - 240px)', minHeight: '400px' }}>
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-4 w-full">
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}
               >
                 <div
-                  className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-3 ${
+                  className={`max-w-[90%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-3 ${
                     message.role === 'user'
                       ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
@@ -297,8 +297,8 @@ export default function AIAssistantPage() {
             ))}
             
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-gray-100 dark:bg-gray-700">
+              <div className="flex justify-start w-full">
+                <div className="max-w-[90%] sm:max-w-[80%] rounded-2xl px-4 py-3 bg-gray-100 dark:bg-gray-700">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">🤖</span>
                     <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">AI Ассистент</span>
@@ -316,25 +316,25 @@ export default function AIAssistantPage() {
           </div>
 
           {/* Quick Prompts */}
-          <div className="border-t border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 bg-gray-50 dark:bg-gray-800/50">
-            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap">
+          <div className="border-t border-gray-200 dark:border-gray-700 px-3 sm:px-4 md:px-6 py-3 bg-gray-50 dark:bg-gray-800/50 w-full overflow-x-hidden">
+            <div className="flex flex-wrap gap-2">
               {quickPrompts.map((prompt, index) => (
                 <button
                   key={index}
                   onClick={() => handleQuickPrompt(prompt.text)}
                   disabled={isLoading}
-                  className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-300 dark:hover:border-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap shrink-0"
+                  className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-300 dark:hover:border-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 break-words"
                 >
-                  <span>{prompt.icon}</span>
-                  <span>{prompt.text}</span>
+                  <span className="shrink-0">{prompt.icon}</span>
+                  <span className="break-words">{prompt.text}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4">
-            <div className="flex gap-2 sm:gap-3">
+          <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4 w-full">
+            <div className="flex gap-2 sm:gap-3 w-full">
               <textarea
                 ref={inputRef}
                 value={inputMessage}
@@ -343,13 +343,13 @@ export default function AIAssistantPage() {
                 placeholder={userRole === 'TEEN' || userRole === 'VIEWER' ? 'Спроси меня о деньгах...' : 'Задайте вопрос ассистенту...'}
                 disabled={isLoading}
                 rows={1}
-                className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none disabled:opacity-50 disabled:cursor-not-allowed min-w-0"
+                className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none disabled:opacity-50 disabled:cursor-not-allowed min-w-0 w-full"
                 style={{ minHeight: '44px', maxHeight: '120px' }}
               />
               <button
                 onClick={() => handleSendMessage()}
                 disabled={!inputMessage.trim() || isLoading}
-                className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0"
+                className="px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0"
               >
                 {isLoading ? (
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -364,18 +364,18 @@ export default function AIAssistantPage() {
                 <span className="hidden sm:inline">Отправить</span>
               </button>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center px-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center px-2 break-words">
               💡 Нажмите Enter для отправки, Shift+Enter для новой строки
             </p>
           </div>
         </div>
 
         {/* Info Banner */}
-        <div className="mt-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-200 dark:border-purple-800 rounded-xl p-3 sm:p-4">
+        <div className="mt-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-200 dark:border-purple-800 rounded-xl p-3 sm:p-4 w-full max-w-full overflow-hidden">
           <div className="flex items-start gap-2 sm:gap-3">
             <span className="text-xl sm:text-2xl shrink-0">✨</span>
             <div className="flex-1 min-w-0">
-              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-1">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-1 break-words">
                 {userRole === 'TEEN' || userRole === 'VIEWER' ? 'Что я умею?' : 'Возможности AI-ассистента'}
               </h3>
               <p className="text-xs text-gray-600 dark:text-gray-400 break-words">

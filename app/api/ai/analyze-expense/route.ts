@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Симулируем AI анализ для демонстрации
-    // В реальной версии здесь будет вызов Ollama или другой AI модели
+    // В реальной версии здесь будет вызов Groq или другой AI модели
     const analysis = analyzeExpenseText(description);
 
     return NextResponse.json({
