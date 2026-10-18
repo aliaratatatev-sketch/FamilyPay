@@ -6,6 +6,7 @@
     "dev": "node scripts/dev-with-qr.js",
     "dev:clean": "next dev",
     "build": "next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
     "fix:escape": "node scripts/fix-escape-errors.js",
