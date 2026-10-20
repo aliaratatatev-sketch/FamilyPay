@@ -72,16 +72,28 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Проверяем, существует ли пользователь в базе данных
-        const existingUser = await prisma.user.findUnique({
+        let existingUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
         
+        // Если пользователя нет — создаём его автоматически
         if (!existingUser) {
-          console.log('❌ Пользователь не найден в базе данных:', user.email);
-          return false; // Блокируем вход для несуществующих пользователей
+          console.log('🆕 Создаём нового пользователя:', user.email);
+          
+          existingUser = await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name || 'Пользователь',
+              emailVerified: new Date(), // Google уже верифицировал email
+              role: 'PARENT', // Роль по умолчанию
+            },
+          });
+          
+          console.log('✅ Пользователь создан:', existingUser.email);
+        } else {
+          console.log('✅ Пользователь найден в базе:', existingUser.email);
         }
         
-        console.log('✅ Пользователь найден в базе:', existingUser.email);
         return true;
       }
       
