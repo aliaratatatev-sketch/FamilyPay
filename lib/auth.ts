@@ -11,6 +11,14 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      // Явно указываем параметры авторизации без дублирования redirect_uri
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -85,17 +93,21 @@ export const authOptions: NextAuthOptions = {
       console.log('URL:', url);
       console.log('BaseURL:', baseUrl);
       
+      // Используем переменную окружения напрямую для продакшена
+      const actualBaseUrl = process.env.NEXTAUTH_URL || baseUrl;
+      console.log('ActualBaseURL:', actualBaseUrl);
+      
       // После успешного входа перенаправляем на dashboard
       if (url.startsWith('/')) {
-        console.log('Redirecting to:', `${baseUrl}${url}`);
-        return `${baseUrl}${url}`;
+        console.log('Redirecting to:', `${actualBaseUrl}${url}`);
+        return `${actualBaseUrl}${url}`;
       }
-      else if (new URL(url).origin === baseUrl) {
+      else if (new URL(url).origin === actualBaseUrl) {
         console.log('Redirecting to:', url);
         return url;
       }
-      console.log('Redirecting to dashboard:', `${baseUrl}/dashboard`);
-      return `${baseUrl}/dashboard`;
+      console.log('Redirecting to dashboard:', `${actualBaseUrl}/dashboard`);
+      return `${actualBaseUrl}/dashboard`;
     },
     async session({ session, token, user }) {
       console.log('📝 Session callback triggered');
