@@ -40,22 +40,8 @@ function LoginPageContent() {
     setLoading(true);
     setError('');
     try {
-      // Получаем параметр redirect из URL
-      const redirectUrl = searchParams.get('redirect') || '/dashboard';
-      
-      // Используем redirect: false для обработки ошибок
-      const result = await signIn('google', {
-        callbackUrl: redirectUrl,
-        redirect: false,
-      });
-      
-      if (result?.error) {
-        setError('Доступ запрещен. Ваш аккаунт не зарегистрирован в системе.');
-        setLoading(false);
-      } else if (result?.ok) {
-        // Успешный вход, перенаправляем вручную
-        router.push(redirectUrl);
-      }
+      // Просто вызываем signIn без callbackUrl - NextAuth сам обработает редирект
+      await signIn('google');
     } catch (err) {
       setError('Ошибка соединения с сервером');
       setLoading(false);
