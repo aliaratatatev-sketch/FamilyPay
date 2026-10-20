@@ -64,36 +64,15 @@ export const authOptions: NextAuthOptions = {
       console.log('User:', user?.email);
       console.log('Account provider:', account?.provider);
       
-      // Если это вход через Google
+      // Если это вход через Google, просто разрешаем
+      // PrismaAdapter автоматически создаст пользователя, если его нет
       if (account?.provider === 'google') {
         if (!user.email) {
           console.log('❌ Нет email от Google');
           return false;
         }
         
-        // Проверяем, существует ли пользователь в базе данных
-        let existingUser = await prisma.user.findUnique({
-          where: { email: user.email },
-        });
-        
-        // Если пользователя нет — создаём его автоматически
-        if (!existingUser) {
-          console.log('🆕 Создаём нового пользователя:', user.email);
-          
-          existingUser = await prisma.user.create({
-            data: {
-              email: user.email,
-              name: user.name || 'Пользователь',
-              emailVerified: new Date(), // Google уже верифицировал email
-              role: 'PARENT', // Роль по умолчанию
-            },
-          });
-          
-          console.log('✅ Пользователь создан:', existingUser.email);
-        } else {
-          console.log('✅ Пользователь найден в базе:', existingUser.email);
-        }
-        
+        console.log('✅ Разрешаем вход через Google для:', user.email);
         return true;
       }
       
