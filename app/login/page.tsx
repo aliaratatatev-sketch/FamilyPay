@@ -40,9 +40,17 @@ function LoginPageContent() {
     setLoading(true);
     setError('');
     try {
-      // Просто вызываем signIn без callbackUrl - NextAuth сам обработает редирект
-      await signIn('google');
+      // Получаем параметр redirect из URL
+      const redirectUrl = searchParams.get('redirect') || '/dashboard';
+      
+      // Вызываем signIn с callbackUrl и redirect: true (по умолчанию)
+      // NextAuth автоматически перенаправит после успешного входа
+      await signIn('google', { 
+        callbackUrl: redirectUrl,
+        redirect: true 
+      });
     } catch (err) {
+      console.error('Google sign-in error:', err);
       setError('Ошибка соединения с сервером');
       setLoading(false);
     }

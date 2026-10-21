@@ -11,7 +11,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      // Явно указываем параметры авторизации без дублирования redirect_uri
       authorization: {
         params: {
           prompt: "consent",
@@ -64,8 +63,7 @@ export const authOptions: NextAuthOptions = {
       console.log('User:', user?.email);
       console.log('Account provider:', account?.provider);
       
-      // Если это вход через Google, просто разрешаем
-      // PrismaAdapter автоматически создаст пользователя, если его нет
+      // Если это вход через Google
       if (account?.provider === 'google') {
         if (!user.email) {
           console.log('❌ Нет email от Google');
@@ -73,10 +71,12 @@ export const authOptions: NextAuthOptions = {
         }
         
         console.log('✅ Разрешаем вход через Google для:', user.email);
+        // PrismaAdapter автоматически создаст пользователя и account в БД
         return true;
       }
       
       // Для других методов входа (credentials) разрешаем
+      console.log('✅ Разрешаем вход через credentials');
       return true;
     },
     async redirect({ url, baseUrl }) {
@@ -84,21 +84,34 @@ export const authOptions: NextAuthOptions = {
       console.log('URL:', url);
       console.log('BaseURL:', baseUrl);
       
-      // Используем переменную окружения напрямую для продакшена
-      const actualBaseUrl = process.env.NEXTAUTH_URL || baseUrl;
-      console.log('ActualBaseURL:', actualBaseUrl);
+      // Всегда используем baseUrl, который NextAuth определяет автоматически
+      // На Vercel это будет правильный URL продакшена
+      console.log('Using baseUrl:', baseUrl);
       
-      // После успешного входа перенаправляем на dashboard
+      // Если URL относительный (начинается с /)
       if (url.startsWith('/')) {
-        console.log('Redirecting to:', `${actualBaseUrl}${url}`);
-        return `${actualBaseUrl}${url}`;
+        const redirectUrl = `${baseUrl}${url}`;
+        console.log('Redirecting to relative path:', redirectUrl);
+        return redirectUrl;
       }
-      else if (new URL(url).origin === actualBaseUrl) {
-        console.log('Redirecting to:', url);
-        return url;
+      
+      // Если URL абсолютный и соответствует baseUrl
+      try {
+        const urlObj = new URL(url);
+        const baseUrlObj = new URL(baseUrl);
+        
+        if (urlObj.origin === baseUrlObj.origin) {
+          console.log('Redirecting to same origin:', url);
+          return url;
+        }
+      } catch (e) {
+        console.error('Error parsing URL:', e);
       }
-      console.log('Redirecting to dashboard:', `${actualBaseUrl}/dashboard`);
-      return `${actualBaseUrl}/dashboard`;
+      
+      // По умолчанию перенаправляем на dashboard
+      const dashboardUrl = `${baseUrl}/dashboard`;
+      console.log('Redirecting to default dashboard:', dashboardUrl);
+      return dashboardUrl;
     },
     async session({ session, token, user }) {
       console.log('📝 Session callback triggered');
