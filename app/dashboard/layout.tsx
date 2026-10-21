@@ -7,6 +7,8 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import NotificationBell from "@/components/NotificationBell";
 import ThemeToggle from "@/app/components/ThemeToggle";
 import LanguageSwitcher from "@/app/components/dashboard/LanguageSwitcher";
+import UrgentNotificationListener from "@/app/components/UrgentNotificationListener";
+import AudioUnlockPrompt from "@/app/components/AudioUnlockPrompt";
 import { LogOut } from "lucide-react";
 
 export default function DashboardLayout({
@@ -36,6 +38,12 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+      {/* Urgent Notification Listener - воспроизводит рингтон для срочных уведомлений */}
+      <UrgentNotificationListener />
+      
+      {/* Audio Unlock Prompt - просит пользователя разрешить звук */}
+      <AudioUnlockPrompt />
+      
       {/* Sidebar */}
       <Sidebar />
 

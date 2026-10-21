@@ -124,7 +124,9 @@ export default function NotificationsPage() {
       const res = await fetch("/api/notifications");
       if (res.ok) {
         const data = await res.json();
-        setNotifications(Array.isArray(data) ? data : []);
+        // Поддержка нового формата API { notifications: [...] }
+        const notificationsList = data.notifications || (Array.isArray(data) ? data : []);
+        setNotifications(notificationsList);
       } else {
         console.error("Failed to fetch notifications:", res.statusText);
         setNotifications([]);

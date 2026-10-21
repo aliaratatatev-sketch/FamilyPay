@@ -50,6 +50,7 @@ export default function MoneyRequestsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [callingRequests, setCallingRequests] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -134,6 +135,37 @@ export default function MoneyRequestsPage() {
     } catch (error) {
       console.error('Error cancelling request:', error);
       alert('Ошибка при отмене запроса');
+    }
+  };
+
+  const handleUrgentCall = async (requestId: string) => {
+    try {
+      setCallingRequests(prev => new Set(prev).add(requestId));
+      
+      const response = await fetch(`/api/money-requests/${requestId}/urgent-call`, {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка при отправке срочного вызова');
+      }
+
+      // Показываем уведомление об успехе
+      alert('📞 Срочное уведомление отправлено членам семьи!');
+    } catch (error) {
+      console.error('Error sending urgent call:', error);
+      alert(error instanceof Error ? error.message : 'Ошибка при отправке срочного вызова');
+    } finally {
+      // Убираем состояние через 3 секунды
+      setTimeout(() => {
+        setCallingRequests(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(requestId);
+          return newSet;
+        });
+      }, 3000);
     }
   };
 
@@ -334,8 +366,18 @@ export default function MoneyRequestsPage() {
                     {request.status === 'PENDING' && (
                       <div className="flex gap-2">
                         <button
+                          onClick={() => handleUrgentCall(request.id)}
+                          disabled={callingRequests.has(request.id)}
+                          className={`px-4 py-2 text-sm bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2 ${
+                            callingRequests.has(request.id) ? 'animate-pulse opacity-75' : ''
+                          }`}
+                          title="Отправить срочное уведомление членам семьи"
+                        >
+                          🚨 Срочный вызов
+                        </button>
+                        <button
                           onClick={() => handleCancelRequest(request.id)}
-                          className="w-full sm:w-auto px-4 py-2 text-sm bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition"
+                          className="flex-1 sm:flex-none px-4 py-2 text-sm bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition"
                         >
                           Отменить запрос
                         </button>

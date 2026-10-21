@@ -51,8 +51,10 @@ export default function NotificationBell() {
       const res = await fetch("/api/notifications?limit=10");
       if (res.ok) {
         const data = await res.json();
-        setNotifications(data);
-        setUnreadCount(data.filter((n: Notification) => !n.isRead).length);
+        // Поддержка нового формата API { notifications: [...] }
+        const notificationsList = data.notifications || data;
+        setNotifications(notificationsList);
+        setUnreadCount(notificationsList.filter((n: Notification) => !n.isRead).length);
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);

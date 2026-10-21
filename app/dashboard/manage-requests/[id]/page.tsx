@@ -70,6 +70,33 @@ export default function RequestDetailPage() {
   
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+
+  // Проверка на партнерские предложения (только для еды)
+  const checkPartnerOffer = () => {
+    if (!request) return false;
+    const titleLower = request.title.toLowerCase();
+    const descLower = (request.description || '').toLowerCase();
+    const foodTriggers = ['еда', 'фастфуд', 'пицц', 'кафе', 'ресторан', 'dodo', 'бургер', 'шаурм', 'суши', 'обед', 'ужин', 'завтрак', 'перекус', 'голод'];
+    return foodTriggers.some(trigger => titleLower.includes(trigger) || descLower.includes(trigger));
+  };
+
+  const promoCode = 'FAMILY15';
+  const discount = '15%';
+  const partner = 'Dodo Pizza';
+  const savings = '~105 KGS';
+
+  const handleCopyPromo = async () => {
+    try {
+      await navigator.clipboard.writeText(promoCode);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const hasPartnerOffer = checkPartnerOffer();
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -422,6 +449,44 @@ export default function RequestDetailPage() {
                   Действия
                 </h3>
                 <div className="space-y-3">
+                  
+                  {/* Партнерское предложение */}
+                  {hasPartnerOffer && (
+                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 p-4 border-2 border-transparent animate-fade-in">
+                      {/* Градиентная рамка */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 opacity-50 blur-sm" />
+                      <div className="absolute inset-[2px] bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 rounded-[10px]" />
+                      
+                      {/* Контент плашки */}
+                      <div className="relative space-y-3">
+                        <div className="flex items-start gap-2">
+                          <span className="text-xl flex-shrink-0">🎁</span>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug">
+                              Партнерское предложение
+                            </p>
+                            <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+                              Скидка <span className="font-bold text-purple-600 dark:text-purple-400">{discount}</span> в{' '}
+                              <span className="font-bold">{partner}</span> по промокоду{' '}
+                              <span className="font-mono font-bold text-pink-600 dark:text-pink-400">{promoCode}</span>
+                            </p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                              💰 Экономия {savings}!
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Кнопка копирования промокода */}
+                        <button
+                          onClick={handleCopyPromo}
+                          className="w-full py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                        >
+                          📋 Скопировать промокод
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <button
                     onClick={() => setShowApproveModal(true)}
                     className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transition"
@@ -483,6 +548,18 @@ export default function RequestDetailPage() {
             router.push('/dashboard/manage-requests');
           }}
         />
+      )}
+
+      {/* Toast уведомление */}
+      {showToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+          <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 border border-white/20">
+            <svg className="w-5 h-5 text-green-400 dark:text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="font-semibold text-sm">Промокод скопирован!</span>
+          </div>
+        </div>
       )}
     </>
   );

@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useLocale } from '../i18n/LocaleContext';
 
 export default function RequestApprovalCard() {
   const { t } = useLocale();
+
   return (
     <div className="relative w-full max-w-md mx-auto animate-fade-in">
       {/* Фоновое свечение */}
@@ -64,6 +66,7 @@ export default function RequestApprovalCard() {
 
           {/* Кнопки решения */}
           <div className="space-y-3 pt-2">
+
             {/* Одобрить */}
             <button className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-[#0D6D6E] to-[#4FD1C5] text-white rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 hover:-translate-y-0.5 transition-all duration-300 active:scale-95">
               {t.requestCard.approve}

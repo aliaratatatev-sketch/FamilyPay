@@ -506,6 +506,7 @@ enum NotificationType {
   MONEY_REQUEST     // Новый запрос на деньги
   REQUEST_APPROVED  // Запрос одобрен
   REQUEST_REJECTED  // Запрос отклонен
+  URGENT_REQUEST    // Срочный запрос на деньги
   SYSTEM            // Системное уведомление
 }
 

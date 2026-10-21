@@ -21,11 +21,15 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const isRead = searchParams.get("isRead");
+    const unreadOnly = searchParams.get("unreadOnly");
     const limit = searchParams.get("limit");
 
     const where: any = { userId: user.id };
     if (isRead !== null) {
       where.isRead = isRead === "true";
+    }
+    if (unreadOnly === "true") {
+      where.isRead = false;
     }
 
     const notifications = await prisma.notification.findMany({
@@ -34,7 +38,13 @@ export async function GET(request: Request) {
       take: limit ? parseInt(limit) : undefined,
     });
 
-    return NextResponse.json(notifications);
+    // Возвращаем с полем read для обратной совместимости
+    const notificationsWithRead = notifications.map(n => ({
+      ...n,
+      read: n.isRead,
+    }));
+
+    return NextResponse.json({ notifications: notificationsWithRead });
   } catch (error) {
     console.error("Error fetching notifications:", error);
     return NextResponse.json(
