@@ -218,12 +218,13 @@ export default function TransactionsPage() {
       KGS: ' сом',
       USD: '$',
       EUR: '€',
+      RUB: ' ₽',
     };
     
-    const symbol = symbols[currency] || currency;
-    const formatted = new Intl.NumberFormat('ru-RU').format(amount);
+    const symbol = symbols[currency] || ' сом';
+    const formatted = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
     
-    return `${formatted} ${symbol}`;
+    return `${formatted}${symbol}`;
   };
 
   const formatDate = (dateString: string) => {

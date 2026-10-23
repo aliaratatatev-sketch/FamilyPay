@@ -266,7 +266,7 @@ export default function BudgetsPage() {
   const handleEdit = (budget: Budget) => {
     setEditingBudget(budget);
     setName(budget.name);
-    setAmount(budget.amount.toString());
+    setAmount(parseFloat(String(budget.amount)).toString());
     setPeriod(budget.period);
     setCategoryId(budget.categoryId || "");
     setAlertAt50(budget.alertAt50);
@@ -288,7 +288,9 @@ export default function BudgetsPage() {
   };
 
   const getProgressPercentage = (spent: number, total: number) => {
-    return Math.min((spent / total) * 100, 100);
+    const spentNum = parseFloat(String(spent));
+    const totalNum = parseFloat(String(total));
+    return Math.min((spentNum / totalNum) * 100, 100);
   };
 
   const getProgressColor = (percentage: number) => {
@@ -299,7 +301,9 @@ export default function BudgetsPage() {
   };
 
   const getAlertLevel = (spent: number, total: number) => {
-    const percentage = (spent / total) * 100;
+    const spentNum = parseFloat(String(spent));
+    const totalNum = parseFloat(String(total));
+    const percentage = (spentNum / totalNum) * 100;
     if (percentage >= 100) return { level: "critical", text: "Превышен лимит!", color: "text-red-600 bg-red-50" };
     if (percentage >= 80) return { level: "warning", text: "Осталось 20%", color: "text-orange-600 bg-orange-50" };
     if (percentage >= 50) return { level: "caution", text: "Осталось 50%", color: "text-yellow-600 bg-yellow-50" };
@@ -307,10 +311,10 @@ export default function BudgetsPage() {
   };
 
   // Calculate stats - ensure budgets is an array
-  const totalBudget = Array.isArray(budgets) ? budgets.reduce((sum, b) => sum + b.amount, 0) : 0;
-  const totalSpent = Array.isArray(budgets) ? budgets.reduce((sum, b) => sum + b.spent, 0) : 0;
+  const totalBudget = Array.isArray(budgets) ? budgets.reduce((sum, b) => sum + parseFloat(String(b.amount)), 0) : 0;
+  const totalSpent = Array.isArray(budgets) ? budgets.reduce((sum, b) => sum + parseFloat(String(b.spent)), 0) : 0;
   const budgetsWithAlerts = Array.isArray(budgets) ? budgets.filter((b) => {
-    const percentage = (b.spent / b.amount) * 100;
+    const percentage = (parseFloat(String(b.spent)) / parseFloat(String(b.amount))) * 100;
     return percentage >= 50;
   }).length : 0;
 
@@ -356,7 +360,7 @@ export default function BudgetsPage() {
               <div>
                 <p className="text-gray-600 text-sm">{t.budgetsPage.totalBudget}</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalBudget.toLocaleString("ru-RU")} сом
+                  {totalBudget.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                 </p>
               </div>
             </div>
@@ -370,7 +374,7 @@ export default function BudgetsPage() {
               <div>
                 <p className="text-gray-600 text-sm">{t.budgetsPage.spent}</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalSpent.toLocaleString("ru-RU")} сом
+                  {totalSpent.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                 </p>
               </div>
             </div>
@@ -469,10 +473,10 @@ export default function BudgetsPage() {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-2xl font-bold text-gray-900">
-                        {budget.spent.toLocaleString("ru-RU")} сом
+                        {parseFloat(String(budget.spent)).toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                       </span>
                       <span className="text-sm text-gray-600">
-                        из {budget.amount.toLocaleString("ru-RU")} сом
+                        из {parseFloat(String(budget.amount)).toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
@@ -484,7 +488,7 @@ export default function BudgetsPage() {
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm font-medium text-gray-700">{percentage.toFixed(1)}%</span>
                       <span className="text-sm text-gray-600">
-                        Осталось: {(budget.amount - budget.spent).toLocaleString("ru-RU")} сом
+                        Осталось: {(parseFloat(String(budget.amount)) - parseFloat(String(budget.spent))).toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                       </span>
                     </div>
                   </div>

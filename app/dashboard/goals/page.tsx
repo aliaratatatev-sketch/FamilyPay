@@ -235,8 +235,8 @@ export default function GoalsPage() {
     setEditingGoal(goal);
     setName(goal.name);
     setDescription(goal.description || "");
-    setTargetAmount(goal.targetAmount.toString());
-    setCurrentAmount(goal.currentAmount.toString());
+    setTargetAmount(parseFloat(String(goal.targetAmount)).toString());
+    setCurrentAmount(parseFloat(String(goal.currentAmount)).toString());
     setDeadline(goal.deadline ? goal.deadline.split("T")[0] : "");
     setShowCreateModal(true);
   };
@@ -299,7 +299,9 @@ export default function GoalsPage() {
   };
 
   const getProgressPercentage = (current: number, target: number) => {
-    return Math.min((current / target) * 100, 100);
+    const currentNum = parseFloat(String(current));
+    const targetNum = parseFloat(String(target));
+    return Math.min((currentNum / targetNum) * 100, 100);
   };
 
   const getProgressColor = (percentage: number) => {
@@ -330,8 +332,8 @@ export default function GoalsPage() {
   // Calculate stats
   const activeGoals = Array.isArray(goals) ? goals.filter((g) => g.status === "ACTIVE").length : 0;
   const completedGoals = Array.isArray(goals) ? goals.filter((g) => g.status === "COMPLETED").length : 0;
-  const totalSaved = Array.isArray(goals) ? goals.reduce((sum, g) => sum + g.currentAmount, 0) : 0;
-  const totalTarget = Array.isArray(goals) ? goals.filter((g) => g.status === "ACTIVE").reduce((sum, g) => sum + g.targetAmount, 0) : 0;
+  const totalSaved = Array.isArray(goals) ? goals.reduce((sum, g) => sum + parseFloat(String(g.currentAmount)), 0) : 0;
+  const totalTarget = Array.isArray(goals) ? goals.filter((g) => g.status === "ACTIVE").reduce((sum, g) => sum + parseFloat(String(g.targetAmount)), 0) : 0;
 
   if (loading) {
     return (
@@ -399,7 +401,7 @@ export default function GoalsPage() {
               <div>
                 <p className="text-gray-600 text-sm">Накоплено</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalSaved.toLocaleString("ru-RU")} сом
+                  {totalSaved.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                 </p>
               </div>
             </div>
@@ -413,7 +415,7 @@ export default function GoalsPage() {
               <div>
                 <p className="text-gray-600 text-sm">Общая цель</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {totalTarget.toLocaleString("ru-RU")} сом
+                  {totalTarget.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                 </p>
               </div>
             </div>
@@ -525,10 +527,10 @@ export default function GoalsPage() {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-2xl font-bold text-gray-900">
-                        {goal.currentAmount.toLocaleString("ru-RU")} сом
+                        {parseFloat(String(goal.currentAmount)).toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                       </span>
                       <span className="text-sm text-gray-600">
-                        из {goal.targetAmount.toLocaleString("ru-RU")} сом
+                        из {parseFloat(String(goal.targetAmount)).toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
@@ -543,7 +545,7 @@ export default function GoalsPage() {
                       </span>
                       {!isCompleted && (
                         <span className="text-sm text-gray-600">
-                          Осталось: {(goal.targetAmount - goal.currentAmount).toLocaleString("ru-RU")} сом
+                          Осталось: {(parseFloat(String(goal.targetAmount)) - parseFloat(String(goal.currentAmount))).toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                         </span>
                       )}
                     </div>
@@ -759,7 +761,7 @@ export default function GoalsPage() {
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Осталось собрать: {(contributingGoal.targetAmount - contributingGoal.currentAmount).toLocaleString("ru-RU")} сом
+                    Осталось собрать: {(parseFloat(String(contributingGoal.targetAmount)) - parseFloat(String(contributingGoal.currentAmount))).toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                   </p>
                 </div>
 

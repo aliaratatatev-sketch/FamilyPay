@@ -69,7 +69,7 @@ export default function DemoAIPage() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl">{preset.category.split(' ')[0]}</span>
                   <span className="text-lg font-bold text-gray-900 dark:text-white">
-                    {preset.amount.toLocaleString()} сом
+                    {preset.amount.toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} сом
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">

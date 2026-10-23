@@ -209,7 +209,7 @@ export default function AccountsPage() {
               <div className="mb-4 p-4 rounded-xl bg-gradient-to-br from-[#0D6D6E]/10 to-[#4FD1C5]/10">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Баланс</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {parseFloat(account.balance).toLocaleString()} {account.currency === 'KGS' ? 'сом' : account.currency}
+                  {parseFloat(account.balance).toLocaleString('ru-RU', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} {account.currency === 'KGS' ? 'сом' : account.currency}
                 </p>
               </div>
 

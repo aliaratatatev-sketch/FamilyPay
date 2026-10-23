@@ -127,7 +127,16 @@ export async function PUT(
     const updateData: any = {};
 
     if (body.name !== undefined) updateData.name = body.name;
-    if (body.amount !== undefined) updateData.amount = body.amount;
+    if (body.amount !== undefined) {
+      const cleanAmount = parseFloat(String(body.amount));
+      if (isNaN(cleanAmount) || cleanAmount <= 0) {
+        return NextResponse.json(
+          { error: 'Amount must be a valid number greater than 0' },
+          { status: 400 }
+        );
+      }
+      updateData.amount = cleanAmount;
+    }
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
     if (body.alertAt50 !== undefined) updateData.alertAt50 = body.alertAt50;
     if (body.alertAt80 !== undefined) updateData.alertAt80 = body.alertAt80;

@@ -131,9 +131,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (amount <= 0) {
+    // Очищаем и конвертируем amount
+    const cleanAmount = parseFloat(String(amount));
+    
+    if (isNaN(cleanAmount) || cleanAmount <= 0) {
       return NextResponse.json(
-        { error: 'Amount must be greater than 0' },
+        { error: 'Amount must be a valid number greater than 0' },
         { status: 400 }
       );
     }
@@ -176,7 +179,7 @@ export async function POST(request: NextRequest) {
         categoryId,
         userId,
         name,
-        amount,
+        amount: cleanAmount,
         currency: family?.currency || 'KGS',
         period,
         startDate: new Date(startDate),
@@ -212,12 +215,12 @@ export async function POST(request: NextRequest) {
         userId,
         type: 'SYSTEM',
         title: 'Бюджет создан',
-        message: `Создан бюджет "${name}" на ${amount} ${family?.currency || 'KGS'}`,
+        message: `Создан бюджет "${name}" на ${cleanAmount} ${family?.currency || 'KGS'}`,
         data: JSON.parse(JSON.stringify({
           budgetId: budget.id,
           familyId,
           familyName: family?.name,
-          amount,
+          amount: cleanAmount,
           period,
         })),
       },
