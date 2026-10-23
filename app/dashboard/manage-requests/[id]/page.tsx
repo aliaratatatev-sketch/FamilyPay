@@ -77,7 +77,7 @@ export default function RequestDetailPage() {
     if (!request) return false;
     const titleLower = request.title.toLowerCase();
     const descLower = (request.description || '').toLowerCase();
-    const foodTriggers = ['еда', 'фастфуд', 'пицц', 'кафе', 'ресторан', 'dodo', 'бургер', 'шаурм', 'суши', 'обед', 'ужин', 'завтрак', 'перекус', 'голод'];
+    const foodTriggers = ['еда', 'еду', 'едой', 'еде', 'фастфуд', 'пицц', 'кафе', 'ресторан', 'dodo', 'бургер', 'шаурм', 'суши', 'обед', 'ужин', 'завтрак', 'перекус', 'голод'];
     return foodTriggers.some(trigger => titleLower.includes(trigger) || descLower.includes(trigger));
   };
 
@@ -96,7 +96,8 @@ export default function RequestDetailPage() {
     }
   };
 
-  const hasPartnerOffer = checkPartnerOffer();
+  // Вычисляем hasPartnerOffer при каждом рендере, чтобы учитывать загрузку данных
+  const hasPartnerOffer = request ? checkPartnerOffer() : false;
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -442,6 +443,49 @@ export default function RequestDetailPage() {
               </div>
             </div>
 
+            {/* Партнерское предложение - показывается всегда для запросов на еду */}
+            {hasPartnerOffer && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <span>🎁</span>
+                  <span>Партнерское предложение</span>
+                </h3>
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 p-4 border-2 border-transparent animate-fade-in">
+                  {/* Градиентная рамка */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 opacity-50 blur-sm" />
+                  <div className="absolute inset-[2px] bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 rounded-[10px]" />
+                  
+                  {/* Контент плашки */}
+                  <div className="relative space-y-3">
+                    <div className="flex items-start gap-2">
+                      <span className="text-2xl flex-shrink-0">🍕</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug">
+                          Специальное предложение для вас!
+                        </p>
+                        <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+                          Скидка <span className="font-bold text-purple-600 dark:text-purple-400">{discount}</span> в{' '}
+                          <span className="font-bold">{partner}</span> по промокоду{' '}
+                          <span className="font-mono font-bold text-pink-600 dark:text-pink-400">{promoCode}</span>
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          💰 Экономия {savings}!
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Кнопка копирования промокода */}
+                    <button
+                      onClick={handleCopyPromo}
+                      className="w-full py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                    >
+                      📋 Скопировать промокод
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
             {isPending && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
@@ -449,44 +493,6 @@ export default function RequestDetailPage() {
                   Действия
                 </h3>
                 <div className="space-y-3">
-                  
-                  {/* Партнерское предложение */}
-                  {hasPartnerOffer && (
-                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 p-4 border-2 border-transparent animate-fade-in">
-                      {/* Градиентная рамка */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 opacity-50 blur-sm" />
-                      <div className="absolute inset-[2px] bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 rounded-[10px]" />
-                      
-                      {/* Контент плашки */}
-                      <div className="relative space-y-3">
-                        <div className="flex items-start gap-2">
-                          <span className="text-xl flex-shrink-0">🎁</span>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug">
-                              Партнерское предложение
-                            </p>
-                            <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
-                              Скидка <span className="font-bold text-purple-600 dark:text-purple-400">{discount}</span> в{' '}
-                              <span className="font-bold">{partner}</span> по промокоду{' '}
-                              <span className="font-mono font-bold text-pink-600 dark:text-pink-400">{promoCode}</span>
-                            </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                              💰 Экономия {savings}!
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Кнопка копирования промокода */}
-                        <button
-                          onClick={handleCopyPromo}
-                          className="w-full py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200"
-                        >
-                          📋 Скопировать промокод
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
                   <button
                     onClick={() => setShowApproveModal(true)}
                     className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transition"
